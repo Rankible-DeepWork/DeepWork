@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="standard">
+<head>
+<meta charset="UTF-8">
+<title>DeepWork</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAF7F8;
+    --paper-deep:#DCEFF1;
+    --line:#B7D9DC;
+    --ink:#0B2E3A;
+    --navy:#0B4F6C;
+    --gold:#17A6B4;
+    --gold-deep:#0E8792;
+    --rust:#F2734F;
+    --sage:#2FB6A3;
+    --sage-deep:#1F8E7F;
+
+    --radius-scale:1;
+    --bg-body:linear-gradient(180deg, #F2FBFC 0%, var(--paper) 340px, var(--paper) 100%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #0E6084);
+    --shadow-chrono:0 10px 28px rgba(11,46,58,0.18);
+    --shadow-panel:0 6px 18px rgba(11,46,58,0.06);
+    --shadow-modal:0 12px 28px rgba(11,46,58,0.22);
+    --shadow-drawer:6px 0 24px rgba(11,46,58,0.18);
+    --on-dark:var(--paper);
+    --masthead-color:var(--navy);
+    --masthead-weight:700;
+    --masthead-size:32px;
+    --masthead-shadow:none;
+    --engraved-color:var(--navy);
+    --endday-bg:var(--ink);
+    --hover-edit:rgba(0,0,0,0.06);
+    --hover-day:rgba(0,0,0,0.03);
+    --hover-menu-item:rgba(0,0,0,0.05);
+    --cooldown-bg:rgba(11,46,58,0.1);
+    --daypast-bg:rgba(11,46,58,0.035);
+    --gold-hover:#2FC4D3;
+    --rust-hover:#D65A38;
+    --redeem-disabled:#A9C4C7;
+    --navy-hover:#073B52;
+  }
+
+  html[data-theme="abyssal"]{
+    --paper:#0A141F;
+    --paper-deep:#101F2E;
+    --line:#20384A;
+    --ink:#DCF3F5;
+    --navy:#04283A;
+    --gold:#2FE3F2;
+    --gold-deep:#17B9CC;
+    --rust:#FF8066;
+    --sage:#2FE8C4;
+    --sage-deep:#1FBF9E;
+
+    --bg-body:radial-gradient(ellipse 900px 500px at 50% -10%, #123246 0%, var(--paper) 60%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #0A4A63);
+    --shadow-chrono:0 0 40px rgba(47,227,242,0.12), 0 10px 28px rgba(0,0,0,0.4);
+    --shadow-panel:0 6px 20px rgba(0,0,0,0.35);
+    --shadow-modal:0 16px 40px rgba(0,0,0,0.5);
+    --shadow-drawer:6px 0 24px rgba(0,0,0,0.4);
+    --on-dark:var(--ink);
+    --masthead-color:var(--gold);
+    --masthead-shadow:0 0 18px rgba(47,227,242,0.35);
+    --engraved-color:var(--line);
+    --endday-bg:#020a10;
+    --hover-edit:rgba(255,255,255,0.08);
+    --hover-day:rgba(255,255,255,0.04);
+    --hover-menu-item:rgba(255,255,255,0.07);
+    --cooldown-bg:rgba(255,255,255,0.08);
+    --daypast-bg:rgba(255,255,255,0.025);
+    --gold-hover:#6FF0FA;
+    --rust-hover:#E85F45;
+    --redeem-disabled:#2A4456;
+    --navy-hover:#0A3B54;
+  }
+
+  html[data-theme="sable"]{
+    --paper:#FBF7EF;
+    --paper-deep:#F2EBDC;
+    --line:#E2D5BC;
+    --ink:#3B342A;
+    --navy:#6B5D48;
+    --gold:#4F94A6;
+    --gold-deep:#3D7A8A;
+    --rust:#C97B4A;
+    --sage:#7FA07A;
+    --sage-deep:#5F8459;
+
+    --radius-scale:0.5;
+    --bg-body:var(--paper);
+    --bg-chrono:var(--navy);
+    --shadow-chrono:none;
+    --shadow-panel:none;
+    --shadow-modal:0 8px 20px rgba(59,52,42,0.12);
+    --shadow-drawer:2px 0 12px rgba(59,52,42,0.1);
+    --on-dark:var(--paper);
+    --masthead-color:var(--ink);
+    --masthead-weight:500;
+    --masthead-size:29px;
+    --engraved-color:var(--navy);
+    --endday-bg:var(--ink);
+    --hover-edit:rgba(59,52,42,0.06);
+    --hover-day:rgba(59,52,42,0.03);
+    --hover-menu-item:rgba(59,52,42,0.05);
+    --cooldown-bg:rgba(59,52,42,0.08);
+    --daypast-bg:rgba(59,52,42,0.03);
+    --gold-hover:#6FB0C0;
+    --rust-hover:#B3693A;
+    --redeem-disabled:#D8C9AE;
+    --navy-hover:#584C3A;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-body);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+  .engraved-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    text-align:center;
+    color:var(--engraved-color);
+    margin-bottom:6px;
+    user-select:none;
+  }
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:16px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .masthead h1{
+    font-family:'Outfit',sans-serif;
+    font-weight:var(--masthead-weight);
+    font-size:var(--masthead-size);
+    letter-spacing:0.2px;
+    margin:0;
+    color:var(--masthead-color);
+    text-shadow:var(--masthead-shadow);
+  }
+  .masthead .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+    margin-bottom:4px;
+  }
+  .balance-block{ text-align:right; }
+  .balance-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--navy);
+    opacity:0.75;
+  }
+  .balance-num{
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:46px;
+    line-height:1;
+    color:var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* Chrono principal */
+  .chrono-panel{
+    background:var(--bg-chrono);
+    color:var(--on-dark);
+    border-radius:calc(22px * var(--radius-scale));
+    padding:22px 24px;
+    margin-bottom:24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    box-shadow:var(--shadow-chrono);
+  }
+  .chrono-left{ display:flex; flex-direction:column; gap:6px; }
+  .chrono-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    opacity:0.65;
+  }
+  .chrono-config{ display:flex; align-items:center; gap:6px; font-size:13.5px; flex-wrap:wrap; }
+  .chrono-config input{
+    width:56px;
+    padding:5px 6px;
+    border:1px solid rgba(236,228,211,0.35);
+    border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:rgba(236,228,211,0.08);
+    color:var(--on-dark);
+  }
+  .chrono-config input:disabled{opacity:0.5;}
+  .chrono-right{ display:flex; align-items:center; gap:18px; }
+  .chrono-display{
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:48px;
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+    min-width:140px;
+    text-align:right;
+  }
+  .chrono-buttons{ display:flex; flex-direction:column; gap:8px; }
+  .btn-chrono{
+    background:var(--gold);
+    color:var(--navy);
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.3px;
+    padding:8px 16px;
+    border-radius:calc(12px * var(--radius-scale));
+    min-width:90px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-chrono:hover{background:var(--gold-hover);}
+  .btn-chrono.running{background:var(--rust);color:#fff;}
+  .btn-chrono.running:hover{background:var(--rust-hover);}
+  .btn-chrono-reset{
+    background:transparent;
+    color:var(--on-dark);
+    opacity:0.55;
+    font-size:11.5px;
+    padding:4px 6px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-chrono-reset:hover{opacity:0.9;}
+  .btn-start-day{
+    background:var(--sage);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    padding:20px 34px;
+    border-radius:calc(12px * var(--radius-scale));
+    border:none;
+    cursor:pointer;
+    min-width:220px;
+    text-align:center;
+  }
+  .btn-start-day:hover{ background:var(--sage-deep); }
+
+  .columns{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:28px; }
+  @media (max-width:640px){ .columns{grid-template-columns:1fr;} }
+  .panel{
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:calc(20px * var(--radius-scale));
+    padding:18px 18px 20px;
+    box-shadow:var(--shadow-panel);
+  }
+  .panel h2{
+    font-family:'Outfit',sans-serif;
+    font-size:17px;
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .panel h2 .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    opacity:0.6;
+    font-weight:400;
+  }
+
+  .entry-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    transition:opacity 0.15s;
+  }
+  .entry-row:last-of-type{border-bottom:none;}
+  .entry-row.dragging{opacity:0.35;}
+  .entry-row.is-cooldown{opacity:0.55;}
+  .entry-row.drag-over-top{ box-shadow: inset 0 2px 0 0 var(--gold); }
+  .entry-row.drag-over-bottom{ box-shadow: inset 0 -2px 0 0 var(--gold); }
+  .entry-name{ font-size:14.5px; flex:1; min-width:0; overflow-wrap:anywhere; }
+  .entry-pts{ font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; white-space:nowrap; }
+  .tasks .entry-pts{color:var(--sage-deep);}
+  .rewards .entry-pts{color:var(--rust);}
+  .entry-actions{ display:flex; align-items:center; gap:6px; }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; border:none; color:inherit; }
+  .btn-do{
+    background:var(--sage); color:#fff; font-size:11.5px; font-weight:600;
+    letter-spacing:0.3px; padding:6px 10px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-do:hover{background:var(--sage-deep);}
+  .btn-redeem{
+    background:var(--rust); color:#fff; font-size:11.5px; font-weight:600;
+    letter-spacing:0.3px; padding:6px 10px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-redeem:disabled{ background:var(--redeem-disabled); cursor:not-allowed; }
+  .btn-edit{
+    background:transparent;
+    color:var(--ink);
+    opacity:0.55;
+    font-size:15px;
+    line-height:1;
+    padding:5px 7px;
+    border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-edit:hover{opacity:1; background:var(--hover-edit);}
+  .cooldown-chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink);
+    opacity:0.7;
+    background:var(--cooldown-bg);
+    padding:6px 10px;
+    border-radius:calc(12px * var(--radius-scale));
+    white-space:nowrap;
+    min-width:48px;
+    text-align:center;
+  }
+  .badge-single{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    font-weight:600;
+    color:var(--gold-deep);
+    background:rgba(23,166,180,0.15);
+    padding:2px 5px;
+    border-radius:calc(12px * var(--radius-scale));
+    vertical-align:middle;
+  }
+  .empty{ font-size:13px; opacity:0.6; font-style:italic; padding:6px 0; }
+
+  .btn-add-open{
+    margin-top:12px;
+    width:100%;
+    background:var(--navy);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.2px;
+    padding:9px 0;
+    border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-add-open:hover{background:var(--navy-hover);}
+  .end-of-day-block{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:6px;
+    margin-bottom:6px;
+    background:rgba(23,166,180,0.07);
+  }
+  .end-of-day-block .entry-row{ border-bottom:none; padding:9px 6px; }
+  .end-of-day-block .entry-name{ font-weight:600; }
+
+  .journal{ border:1px solid var(--line); background:var(--paper-deep); border-radius:calc(20px * var(--radius-scale)); padding:18px; box-shadow:var(--shadow-panel); }
+  .journal h2{ font-family:'Outfit',sans-serif; font-size:17px; margin:0 0 4px; }
+  .journal .sub{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px;
+    text-transform:uppercase; opacity:0.55; margin-bottom:10px;
+  }
+  .day-group{ border-bottom:1px solid var(--line); }
+  .day-group:last-child{ border-bottom:none; }
+  .day-header{
+    width:100%;
+    display:flex; align-items:center; gap:10px;
+    background:transparent;
+    padding:9px 2px;
+    font-family:'Inter',sans-serif;
+    text-align:left;
+  }
+  .day-header:hover{ background:var(--hover-day); }
+  .day-chevron{
+    display:inline-block;
+    font-size:14px;
+    color:var(--navy);
+    transition:transform 0.15s;
+    transform:rotate(0deg);
+  }
+  .day-chevron.open{ transform:rotate(90deg); }
+  .day-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:14.5px;
+    text-transform:capitalize; flex:1;
+  }
+  .day-count{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; opacity:0.5;
+  }
+  .day-group.day-past .day-title{ color:var(--ink); opacity:0.75; }
+  .day-group.day-past{ background:var(--daypast-bg); }
+  .day-body{ padding:0 2px 6px; }
+  .jrow{
+    display:grid; grid-template-columns:22px auto 1fr auto auto; align-items:center;
+    gap:12px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px;
+  }
+  .jrow:last-child{border-bottom:none;}
+  .stamp{ width:20px;height:20px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+  .stamp.gain{background:var(--sage);}
+  .stamp.spend{background:var(--rust);}
+  .jtime{ font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:0.55; white-space:nowrap; }
+  .jlabel{overflow-wrap:anywhere;}
+  .jdelta{ font-family:'IBM Plex Mono',monospace; font-weight:600; white-space:nowrap; }
+  .jdelta.gain{color:var(--sage-deep);}
+  .jdelta.spend{color:var(--rust);}
+  .jbalance{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; opacity:0.6; white-space:nowrap; }
+
+  .loading{padding:40px;text-align:center;opacity:0.5;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+
+  /* Modal ajout / édition */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(11,46,58,0.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-card{
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:calc(18px * var(--radius-scale));
+    width:100%;
+    max-width:360px;
+    padding:20px 20px 16px;
+    box-shadow:var(--shadow-modal);
+  }
+  .modal-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:18px;
+    margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:8px;
+  }
+  .modal-field{ display:flex; flex-direction:column; gap:4px; margin-bottom:12px; font-size:12.5px; }
+  .modal-field span{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; opacity:0.65; }
+  .modal-field input{
+    padding:8px 9px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-size:14px; font-family:'Inter',sans-serif; background:var(--paper-deep); color:var(--ink);
+  }
+  .modal-toggle-block{ margin-bottom:12px; padding-top:8px; border-top:1px dashed var(--line); }
+  .modal-checkbox{ display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+  .modal-subfield{ display:flex; align-items:center; gap:6px; margin-top:8px; font-size:12.5px; padding-left:24px; }
+  .modal-subfield input{
+    width:60px; padding:5px 6px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:var(--paper-deep); color:var(--ink);
+  }
+  .modal-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:8px; }
+  .modal-actions-right{ display:flex; gap:8px; }
+  .btn-modal-delete{
+    background:transparent; color:var(--rust); font-size:12px; font-weight:600;
+    padding:8px 4px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-delete:hover{ text-decoration:underline; }
+  .btn-modal-cancel{
+    background:transparent; color:var(--ink); opacity:0.7; font-size:12.5px;
+    padding:8px 12px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-cancel:hover{opacity:1;}
+  .btn-modal-save{
+    background:var(--sage); color:#fff; font-size:12.5px; font-weight:600;
+    padding:8px 14px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-save:hover{background:var(--sage-deep);}
+
+  /* Ecran de pause */
+  .pause-overlay{
+    position:fixed; inset:0; background:var(--navy); color:var(--on-dark);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:200; gap:10px;
+  }
+  .pause-close{
+    position:absolute; top:20px; right:24px;
+    background:transparent; color:var(--on-dark); opacity:0.7;
+    font-size:28px; line-height:1; padding:6px 10px; border-radius:50%;
+  }
+  .pause-close:hover{opacity:1; background:rgba(236,228,211,0.1);}
+  .pause-label{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:3px;
+    text-transform:uppercase; opacity:0.6;
+  }
+  .pause-reward-name{ font-family:'Outfit',sans-serif; font-size:22px; margin-bottom:8px; }
+  .pause-display{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:88px;
+    font-variant-numeric:tabular-nums; line-height:1;
+  }
+  .pause-refund-hint{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.55; margin-top:14px;
+  }
+  .endday-overlay{ background:var(--endday-bg); }
+  .btn-rallonge{
+    margin-top:26px;
+    background:var(--gold);
+    color:var(--navy);
+    font-weight:700;
+    font-size:13.5px;
+    letter-spacing:0.4px;
+    padding:12px 28px;
+    border-radius:calc(12px * var(--radius-scale));
+    border:none;
+    cursor:pointer;
+  }
+  .btn-rallonge:hover{ background:var(--gold-hover); }
+
+  .app-menu-btn{
+    position:fixed;
+    top:16px; left:16px;
+    width:42px; height:42px;
+    border-radius:50%;
+    background:var(--navy);
+    color:var(--on-dark);
+    font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,0.22);
+    z-index:70;
+  }
+  .app-menu-btn:hover{ background:var(--navy-hover); }
+  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); }
+  .app-drawer{
+    position:fixed;
+    top:0; left:0; bottom:0;
+    width:280px;
+    max-width:85vw;
+    background:var(--paper);
+    color:var(--ink);
+    border-right:1px solid var(--line);
+    border-radius:0 calc(24px * var(--radius-scale)) calc(24px * var(--radius-scale)) 0;
+    box-shadow:var(--shadow-drawer);
+    transform:translateX(-100%);
+    transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1);
+    z-index:60;
+    display:flex;
+    flex-direction:column;
+  }
+  .app-drawer.open{ transform:translateX(0); }
+  .app-drawer-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 16px 14px;
+    border-bottom:1px solid var(--line);
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:16px;
+    color:var(--ink);
+    min-height:20px;
+  }
+  .drawer-close, .drawer-back{
+    background:transparent; border:none; cursor:pointer;
+    font-size:19px; color:var(--ink); opacity:0.55; padding:2px 6px;
+  }
+  .drawer-close:hover, .drawer-back:hover{ opacity:1; }
+  .app-drawer-body{ padding:12px 16px 20px; overflow-y:auto; flex:1; color:var(--ink); }
+  .app-menu-item{
+    display:flex; align-items:center; gap:8px;
+    padding:11px 8px;
+    font-size:13.5px;
+    border-radius:calc(12px * var(--radius-scale));
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:none;
+    font-family:'Inter',sans-serif;
+  }
+  .app-menu-item.soon-item{ opacity:0.42; }
+  .app-menu-item.clickable{ cursor:pointer; opacity:1; }
+  .app-menu-item.clickable:hover{ background:var(--hover-menu-item); }
+  .app-menu-item .chevron{ margin-left:auto; opacity:0.45; }
+  .app-menu-item .soon{
+    margin-left:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    opacity:0.8;
+  }
+  .settings-block{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
+  .settings-block:last-child{ border-bottom:none; }
+  .settings-label{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; opacity:0.75; margin-bottom:2px; }
+  .settings-hour-row{ display:flex; align-items:center; gap:6px; font-weight:400; text-transform:none; letter-spacing:normal; opacity:1; font-size:13px; }
+  .settings-hour-row input{
+    width:56px; padding:6px 7px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace; font-size:13px; background:var(--paper-deep); color:var(--ink);
+  }
+  .settings-hint{ font-size:11px; opacity:0.55; margin:8px 0 0; line-height:1.4; }
+  .settings-row-buttons{ display:flex; gap:8px; }
+  .btn-settings{
+    background:var(--navy); color:#fff; font-size:12px; font-weight:600;
+    padding:8px 12px; border-radius:calc(12px * var(--radius-scale)); border:none; cursor:pointer; text-align:center;
+  }
+  .btn-settings:hover{ background:var(--navy-hover); }
+  .btn-settings-danger{
+    background:transparent; color:var(--rust); font-size:12px; font-weight:600;
+    padding:9px 4px; border:1px solid var(--rust); border-radius:calc(12px * var(--radius-scale)); cursor:pointer; width:100%;
+  }
+  .btn-settings-danger:hover{ background:rgba(242,115,79,0.08); }
+
+  .theme-swatch-list{ display:flex; flex-direction:column; gap:8px; }
+  .theme-swatch{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 10px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:calc(12px * var(--radius-scale));
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+    transition:background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+  .theme-swatch:hover{ background:var(--paper-deep); }
+  .theme-swatch:active{ transform:scale(0.98); }
+  .theme-swatch.active{ border-color:var(--gold); }
+  .theme-swatch-dot{
+    width:28px; height:28px; border-radius:50%; flex-shrink:0;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  .theme-dot-standard{ background:linear-gradient(135deg,#17A6B4,#0B4F6C); }
+  .theme-dot-abyssal{ background:linear-gradient(135deg,#2FE3F2,#04283A); }
+  .theme-dot-sable{ background:linear-gradient(135deg,#4F94A6,#F2EBDC); }
+  .theme-swatch-text{ display:flex; flex-direction:column; gap:1px; flex:1; }
+  .theme-swatch-label{ font-size:13px; font-weight:600; }
+  .theme-swatch-desc{ font-size:11px; opacity:0.6; }
+  .theme-swatch-check{ color:var(--gold); font-weight:700; font-size:14px; }
+
+  /* Animations du menu */
+  @keyframes menuBackdropIn{ from{ opacity:0; } to{ opacity:1; } }
+  .app-menu-backdrop{ animation:menuBackdropIn 0.25s ease; }
+
+  @keyframes menuItemIn{
+    from{ opacity:0; transform:translateX(-12px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .app-drawer-body{ animation:menuItemIn 0.22s ease; }
+  .app-drawer-body > *{ animation:menuItemIn 0.3s cubic-bezier(0.22,0.61,0.36,1) backwards; }
+  .app-drawer-body > *:nth-child(1){ animation-delay:0.05s; }
+  .app-drawer-body > *:nth-child(2){ animation-delay:0.10s; }
+  .app-drawer-body > *:nth-child(3){ animation-delay:0.15s; }
+  .app-drawer-body > *:nth-child(4){ animation-delay:0.20s; }
+  .app-drawer-body > *:nth-child(5){ animation-delay:0.25s; }
+
+  .app-menu-item{ transition:background 0.15s ease, transform 0.1s ease; }
+  .app-menu-item.clickable:active{ transform:scale(0.97); }
+  .theme-swatch-dot{ transition:transform 0.15s ease; }
+  .theme-swatch:hover .theme-swatch-dot{ transform:scale(1.08); }
+
+  .app-menu-btn{ transition:background 0.15s ease, transform 0.1s ease; }
+  .app-menu-btn:active{ transform:scale(0.92); }
+  .drawer-close, .drawer-back{ transition:background 0.15s ease, transform 0.1s ease; border-radius:50%; }
+  .drawer-close:active, .drawer-back:active{ transform:scale(0.9); }
+</style>
+<!--
+  Analytics Umami — remplace "VOTRE-WEBSITE-ID-ICI" par l'ID donné par ton
+  tableau de bord Umami (cloud.umami.is ou ton instance auto-hébergée).
+  Sans un ID valide, ce script ne fait rien (aucune erreur, aucune donnée envoyée).
+-->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="VOTRE-WEBSITE-ID-ICI"></script>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading">Ouverture du carnet…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'carnet-points-data';
+let state = null;
+
+/* Chrono principal (haut de page) */
+let chronoRunning = false;
+let chronoHandle = null;
+let remainingSeconds = 0;
+
+/* Modal ajout / édition */
+let modal = null;
+
+/* Drag & drop */
+let dragSrcId = null;
+let dragSrcList = null;
+
+/* Pause plein écran */
+let activePause = null;
+let chronoWasRunningBeforePause = false;
+
+/* Écran fin de journée */
+let endOfDayScreenActive = false;
+
+/* Menu application */
+let appMenuOpen = false;
+let appMenuView = 'main';
+
+/* Journal groupé par jour */
+let explicitOpenDays = new Set();
+let explicitClosedDays = new Set();
+
+function cryptoId(){ return Math.random().toString(36).slice(2,10); }
+
+function trackEvent(name, data){
+  try{
+    if(window.umami && typeof window.umami.track==='function'){
+      if(data) window.umami.track(name, data); else window.umami.track(name);
+    }
+  }catch(e){ /* pas grave si bloqué (ex. bloqueur de pub) */ }
+}
+
+function defaultState(){
+  return {
+    balance: 0,
+    chrono: { pts: 5, minutes: 15 },
+    dayStarted: false,
+    lastProcessedDayBoundary: null,
+    dayStartHour: 5,
+    theme: 'standard',
+    endOfDayReward: { cost: 50 },
+    tasks: [
+      { id: cryptoId(), name: 'Ranger le bureau', pts: 10, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 },
+      { id: cryptoId(), name: 'Séance de sport', pts: 20, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 }
+    ],
+    rewards: [
+      { id: cryptoId(), name: '30 min de temps libre', cost: 15, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:30, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Épisode de série', cost: 25, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:false, pauseMinutes:15, pauseSeconds:0 }
+    ],
+    history: []
+  };
+}
+
+async function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : defaultState();
+  }catch(e){
+    state = defaultState();
+  }
+  if(!state.chrono) state.chrono = { pts:5, minutes:15 };
+  if(state.dayStarted===undefined) state.dayStarted = false;
+  if(state.lastProcessedDayBoundary===undefined) state.lastProcessedDayBoundary = null;
+  if(state.dayStartHour===undefined || state.dayStartHour===null) state.dayStartHour = 5;
+  if(!state.theme) state.theme = 'standard';
+  applyTheme(state.theme);
+  if(!state.endOfDayReward) state.endOfDayReward = { cost:50 };
+  state.tasks.forEach(t=>{
+    if(t.cooldownEnabled===undefined) t.cooldownEnabled=false;
+    if(!t.cooldownMinutes) t.cooldownMinutes=15;
+    if(t.cooldownSeconds===undefined) t.cooldownSeconds=0;
+    if(t.limitedUses===undefined) t.limitedUses = !!t.singleUse;
+    if(t.usesLeft===undefined) t.usesLeft = t.singleUse ? 1 : 1;
+  });
+  state.rewards.forEach(r=>{
+    if(r.cooldownEnabled===undefined) r.cooldownEnabled=false;
+    if(!r.cooldownMinutes) r.cooldownMinutes=15;
+    if(r.cooldownSeconds===undefined) r.cooldownSeconds=0;
+    if(r.pauseEnabled===undefined) r.pauseEnabled=false;
+    if(!r.pauseMinutes) r.pauseMinutes=15;
+    if(r.pauseSeconds===undefined) r.pauseSeconds=0;
+  });
+  remainingSeconds = state.chrono.minutes*60;
+  checkDayRollover();
+  render();
+}
+
+async function save(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){ console.error('Erreur de sauvegarde', e); }
+}
+
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function formatTime(sec){
+  sec = Math.max(0, sec);
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return m+':'+s;
+}
+
+function isCooldownActive(item){ return item.cooldownUntil && item.cooldownUntil > Date.now(); }
+
+function formatTodayLong(){
+  return new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+function dayKey(ts){
+  const d = new Date(ts);
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function formatDayLabel(ts){
+  const d = new Date(ts);
+  const today = new Date();
+  if(d.toDateString()===today.toDateString()) return "Aujourd'hui";
+  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  if(d.toDateString()===yesterday.toDateString()) return 'Hier';
+  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+}
+function formatEntryTime(ts){
+  return new Date(ts).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+function groupHistoryByDay(history){
+  const groups = [];
+  let currentKey = null, currentGroup = null;
+  history.forEach(h=>{
+    const key = dayKey(h.ts);
+    if(key !== currentKey){
+      currentGroup = { key, entries: [] };
+      groups.push(currentGroup);
+      currentKey = key;
+    }
+    currentGroup.entries.push(h);
+  });
+  return groups;
+}
+function isDayOpen(key, isToday){
+  if(explicitClosedDays.has(key)) return false;
+  if(explicitOpenDays.has(key)) return true;
+  return isToday;
+}
+function toggleDay(key){
+  const isToday = key === dayKey(Date.now());
+  if(isDayOpen(key, isToday)){
+    explicitClosedDays.add(key);
+    explicitOpenDays.delete(key);
+  }else{
+    explicitOpenDays.add(key);
+    explicitClosedDays.delete(key);
+  }
+  render();
+}
+
+/* ---------- Chrono principal ---------- */
+function toggleChrono(){
+  if(chronoRunning){
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    render();
+  }else{
+    if(remainingSeconds<=0) remainingSeconds = state.chrono.minutes*60;
+    chronoRunning = true;
+    chronoHandle = setInterval(chronoTick, 1000);
+    render();
+  }
+}
+function chronoTick(){
+  remainingSeconds -= 1;
+  if(remainingSeconds<=0){
+    state.balance += state.chrono.pts;
+    state.history.unshift({ id: cryptoId(), type:'gain', label:'Chrono ('+state.chrono.minutes+' min)', delta:state.chrono.pts, balance:state.balance, ts:Date.now() });
+    remainingSeconds = state.chrono.minutes*60;
+    save(); render();
+    return;
+  }
+  const el = document.getElementById('chronoDisplay');
+  if(el) el.textContent = formatTime(remainingSeconds);
+}
+function resetChrono(){
+  clearInterval(chronoHandle);
+  chronoRunning = false;
+  remainingSeconds = state.chrono.minutes*60;
+  render();
+}
+function startDay(){
+  state.dayStarted = true;
+  remainingSeconds = state.chrono.minutes*60;
+  clearInterval(chronoHandle);
+  chronoRunning = true;
+  chronoHandle = setInterval(chronoTick, 1000);
+  save(); render();
+  trackEvent('journee-demarree');
+}
+function dayBoundaryTs(ts){
+  const hour = (state && state.dayStartHour!==undefined && state.dayStartHour!==null) ? state.dayStartHour : 5;
+  const d = new Date(ts);
+  if(d.getHours() < hour) d.setDate(d.getDate()-1);
+  d.setHours(hour,0,0,0);
+  return d.getTime();
+}
+function checkDayRollover(){
+  const nowBoundary = dayBoundaryTs(Date.now());
+  if(state.lastProcessedDayBoundary === nowBoundary) return false;
+  const isFirstRun = !state.lastProcessedDayBoundary;
+  if(!isFirstRun && nowBoundary > state.lastProcessedDayBoundary){
+    const dayMs = 24*60*60*1000;
+    let daysMissed = Math.round((nowBoundary - state.lastProcessedDayBoundary) / dayMs);
+    if(daysMissed < 1) daysMissed = 1;
+    const before = state.balance;
+    for(let i=0;i<daysMissed;i++){ state.balance = Math.floor(state.balance/2); }
+    if(before !== state.balance){
+      const label = daysMissed>1 ? 'Journées manquées ×'+daysMissed+' (-50%/jour)' : 'Nouvelle journée (-50%)';
+      state.history.unshift({ id:cryptoId(), type:'spend', label:label, delta:(before-state.balance), balance:state.balance, ts:Date.now() });
+    }
+  }
+  state.lastProcessedDayBoundary = nowBoundary;
+  state.dayStarted = false;
+  clearInterval(chronoHandle);
+  chronoRunning = false;
+  remainingSeconds = state.chrono.minutes*60;
+  save();
+  return true;
+}
+function updateChronoPts(val){
+  const n = parseInt(val,10);
+  if(n>0){ state.chrono.pts = n; save(); }
+}
+function updateChronoMinutes(val){
+  const n = parseInt(val,10);
+  if(n>0){
+    state.chrono.minutes = n;
+    if(!chronoRunning) remainingSeconds = n*60;
+    save(); render();
+  }
+}
+
+function cooldownMs(item){ return ((item.cooldownMinutes||0)*60 + (item.cooldownSeconds||0)) * 1000; }
+function pauseTotalSeconds(reward){ return (reward.pauseMinutes||0)*60 + (reward.pauseSeconds||0); }
+
+/* ---------- Actions tâches / récompenses ---------- */
+function completeTask(id){
+  const t = state.tasks.find(x=>x.id===id);
+  if(!t || isCooldownActive(t)) return;
+  state.balance += t.pts;
+  state.history.unshift({ id: cryptoId(), type:'gain', label:t.name, delta:t.pts, balance:state.balance, ts:Date.now() });
+  trackEvent('tache-completee', { pts:t.pts });
+  if(t.limitedUses){
+    t.usesLeft = (t.usesLeft||1) - 1;
+    if(t.usesLeft <= 0){
+      state.tasks = state.tasks.filter(x=>x.id!==id);
+      save(); render();
+      return;
+    }
+  }
+  if(t.cooldownEnabled && cooldownMs(t)>0){
+    t.cooldownUntil = Date.now() + cooldownMs(t);
+  }
+  save(); render();
+}
+
+function redeemReward(id){
+  const r = state.rewards.find(x=>x.id===id);
+  if(!r || isCooldownActive(r) || state.balance < r.cost) return;
+  state.balance -= r.cost;
+  state.history.unshift({ id: cryptoId(), type:'spend', label:r.name, delta:r.cost, balance:state.balance, ts:Date.now() });
+  trackEvent('recompense-echangee', { cost:r.cost });
+  if(r.cooldownEnabled && cooldownMs(r)>0){ r.cooldownUntil = Date.now() + cooldownMs(r); }
+  save();
+  if(r.pauseEnabled && pauseTotalSeconds(r)>0){ startPause(r, r.cost); }
+  else { render(); }
+}
+
+function redeemEndOfDay(){
+  const rw = state.endOfDayReward;
+  if(!rw || state.balance < rw.cost) return;
+  state.balance -= rw.cost;
+  state.history.unshift({ id: cryptoId(), type:'spend', label:'Fin de journée', delta:rw.cost, balance:state.balance, ts:Date.now() });
+  save();
+  endOfDayScreenActive = true;
+  render();
+  trackEvent('fin-journee-achetee');
+}
+
+function returnFromEndOfDay(){
+  endOfDayScreenActive = false;
+  render();
+}
+
+function toggleAppMenu(){
+  appMenuOpen = !appMenuOpen;
+  if(appMenuOpen) appMenuView = 'main';
+  render();
+}
+function closeAppMenu(){
+  appMenuOpen = false;
+  render();
+}
+function openSettingsView(){
+  appMenuView = 'settings';
+  render();
+}
+function backToMenuMain(){
+  appMenuView = 'main';
+  render();
+}
+
+function updateDayStartHour(val){
+  const h = parseInt(val,10);
+  if(isNaN(h) || h<0 || h>23) return;
+  state.dayStartHour = h;
+  /* Recalage de la référence pour ne pas déclencher un malus juste en changeant l'heure */
+  state.lastProcessedDayBoundary = dayBoundaryTs(Date.now());
+  save();
+}
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+}
+function setTheme(theme){
+  state.theme = theme;
+  applyTheme(theme);
+  save(); render();
+  trackEvent('theme-change', { theme });
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'carnet-de-points-sauvegarde.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importDataFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.rewards)){
+        state = parsed;
+        save(); render();
+      }
+    }catch(err){ console.error('Fichier de sauvegarde invalide', err); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function resetAllData(){
+  if(!confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) return;
+  state = defaultState();
+  save(); render();
+}
+
+function renderAppMenu(){
+  let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="Menu" onclick="toggleAppMenu()">☰</button>`;
+  html += `<div class="app-drawer ${appMenuOpen?'open':''}">`;
+  html += `<div class="app-drawer-header">`;
+  if(appMenuView==='settings'){
+    html += `<button class="drawer-back" onclick="backToMenuMain()" title="Retour">‹</button><span>Paramètres</span>`;
+  }else{
+    html += `<span>Menu</span>`;
+  }
+  html += `<button class="drawer-close" onclick="closeAppMenu()" title="Fermer">×</button>`;
+  html += `</div>`;
+  html += `<div class="app-drawer-body">`;
+  if(appMenuView==='settings'){
+    html += renderSettingsView();
+  }else{
+    html += `
+      <div class="app-menu-item soon-item"><span>Calculatrice</span><span class="soon">Bientôt</span></div>
+      <div class="app-menu-item soon-item"><span>Bloc-notes</span><span class="soon">Bientôt</span></div>
+      <button class="app-menu-item clickable" onclick="openSettingsView()"><span>Paramètres</span><span class="chevron">›</span></button>
+    `;
+  }
+  html += `</div></div>`;
+  if(appMenuOpen) html += `<div class="app-menu-backdrop" onclick="closeAppMenu()"></div>`;
+  return html;
+}
+
+function renderSettingsView(){
+  const hour = state.dayStartHour!==undefined ? state.dayStartHour : 5;
+  const theme = state.theme || 'standard';
+  const themes = [
+    { id:'standard', label:'Standard', desc:'Océan clair et moderne' },
+    { id:'abyssal', label:'Abyssal', desc:'Fond sombre, accents lumineux' },
+    { id:'sable', label:'Sable', desc:'Minimaliste, tons chauds' }
+  ];
+  const themeSwatches = themes.map(t=>`
+    <button class="theme-swatch ${theme===t.id?'active':''}" data-theme-swatch="${t.id}" onclick="setTheme('${t.id}')">
+      <span class="theme-swatch-dot theme-dot-${t.id}"></span>
+      <span class="theme-swatch-text">
+        <span class="theme-swatch-label">${t.label}</span>
+        <span class="theme-swatch-desc">${t.desc}</span>
+      </span>
+      ${theme===t.id ? '<span class="theme-swatch-check">✓</span>' : ''}
+    </button>
+  `).join('');
+  return `
+    <div class="settings-block">
+      <div class="settings-label"><span>Apparence</span></div>
+      <div class="theme-swatch-list">
+        ${themeSwatches}
+      </div>
+    </div>
+    <div class="settings-block">
+      <label class="settings-label">
+        <span>Heure de début de journée</span>
+        <div class="settings-hour-row">
+          <input type="number" min="0" max="23" id="settingsDayHour" value="${hour}" onchange="updateDayStartHour(this.value)">
+          <span>h 00</span>
+        </div>
+      </label>
+      <p class="settings-hint">Le solde de points est réduit de moitié à chaque passage de cette heure.</p>
+    </div>
+    <div class="settings-block">
+      <div class="settings-label"><span>Sauvegarde</span></div>
+      <div class="settings-row-buttons">
+        <button class="btn-settings" onclick="exportData()">Exporter</button>
+        <label class="btn-settings" style="cursor:pointer;">
+          Importer
+          <input type="file" accept="application/json" style="display:none;" onchange="importDataFile(this)">
+        </label>
+      </div>
+    </div>
+    <div class="settings-block">
+      <div class="settings-label"><span>Zone sensible</span></div>
+      <button class="btn-settings-danger" onclick="resetAllData()">Réinitialiser toutes les données</button>
+    </div>
+  `;
+}
+
+/* ---------- Pause plein écran ---------- */
+function startPause(reward, costPaid){
+  if(chronoRunning){
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    chronoWasRunningBeforePause = true;
+  }else{
+    chronoWasRunningBeforePause = false;
+  }
+  activePause = {
+    rewardName: reward.name,
+    totalSeconds: pauseTotalSeconds(reward),
+    remainingSeconds: pauseTotalSeconds(reward),
+    costPaid: costPaid,
+    handle: null
+  };
+  activePause.handle = setInterval(pauseTick, 1000);
+  render();
+}
+function pauseTick(){
+  if(!activePause) return;
+  activePause.remainingSeconds -= 1;
+  if(activePause.remainingSeconds<=0){ finishPause(false); return; }
+  updatePauseDisplay();
+}
+function updatePauseDisplay(){
+  const d = document.getElementById('pauseDisplay');
+  if(d) d.textContent = formatTime(activePause.remainingSeconds);
+  const hint = document.getElementById('pauseRefundHint');
+  if(hint) hint.textContent = 'Fin anticipée : +'+computeRefund()+' pts';
+}
+function computeRefund(){
+  if(!activePause) return 0;
+  const ratio = activePause.remainingSeconds / activePause.totalSeconds;
+  const raw = activePause.costPaid * ratio;
+  const penalty = activePause.costPaid * 0.20;
+  let refund = Math.round(raw - penalty);
+  if(refund < 0) refund = 0;
+  return refund;
+}
+function endPauseEarly(){ finishPause(true); }
+function finishPause(early){
+  if(!activePause) return;
+  clearInterval(activePause.handle);
+  if(early){
+    const refund = computeRefund();
+    if(refund>0){
+      state.balance += refund;
+      state.history.unshift({ id:cryptoId(), type:'gain', label:'Fin anticipée : '+activePause.rewardName, delta:refund, balance:state.balance, ts:Date.now() });
+      save();
+    }
+  }
+  activePause = null;
+  if(chronoWasRunningBeforePause){
+    chronoWasRunningBeforePause = false;
+    chronoRunning = true;
+    chronoHandle = setInterval(chronoTick, 1000);
+  }
+  render();
+}
+
+/* ---------- Tick global (cooldowns) ---------- */
+function globalTick(){
+  let needsRerender = false;
+  if(checkDayRollover()) needsRerender = true;
+  document.querySelectorAll('.cooldown-chip[data-until]').forEach(function(el){
+    const until = parseInt(el.dataset.until,10);
+    const remaining = until - Date.now();
+    if(remaining<=0){ needsRerender = true; }
+    else{ el.textContent = formatTime(Math.ceil(remaining/1000)); }
+  });
+  if(needsRerender) render();
+}
+setInterval(globalTick, 1000);
+
+/* ---------- Glisser-déposer ---------- */
+function onRowDragStart(e){
+  const row = e.currentTarget;
+  dragSrcId = row.dataset.id;
+  dragSrcList = row.dataset.list;
+  e.dataTransfer.effectAllowed = 'move';
+  row.classList.add('dragging');
+}
+function clearDragOverClasses(){
+  document.querySelectorAll('.drag-over-top,.drag-over-bottom').forEach(function(el){
+    el.classList.remove('drag-over-top','drag-over-bottom');
+  });
+}
+function onRowDragOver(e){
+  e.preventDefault();
+  const row = e.currentTarget;
+  if(!dragSrcId || row.dataset.id===dragSrcId || row.dataset.list!==dragSrcList) return;
+  const rect = row.getBoundingClientRect();
+  const midpoint = rect.top + rect.height/2;
+  clearDragOverClasses();
+  if(e.clientY < midpoint) row.classList.add('drag-over-top');
+  else row.classList.add('drag-over-bottom');
+}
+function onRowDrop(e){
+  e.preventDefault(); e.stopPropagation();
+  const row = e.currentTarget;
+  const insertAfter = row.classList.contains('drag-over-bottom');
+  clearDragOverClasses();
+  finishDrop(row.dataset.list, row.dataset.id, insertAfter);
+}
+function onContainerDrop(e, list){
+  e.preventDefault();
+  clearDragOverClasses();
+  finishDrop(list, null, false);
+}
+function finishDrop(targetList, targetId, insertAfter){
+  if(!dragSrcId || dragSrcList!==targetList){ resetDrag(); return; }
+  const arr = targetList==='task' ? state.tasks : state.rewards;
+  const fromIdx = arr.findIndex(x=>x.id===dragSrcId);
+  if(fromIdx<0){ resetDrag(); return; }
+  const [item] = arr.splice(fromIdx,1);
+  if(targetId===null || targetId===dragSrcId){
+    arr.push(item);
+  }else{
+    let toIdx = arr.findIndex(x=>x.id===targetId);
+    if(toIdx<0) toIdx = arr.length;
+    else if(insertAfter) toIdx += 1;
+    arr.splice(toIdx,0,item);
+  }
+  resetDrag();
+  save(); render();
+}
+function onRowDragEnd(e){
+  const row = e.currentTarget;
+  row.removeAttribute('draggable');
+  row.classList.remove('dragging');
+  clearDragOverClasses();
+  resetDrag();
+}
+function resetDrag(){ dragSrcId=null; dragSrcList=null; }
+function armDrag(el){ el.closest('.entry-row').setAttribute('draggable','true'); }
+function disarmDrag(el){
+  const row = el.closest('.entry-row');
+  if(!row.classList.contains('dragging')) row.removeAttribute('draggable');
+}
+
+/* ---------- Modal ajout / édition ---------- */
+function openAddTaskModal(){ modal = { type:'add-task' }; render(); }
+function openAddRewardModal(){ modal = { type:'add-reward' }; render(); }
+function openEditTaskModal(id){ modal = { type:'edit-task', id }; render(); }
+function openEditRewardModal(id){ modal = { type:'edit-reward', id }; render(); }
+function openEditEndOfDayModal(){ modal = { type:'edit-endofday' }; render(); }
+function closeModal(){ modal = null; render(); }
+
+const MODAL_INPUT_IDS = ['modalName','modalPts','modalCooldownChk','modalCooldownMin','modalCooldownSec','modalLimitedUsesChk','modalUsesLeft','modalPauseChk','modalPauseMin','modalPauseSec','modalEndDayCost','settingsDayHour'];
+
+function snapshotModalInputs(){
+  if(!modal && appMenuView!=='settings') return null;
+  const snap = {};
+  MODAL_INPUT_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) snap[id] = (el.type==='checkbox') ? el.checked : el.value;
+  });
+  return snap;
+}
+
+function restoreModalInputs(snap){
+  if(!snap) return;
+  Object.keys(snap).forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type==='checkbox') el.checked = snap[id];
+    else el.value = snap[id];
+  });
+  ['modalCooldownChk','modalLimitedUsesChk','modalPauseChk'].forEach(chkId=>{
+    const chk = document.getElementById(chkId);
+    if(!chk) return;
+    const rowId = chkId==='modalCooldownChk' ? 'modalCooldownRow' : chkId==='modalLimitedUsesChk' ? 'modalUsesRow' : 'modalPauseRow';
+    const row = document.getElementById(rowId);
+    if(row) row.style.display = chk.checked ? 'flex' : 'none';
+  });
+}
+
+function toggleModalRow(chkId, rowId){
+  const chk = document.getElementById(chkId);
+  document.getElementById(rowId).style.display = chk.checked ? 'flex' : 'none';
+}
+
+function submitModal(){
+  if(!modal) return;
+  if(modal.type==='edit-endofday'){
+    const cost = parseInt(document.getElementById('modalEndDayCost').value,10);
+    if(!(cost>0)) return;
+    state.endOfDayReward.cost = cost;
+    modal = null;
+    save(); render();
+    return;
+  }
+  const isTask = modal.type.indexOf('task')>=0;
+  const isEdit = modal.type.indexOf('edit')===0;
+  const name = document.getElementById('modalName').value.trim();
+  const pts = parseInt(document.getElementById('modalPts').value,10);
+  if(!name || !(pts>0)) return;
+  const cooldownEnabled = document.getElementById('modalCooldownChk').checked;
+  const cooldownMinutes = parseInt(document.getElementById('modalCooldownMin').value,10) || 0;
+  const cooldownSeconds = Math.min(59, Math.max(0, parseInt(document.getElementById('modalCooldownSec').value,10) || 0));
+  let limitedUses = false, usesLeft = 1;
+  if(isTask){
+    limitedUses = document.getElementById('modalLimitedUsesChk').checked;
+    usesLeft = Math.max(1, parseInt(document.getElementById('modalUsesLeft').value,10) || 1);
+  }
+  let pauseEnabled=false, pauseMinutes=15, pauseSeconds=0;
+  if(!isTask){
+    pauseEnabled = document.getElementById('modalPauseChk').checked;
+    pauseMinutes = parseInt(document.getElementById('modalPauseMin').value,10) || 0;
+    pauseSeconds = Math.min(59, Math.max(0, parseInt(document.getElementById('modalPauseSec').value,10) || 0));
+  }
+  if(isEdit){
+    const arr = isTask ? state.tasks : state.rewards;
+    const item = arr.find(x=>x.id===modal.id);
+    if(!item){ modal=null; render(); return; }
+    item.name = name;
+    if(isTask) item.pts = pts; else item.cost = pts;
+    item.cooldownEnabled = cooldownEnabled;
+    item.cooldownMinutes = cooldownMinutes;
+    item.cooldownSeconds = cooldownSeconds;
+    if(isTask){ item.limitedUses = limitedUses; item.usesLeft = usesLeft; }
+    if(!isTask){ item.pauseEnabled = pauseEnabled; item.pauseMinutes = pauseMinutes; item.pauseSeconds = pauseSeconds; }
+  }else{
+    const newItem = isTask
+      ? { id:cryptoId(), name, pts, cooldownEnabled, cooldownMinutes, cooldownSeconds, cooldownUntil:null, limitedUses, usesLeft }
+      : { id:cryptoId(), name, cost:pts, cooldownEnabled, cooldownMinutes, cooldownSeconds, cooldownUntil:null, pauseEnabled, pauseMinutes, pauseSeconds };
+    (isTask?state.tasks:state.rewards).push(newItem);
+    trackEvent(isTask ? 'tache-creee' : 'recompense-creee', { pts });
+  }
+  modal = null;
+  save(); render();
+}
+
+function deleteFromModal(){
+  if(!modal || !modal.id) return;
+  const isTask = modal.type.indexOf('task')>=0;
+  if(isTask) state.tasks = state.tasks.filter(x=>x.id!==modal.id);
+  else state.rewards = state.rewards.filter(x=>x.id!==modal.id);
+  modal = null;
+  save(); render();
+}
+
+function renderModal(){
+  if(!modal) return '';
+  if(modal.type==='edit-endofday'){
+    return `
+    <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
+      <div class="modal-card">
+        <div class="modal-title">Modifier "Fin de journée"</div>
+        <label class="modal-field">
+          <span>Coût en points</span>
+          <input type="number" min="1" id="modalEndDayCost" value="${state.endOfDayReward.cost}">
+        </label>
+        <div class="modal-actions">
+          <span></span>
+          <div class="modal-actions-right">
+            <button class="btn-modal-cancel" onclick="closeModal()">Annuler</button>
+            <button class="btn-modal-save" onclick="submitModal()">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  const isTask = modal.type.indexOf('task')>=0;
+  const isEdit = modal.type.indexOf('edit')===0;
+  let item = null;
+  if(isEdit){
+    item = isTask ? state.tasks.find(x=>x.id===modal.id) : state.rewards.find(x=>x.id===modal.id);
+    if(!item){ modal=null; return ''; }
+  }
+  const title = isEdit ? (isTask?'Modifier la tâche':'Modifier la récompense') : (isTask?'Nouvelle tâche':'Nouvelle récompense');
+  const name = item ? item.name : '';
+  const ptsLabel = isTask ? 'Points obtenus' : 'Coût en points';
+  const ptsVal = item ? (isTask?item.pts:item.cost) : '';
+  const cooldownEnabled = item ? !!item.cooldownEnabled : false;
+  const cooldownMinutes = item && item.cooldownMinutes ? item.cooldownMinutes : 0;
+  const cooldownSeconds = item && item.cooldownSeconds ? item.cooldownSeconds : 0;
+  const pauseEnabled = item ? !!item.pauseEnabled : false;
+  const pauseMinutes = item && item.pauseMinutes ? item.pauseMinutes : 15;
+  const pauseSeconds = item && item.pauseSeconds ? item.pauseSeconds : 0;
+  const limitedUses = item ? !!item.limitedUses : false;
+  const usesLeft = item && item.usesLeft ? item.usesLeft : 1;
+
+  return `
+  <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
+    <div class="modal-card">
+      <div class="modal-title">${title}</div>
+      <label class="modal-field">
+        <span>Nom</span>
+        <input type="text" id="modalName" value="${esc(name)}" placeholder="${isTask?'Ex. Sport':'Ex. Temps libre'}">
+      </label>
+      <label class="modal-field">
+        <span>${ptsLabel}</span>
+        <input type="number" min="1" id="modalPts" value="${ptsVal}">
+      </label>
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalCooldownChk" ${cooldownEnabled?'checked':''} onchange="toggleModalRow('modalCooldownChk','modalCooldownRow')">
+          <span>Cooldown avant de pouvoir la refaire</span>
+        </label>
+        <div class="modal-subfield" id="modalCooldownRow" style="${cooldownEnabled?'display:flex;':'display:none;'}">
+          <span>Durée</span>
+          <input type="number" min="0" id="modalCooldownMin" value="${cooldownMinutes}">
+          <span>min</span>
+          <input type="number" min="0" max="59" id="modalCooldownSec" value="${cooldownSeconds}">
+          <span>s</span>
+        </div>
+      </div>
+      ${isTask ? `
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalLimitedUsesChk" ${limitedUses?'checked':''} onchange="toggleModalRow('modalLimitedUsesChk','modalUsesRow')">
+          <span>Nombre d'utilisations limité</span>
+        </label>
+        <div class="modal-subfield" id="modalUsesRow" style="${limitedUses?'display:flex;':'display:none;'}">
+          <span>Utilisations</span>
+          <input type="number" min="1" id="modalUsesLeft" value="${usesLeft}">
+        </div>
+      </div>` : ''}
+      ${!isTask ? `
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalPauseChk" ${pauseEnabled?'checked':''} onchange="toggleModalRow('modalPauseChk','modalPauseRow')">
+          <span>Déclenche une pause à l'échange</span>
+        </label>
+        <div class="modal-subfield" id="modalPauseRow" style="${pauseEnabled?'display:flex;':'display:none;'}">
+          <span>Durée</span>
+          <input type="number" min="0" id="modalPauseMin" value="${pauseMinutes}">
+          <span>min</span>
+          <input type="number" min="0" max="59" id="modalPauseSec" value="${pauseSeconds}">
+          <span>s</span>
+        </div>
+      </div>` : ''}
+      <div class="modal-actions">
+        ${isEdit ? `<button class="btn-modal-delete" onclick="deleteFromModal()">Supprimer</button>` : '<span></span>'}
+        <div class="modal-actions-right">
+          <button class="btn-modal-cancel" onclick="closeModal()">Annuler</button>
+          <button class="btn-modal-save" onclick="submitModal()">${isEdit?'Enregistrer':'Ajouter'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPauseOverlay(){
+  if(!activePause) return '';
+  return `
+  <div class="pause-overlay">
+    <button class="pause-close" onclick="endPauseEarly()" title="Terminer la pause">×</button>
+    <div class="pause-label">Pause</div>
+    <div class="pause-reward-name">${esc(activePause.rewardName)}</div>
+    <div class="pause-display" id="pauseDisplay">${formatTime(activePause.remainingSeconds)}</div>
+    <div class="pause-refund-hint" id="pauseRefundHint">Fin anticipée : +${computeRefund()} pts</div>
+  </div>`;
+}
+
+function renderEndOfDayOverlay(){
+  if(!endOfDayScreenActive) return '';
+  return `
+  <div class="pause-overlay endday-overlay">
+    <div class="pause-label">Fin de journée</div>
+    <div class="pause-reward-name">La journée est close</div>
+    <button class="btn-rallonge" onclick="returnFromEndOfDay()">Rallonge</button>
+  </div>`;
+}
+
+/* ---------- Rendu des lignes ---------- */
+function taskRowHtml(t){
+  const cdActive = isCooldownActive(t);
+  const remaining = cdActive ? Math.ceil((t.cooldownUntil-Date.now())/1000) : 0;
+  const actionHtml = cdActive
+    ? `<span class="cooldown-chip" data-until="${t.cooldownUntil}">${formatTime(remaining)}</span>`
+    : `<button class="btn-do" onclick="completeTask('${t.id}')">Fait</button>`;
+  return `
+    <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${t.id}" data-list="task"
+      ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      <span class="entry-name">${esc(t.name)}${t.limitedUses?' <span class="badge-single">×'+t.usesLeft+'</span>':''}</span>
+      <span class="entry-pts">+${t.pts}</span>
+      <div class="entry-actions">
+        ${actionHtml}
+        <button class="btn-edit" title="Modifier"
+          onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
+          onclick="openEditTaskModal('${t.id}')">✎</button>
+      </div>
+    </div>`;
+}
+
+function rewardRowHtml(r){
+  const cdActive = isCooldownActive(r);
+  const remaining = cdActive ? Math.ceil((r.cooldownUntil-Date.now())/1000) : 0;
+  const canAfford = state.balance >= r.cost;
+  const actionHtml = cdActive
+    ? `<span class="cooldown-chip" data-until="${r.cooldownUntil}">${formatTime(remaining)}</span>`
+    : `<button class="btn-redeem" ${canAfford?'':'disabled'} onclick="redeemReward('${r.id}')">Échanger</button>`;
+  return `
+    <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${r.id}" data-list="reward"
+      ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      <span class="entry-name">${esc(r.name)}</span>
+      <span class="entry-pts">-${r.cost}</span>
+      <div class="entry-actions">
+        ${actionHtml}
+        <button class="btn-edit" title="Modifier"
+          onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
+          onclick="openEditRewardModal('${r.id}')">✎</button>
+      </div>
+    </div>`;
+}
+
+function journalGroupsHtml(){
+  if(!state.history.length) return '<div class="empty">Le journal est vide. Termine une tâche pour commencer.</div>';
+  const groups = groupHistoryByDay(state.history);
+  const todayKey = dayKey(Date.now());
+  return groups.map(g=>{
+    const isToday = g.key === todayKey;
+    const open = isDayOpen(g.key, isToday);
+    const rowsHtml = g.entries.map(h=>`
+      <div class="jrow">
+        <span class="stamp ${h.type}">${h.type==='gain'?'+':'−'}</span>
+        <span class="jtime">${formatEntryTime(h.ts)}</span>
+        <span class="jlabel">${esc(h.label)}</span>
+        <span class="jdelta ${h.type}">${h.type==='gain'?'+':'-'}${h.delta}</span>
+        <span class="jbalance">solde ${h.balance}</span>
+      </div>
+    `).join('');
+    return `
+      <div class="day-group ${isToday?'':'day-past'}">
+        <button class="day-header" onclick="toggleDay('${g.key}')">
+          <span class="day-chevron ${open?'open':''}">›</span>
+          <span class="day-title">${formatDayLabel(g.entries[0].ts)}</span>
+          <span class="day-count">${g.entries.length} mouvement${g.entries.length>1?'s':''}</span>
+        </button>
+        <div class="day-body" style="${open?'':'display:none;'}">
+          ${rowsHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const modalSnap = snapshotModalInputs();
+
+  const tasksHtml = state.tasks.length ? state.tasks.map(taskRowHtml).join('') : '<div class="empty">Aucune tâche pour l’instant.</div>';
+  const rewardsHtml = state.rewards.length ? state.rewards.map(rewardRowHtml).join('') : '<div class="empty">Aucune récompense pour l’instant.</div>';
+
+  app.innerHTML = `
+    ${renderAppMenu()}
+    <div class="engraved-date">${formatTodayLong()}</div>
+    <div class="masthead">
+      <div>
+        <h1>DeepWork</h1>
+      </div>
+      <div class="balance-block">
+        <div class="balance-label">Solde actuel</div>
+        <div class="balance-num">${state.balance}</div>
+      </div>
+    </div>
+
+    <div class="chrono-panel">
+      <div class="chrono-left">
+        <div class="chrono-eyebrow">Chrono à points</div>
+        <div class="chrono-config">
+          <span>Donne</span>
+          <input type="number" min="1" value="${state.chrono.pts}" ${chronoRunning?'disabled':''} onchange="updateChronoPts(this.value)">
+          <span>pts toutes les</span>
+          <input type="number" min="1" value="${state.chrono.minutes}" ${chronoRunning?'disabled':''} onchange="updateChronoMinutes(this.value)">
+          <span>min</span>
+        </div>
+      </div>
+      <div class="chrono-right">
+        ${state.dayStarted ? `
+        <div class="chrono-display" id="chronoDisplay">${formatTime(remainingSeconds)}</div>
+        <div class="chrono-buttons">
+          <button class="btn-chrono ${chronoRunning?'running':''}" onclick="toggleChrono()">${chronoRunning?'Pause':'Démarrer'}</button>
+          <button class="btn-chrono-reset" onclick="resetChrono()">Réinitialiser</button>
+        </div>` : `
+        <button class="btn-start-day" onclick="startDay()">Commencer la journée</button>`}
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="panel tasks">
+        <h2>Tâches <span class="tag">gagner</span></h2>
+        <div id="taskList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'task')">
+          ${tasksHtml}
+        </div>
+        <button class="btn-add-open" onclick="openAddTaskModal()">+ Ajouter une tâche</button>
+      </div>
+
+      <div class="panel rewards">
+        <h2>Récompenses <span class="tag">dépenser</span></h2>
+        <div class="end-of-day-block">
+          <div class="entry-row">
+            <span class="entry-name">Fin de journée</span>
+            <span class="entry-pts">-${state.endOfDayReward.cost}</span>
+            <div class="entry-actions">
+              <button class="btn-redeem" ${state.balance<state.endOfDayReward.cost?'disabled':''} onclick="redeemEndOfDay()">Échanger</button>
+              <button class="btn-edit" title="Modifier le coût" onclick="openEditEndOfDayModal()">✎</button>
+            </div>
+          </div>
+        </div>
+        <div id="rewardList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'reward')">
+          ${rewardsHtml}
+        </div>
+        <button class="btn-add-open" onclick="openAddRewardModal()">+ Ajouter une récompense</button>
+      </div>
+    </div>
+
+    <div class="journal">
+      <h2>Journal</h2>
+      <div class="sub">Historique des mouvements</div>
+      ${journalGroupsHtml()}
+    </div>
+
+    ${renderModal()}
+    ${renderPauseOverlay()}
+    ${renderEndOfDayOverlay()}
+  `;
+  restoreModalInputs(modalSnap);
+}
+
+load();
+</script>
+</body>
+</html>
