@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="standard">
+<html lang="en" data-theme="standard">
 <head>
 <meta charset="UTF-8">
 <title>DeepWork</title>
@@ -668,14 +668,17 @@
   .app-menu-btn:active{ transform:scale(0.92); }
   .drawer-close, .drawer-back{ transition:background 0.15s ease, transform 0.1s ease; border-radius:50%; }
   .drawer-close:active, .drawer-back:active{ transform:scale(0.9); }
-
-  
 </style>
-<script defer src="https://cloud.umami.is/script.js" data-website-id="f0f5e9d4-b689-40e3-8a8f-99cdbb6ad3c3"></script>
+<!--
+  Analytics Umami — remplace "VOTRE-WEBSITE-ID-ICI" par l'ID donné par ton
+  tableau de bord Umami (cloud.umami.is ou ton instance auto-hébergée).
+  Sans un ID valide, ce script ne fait rien (aucune erreur, aucune donnée envoyée).
+-->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="VOTRE-WEBSITE-ID-ICI"></script>
 </head>
 <body>
 <div class="wrap" id="app">
-  <div class="loading">Ouverture du carnet…</div>
+  <div class="loading">Opening…</div>
 </div>
 
 <script>
@@ -719,22 +722,157 @@ function trackEvent(name, data){
   }catch(e){ /* pas grave si bloqué (ex. bloqueur de pub) */ }
 }
 
+/* ---------- i18n ---------- */
+const LOCALE_MAP = { fr:'fr-FR', en:'en-US', es:'es-ES' };
+const I18N = {
+  fr:{
+    appName:'DeepWork', tagline:'Carnet de points',
+    balanceLabel:'Solde actuel',
+    chronoEyebrow:'Chrono à points', chronoGives:'Donne', chronoEvery:'pts toutes les', chronoMin:'min',
+    startDay:'Commencer la journée', pause:'Pause', start:'Démarrer', reset:'Réinitialiser',
+    tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
+    rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
+    done:'Fait', redeem:'Échanger', edit:'Modifier',
+    noTasks:'Aucune tâche pour l’instant.', noRewards:'Aucune récompense pour l’instant.',
+    endOfDay:'Fin de journée',
+    journalTitle:'Journal', journalSub:'Historique des mouvements', journalEmpty:'Le journal est vide. Termine une tâche pour commencer.',
+    today:"Aujourd'hui", yesterday:'Hier', movement:'mouvement', movements:'mouvements',
+    solde:'solde',
+    newDayLabel:'Nouvelle journée (-50%)', missedDaysLabel:'Journées manquées', perDay:'/jour',
+    chronoJournalLabel:'Chrono',
+    pauseLabel:'Pause', earlyEnd:'Fin anticipée', pauseOf:'Pause :',
+    endOfDayScreenTitle:'Fin de journée', endOfDayScreenSub:'La journée est close', rallonge:'Rallonge',
+    modalNewTask:'Nouvelle tâche', modalEditTask:'Modifier la tâche',
+    modalNewReward:'Nouvelle récompense', modalEditReward:'Modifier la récompense',
+    modalEditEndOfDay:'Modifier "Fin de journée"',
+    fieldName:'Nom', fieldPtsGained:'Points obtenus', fieldCost:'Coût en points',
+    placeholderTask:'Ex. Sport', placeholderReward:'Ex. Temps libre',
+    cooldownToggle:'Cooldown avant de pouvoir la refaire', duration:'Durée', min:'min', sec:'s',
+    singleUseToggle:"Nombre d'utilisations limité", uses:'Utilisations',
+    pauseToggle:"Déclenche une pause à l'échange",
+    delete:'Supprimer', cancel:'Annuler', save:'Enregistrer', add:'Ajouter',
+    menu:'Menu', settings:'Paramètres', calculator:'Calculatrice', notepad:'Bloc-notes', soon:'Bientôt',
+    appearance:'Apparence',
+    themeStandardLabel:'Standard', themeStandardDesc:'Océan clair et moderne',
+    themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Fond sombre, accents lumineux',
+    themeSableLabel:'Sable', themeSableDesc:'Minimaliste, tons chauds',
+    language:'Langue',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Heure de début de journée',
+    dayStartHint:'Le solde de points est réduit de moitié à chaque passage de cette heure.',
+    backup:'Sauvegarde', export:'Exporter', import:'Importer',
+    dangerZone:'Zone sensible', resetAllData:'Réinitialiser toutes les données',
+    resetConfirm:'Réinitialiser toutes les données ? Cette action est irréversible.',
+    opening:'Ouverture du carnet…',
+  },
+  en:{
+    appName:'DeepWork', tagline:'Points Journal',
+    balanceLabel:'Current balance',
+    chronoEyebrow:'Points timer', chronoGives:'Gives', chronoEvery:'pts every', chronoMin:'min',
+    startDay:'Start the day', pause:'Pause', start:'Start', reset:'Reset',
+    tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
+    rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
+    done:'Done', redeem:'Redeem', edit:'Edit',
+    noTasks:'No tasks yet.', noRewards:'No rewards yet.',
+    endOfDay:'End of day',
+    journalTitle:'Journal', journalSub:'Activity history', journalEmpty:'The journal is empty. Complete a task to get started.',
+    today:'Today', yesterday:'Yesterday', movement:'entry', movements:'entries',
+    solde:'balance',
+    newDayLabel:'New day (-50%)', missedDaysLabel:'Missed days', perDay:'/day',
+    chronoJournalLabel:'Timer',
+    pauseLabel:'Break', earlyEnd:'Early end', pauseOf:'Break:',
+    endOfDayScreenTitle:'End of day', endOfDayScreenSub:'The day is closed', rallonge:'Extra time',
+    modalNewTask:'New task', modalEditTask:'Edit task',
+    modalNewReward:'New reward', modalEditReward:'Edit reward',
+    modalEditEndOfDay:'Edit "End of day"',
+    fieldName:'Name', fieldPtsGained:'Points earned', fieldCost:'Cost in points',
+    placeholderTask:'E.g. Workout', placeholderReward:'E.g. Free time',
+    cooldownToggle:'Cooldown before it can be done again', duration:'Duration', min:'min', sec:'s',
+    singleUseToggle:'Limited number of uses', uses:'Uses',
+    pauseToggle:'Triggers a break when redeemed',
+    delete:'Delete', cancel:'Cancel', save:'Save', add:'Add',
+    menu:'Menu', settings:'Settings', calculator:'Calculator', notepad:'Notepad', soon:'Soon',
+    appearance:'Appearance',
+    themeStandardLabel:'Standard', themeStandardDesc:'Bright, modern ocean',
+    themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Dark background, glowing accents',
+    themeSableLabel:'Sand', themeSableDesc:'Minimal, warm tones',
+    language:'Language',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Day start hour',
+    dayStartHint:'Your point balance is cut in half every time this hour passes.',
+    backup:'Backup', export:'Export', import:'Import',
+    dangerZone:'Danger zone', resetAllData:'Reset all data',
+    resetConfirm:'Reset all data? This action cannot be undone.',
+    opening:'Opening your journal…',
+  },
+  es:{
+    appName:'DeepWork', tagline:'Diario de puntos',
+    balanceLabel:'Saldo actual',
+    chronoEyebrow:'Cronómetro de puntos', chronoGives:'Da', chronoEvery:'pts cada', chronoMin:'min',
+    startDay:'Empezar el día', pause:'Pausa', start:'Iniciar', reset:'Reiniciar',
+    tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
+    rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
+    done:'Hecho', redeem:'Canjear', edit:'Editar',
+    noTasks:'Aún no hay tareas.', noRewards:'Aún no hay recompensas.',
+    endOfDay:'Fin del día',
+    journalTitle:'Diario', journalSub:'Historial de movimientos', journalEmpty:'El diario está vacío. Completa una tarea para empezar.',
+    today:'Hoy', yesterday:'Ayer', movement:'movimiento', movements:'movimientos',
+    solde:'saldo',
+    newDayLabel:'Nuevo día (-50%)', missedDaysLabel:'Días perdidos', perDay:'/día',
+    chronoJournalLabel:'Cronómetro',
+    pauseLabel:'Pausa', earlyEnd:'Fin anticipado', pauseOf:'Pausa:',
+    endOfDayScreenTitle:'Fin del día', endOfDayScreenSub:'El día está cerrado', rallonge:'Tiempo extra',
+    modalNewTask:'Nueva tarea', modalEditTask:'Editar tarea',
+    modalNewReward:'Nueva recompensa', modalEditReward:'Editar recompensa',
+    modalEditEndOfDay:'Editar "Fin del día"',
+    fieldName:'Nombre', fieldPtsGained:'Puntos obtenidos', fieldCost:'Coste en puntos',
+    placeholderTask:'Ej. Deporte', placeholderReward:'Ej. Tiempo libre',
+    cooldownToggle:'Espera antes de poder repetirla', duration:'Duración', min:'min', sec:'s',
+    singleUseToggle:'Número limitado de usos', uses:'Usos',
+    pauseToggle:'Activa una pausa al canjearla',
+    delete:'Eliminar', cancel:'Cancelar', save:'Guardar', add:'Añadir',
+    menu:'Menú', settings:'Ajustes', calculator:'Calculadora', notepad:'Notas', soon:'Pronto',
+    appearance:'Apariencia',
+    themeStandardLabel:'Estándar', themeStandardDesc:'Océano claro y moderno',
+    themeAbyssalLabel:'Abisal', themeAbyssalDesc:'Fondo oscuro, acentos brillantes',
+    themeSableLabel:'Arena', themeSableDesc:'Minimalista, tonos cálidos',
+    language:'Idioma',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Hora de inicio del día',
+    dayStartHint:'El saldo de puntos se reduce a la mitad cada vez que pasa esta hora.',
+    backup:'Copia de seguridad', export:'Exportar', import:'Importar',
+    dangerZone:'Zona sensible', resetAllData:'Restablecer todos los datos',
+    resetConfirm:'¿Restablecer todos los datos? Esta acción no se puede deshacer.',
+    opening:'Abriendo tu diario…',
+  }
+};
+function t(key){
+  const lang = (state && state.language) || 'en';
+  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+}
+function currentLocale(){
+  const lang = (state && state.language) || 'en';
+  return LOCALE_MAP[lang] || 'en-US';
+}
+
 function defaultState(){
   return {
     balance: 0,
-    chrono: { pts: 5, minutes: 15 },
+    chrono: { pts: 2, minutes: 5 },
     dayStarted: false,
     lastProcessedDayBoundary: null,
     dayStartHour: 5,
     theme: 'standard',
+    language: 'en',
     endOfDayReward: { cost: 50 },
     tasks: [
-      { id: cryptoId(), name: 'Ranger le bureau', pts: 10, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 },
-      { id: cryptoId(), name: 'Séance de sport', pts: 20, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 }
+      { id: cryptoId(), name: 'Sport', pts: 4, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 },
+      { id: cryptoId(), name: 'Ranger le bureau', pts: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 },
+      { id: cryptoId(), name: 'Personal Work Fini', pts: 5, cooldownEnabled:true, cooldownMinutes:1, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1 }
     ],
     rewards: [
       { id: cryptoId(), name: '30 min de temps libre', cost: 15, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:30, pauseSeconds:0 },
-      { id: cryptoId(), name: 'Épisode de série', cost: 25, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:false, pauseMinutes:15, pauseSeconds:0 }
+      { id: cryptoId(), name: '5 min', cost: 8, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:5, pauseSeconds:0 }
     ],
     history: []
   };
@@ -747,12 +885,14 @@ async function load(){
   }catch(e){
     state = defaultState();
   }
-  if(!state.chrono) state.chrono = { pts:5, minutes:15 };
+  if(!state.chrono) state.chrono = { pts:2, minutes:5 };
   if(state.dayStarted===undefined) state.dayStarted = false;
   if(state.lastProcessedDayBoundary===undefined) state.lastProcessedDayBoundary = null;
   if(state.dayStartHour===undefined || state.dayStartHour===null) state.dayStartHour = 5;
   if(!state.theme) state.theme = 'standard';
+  if(!state.language) state.language = 'en';
   applyTheme(state.theme);
+  document.documentElement.setAttribute('lang', state.language);
   if(!state.endOfDayReward) state.endOfDayReward = { cost:50 };
   state.tasks.forEach(t=>{
     if(t.cooldownEnabled===undefined) t.cooldownEnabled=false;
@@ -792,7 +932,7 @@ function formatTime(sec){
 function isCooldownActive(item){ return item.cooldownUntil && item.cooldownUntil > Date.now(); }
 
 function formatTodayLong(){
-  return new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  return new Date().toLocaleDateString(currentLocale(), { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
 function dayKey(ts){
   const d = new Date(ts);
@@ -801,13 +941,13 @@ function dayKey(ts){
 function formatDayLabel(ts){
   const d = new Date(ts);
   const today = new Date();
-  if(d.toDateString()===today.toDateString()) return "Aujourd'hui";
+  if(d.toDateString()===today.toDateString()) return t('today');
   const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
-  if(d.toDateString()===yesterday.toDateString()) return 'Hier';
-  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  if(d.toDateString()===yesterday.toDateString()) return t('yesterday');
+  return d.toLocaleDateString(currentLocale(), { weekday:'long', day:'numeric', month:'long' });
 }
 function formatEntryTime(ts){
-  return new Date(ts).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  return new Date(ts).toLocaleTimeString(currentLocale(), { hour:'2-digit', minute:'2-digit' });
 }
 function groupHistoryByDay(history){
   const groups = [];
@@ -857,7 +997,7 @@ function chronoTick(){
   remainingSeconds -= 1;
   if(remainingSeconds<=0){
     state.balance += state.chrono.pts;
-    state.history.unshift({ id: cryptoId(), type:'gain', label:'Chrono ('+state.chrono.minutes+' min)', delta:state.chrono.pts, balance:state.balance, ts:Date.now() });
+    state.history.unshift({ id: cryptoId(), type:'gain', label:t('chronoJournalLabel')+' ('+state.chrono.minutes+' '+t('min')+')', delta:state.chrono.pts, balance:state.balance, ts:Date.now() });
     remainingSeconds = state.chrono.minutes*60;
     save(); render();
     return;
@@ -898,7 +1038,7 @@ function checkDayRollover(){
     const before = state.balance;
     for(let i=0;i<daysMissed;i++){ state.balance = Math.floor(state.balance/2); }
     if(before !== state.balance){
-      const label = daysMissed>1 ? 'Journées manquées ×'+daysMissed+' (-50%/jour)' : 'Nouvelle journée (-50%)';
+      const label = daysMissed>1 ? (t('missedDaysLabel')+' ×'+daysMissed+' (-50%'+t('perDay')+')') : t('newDayLabel');
       state.history.unshift({ id:cryptoId(), type:'spend', label:label, delta:(before-state.balance), balance:state.balance, ts:Date.now() });
     }
   }
@@ -963,7 +1103,7 @@ function redeemEndOfDay(){
   const rw = state.endOfDayReward;
   if(!rw || state.balance < rw.cost) return;
   state.balance -= rw.cost;
-  state.history.unshift({ id: cryptoId(), type:'spend', label:'Fin de journée', delta:rw.cost, balance:state.balance, ts:Date.now() });
+  state.history.unshift({ id: cryptoId(), type:'spend', label:t('endOfDay'), delta:rw.cost, balance:state.balance, ts:Date.now() });
   save();
   endOfDayScreenActive = true;
   render();
@@ -1011,6 +1151,12 @@ function setTheme(theme){
   save(); render();
   trackEvent('theme-change', { theme });
 }
+function setLang(lang){
+  state.language = lang;
+  document.documentElement.setAttribute('lang', lang);
+  save(); render();
+  trackEvent('lang-change', { lang });
+}
 
 function exportData(){
   const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
@@ -1042,30 +1188,30 @@ function importDataFile(input){
 }
 
 function resetAllData(){
-  if(!confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) return;
+  if(!confirm(t('resetConfirm'))) return;
   state = defaultState();
   save(); render();
 }
 
 function renderAppMenu(){
-  let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="Menu" onclick="toggleAppMenu()">☰</button>`;
+  let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="${t('menu')}" onclick="toggleAppMenu()">☰</button>`;
   html += `<div class="app-drawer ${appMenuOpen?'open':''}">`;
   html += `<div class="app-drawer-header">`;
   if(appMenuView==='settings'){
-    html += `<button class="drawer-back" onclick="backToMenuMain()" title="Retour">‹</button><span>Paramètres</span>`;
+    html += `<button class="drawer-back" onclick="backToMenuMain()" title="Back">‹</button><span>${t('settings')}</span>`;
   }else{
-    html += `<span>Menu</span>`;
+    html += `<span>${t('menu')}</span>`;
   }
-  html += `<button class="drawer-close" onclick="closeAppMenu()" title="Fermer">×</button>`;
+  html += `<button class="drawer-close" onclick="closeAppMenu()" title="Close">×</button>`;
   html += `</div>`;
   html += `<div class="app-drawer-body">`;
   if(appMenuView==='settings'){
     html += renderSettingsView();
   }else{
     html += `
-      <div class="app-menu-item soon-item"><span>Calculatrice</span><span class="soon">Bientôt</span></div>
-      <div class="app-menu-item soon-item"><span>Bloc-notes</span><span class="soon">Bientôt</span></div>
-      <button class="app-menu-item clickable" onclick="openSettingsView()"><span>Paramètres</span><span class="chevron">›</span></button>
+      <div class="app-menu-item soon-item"><span>${t('calculator')}</span><span class="soon">${t('soon')}</span></div>
+      <div class="app-menu-item soon-item"><span>${t('notepad')}</span><span class="soon">${t('soon')}</span></div>
+      <button class="app-menu-item clickable" onclick="openSettingsView()"><span>${t('settings')}</span><span class="chevron">›</span></button>
     `;
   }
   html += `</div></div>`;
@@ -1076,51 +1222,71 @@ function renderAppMenu(){
 function renderSettingsView(){
   const hour = state.dayStartHour!==undefined ? state.dayStartHour : 5;
   const theme = state.theme || 'standard';
+  const lang = state.language || 'en';
   const themes = [
-    { id:'standard', label:'Standard', desc:'Océan clair et moderne' },
-    { id:'abyssal', label:'Abyssal', desc:'Fond sombre, accents lumineux' },
-    { id:'sable', label:'Sable', desc:'Minimaliste, tons chauds' }
+    { id:'standard', label:t('themeStandardLabel'), desc:t('themeStandardDesc') },
+    { id:'abyssal', label:t('themeAbyssalLabel'), desc:t('themeAbyssalDesc') },
+    { id:'sable', label:t('themeSableLabel'), desc:t('themeSableDesc') }
   ];
-  const themeSwatches = themes.map(t=>`
-    <button class="theme-swatch ${theme===t.id?'active':''}" data-theme-swatch="${t.id}" onclick="setTheme('${t.id}')">
-      <span class="theme-swatch-dot theme-dot-${t.id}"></span>
+  const themeSwatches = themes.map(th=>`
+    <button class="theme-swatch ${theme===th.id?'active':''}" data-theme-swatch="${th.id}" onclick="setTheme('${th.id}')">
+      <span class="theme-swatch-dot theme-dot-${th.id}"></span>
       <span class="theme-swatch-text">
-        <span class="theme-swatch-label">${t.label}</span>
-        <span class="theme-swatch-desc">${t.desc}</span>
+        <span class="theme-swatch-label">${th.label}</span>
+        <span class="theme-swatch-desc">${th.desc}</span>
       </span>
-      ${theme===t.id ? '<span class="theme-swatch-check">✓</span>' : ''}
+      ${theme===th.id ? '<span class="theme-swatch-check">✓</span>' : ''}
+    </button>
+  `).join('');
+  const languages = [
+    { id:'en', label:t('langEn') },
+    { id:'fr', label:t('langFr') },
+    { id:'es', label:t('langEs') }
+  ];
+  const langSwatches = languages.map(lg=>`
+    <button class="theme-swatch lang-swatch ${lang===lg.id?'active':''}" onclick="setLang('${lg.id}')">
+      <span class="theme-swatch-text">
+        <span class="theme-swatch-label">${lg.label}</span>
+      </span>
+      ${lang===lg.id ? '<span class="theme-swatch-check">✓</span>' : ''}
     </button>
   `).join('');
   return `
     <div class="settings-block">
-      <div class="settings-label"><span>Apparence</span></div>
+      <div class="settings-label"><span>${t('appearance')}</span></div>
       <div class="theme-swatch-list">
         ${themeSwatches}
       </div>
     </div>
     <div class="settings-block">
+      <div class="settings-label"><span>${t('language')}</span></div>
+      <div class="theme-swatch-list">
+        ${langSwatches}
+      </div>
+    </div>
+    <div class="settings-block">
       <label class="settings-label">
-        <span>Heure de début de journée</span>
+        <span>${t('dayStartHourLabel')}</span>
         <div class="settings-hour-row">
           <input type="number" min="0" max="23" id="settingsDayHour" value="${hour}" onchange="updateDayStartHour(this.value)">
           <span>h 00</span>
         </div>
       </label>
-      <p class="settings-hint">Le solde de points est réduit de moitié à chaque passage de cette heure.</p>
+      <p class="settings-hint">${t('dayStartHint')}</p>
     </div>
     <div class="settings-block">
-      <div class="settings-label"><span>Sauvegarde</span></div>
+      <div class="settings-label"><span>${t('backup')}</span></div>
       <div class="settings-row-buttons">
-        <button class="btn-settings" onclick="exportData()">Exporter</button>
+        <button class="btn-settings" onclick="exportData()">${t('export')}</button>
         <label class="btn-settings" style="cursor:pointer;">
-          Importer
+          ${t('import')}
           <input type="file" accept="application/json" style="display:none;" onchange="importDataFile(this)">
         </label>
       </div>
     </div>
     <div class="settings-block">
-      <div class="settings-label"><span>Zone sensible</span></div>
-      <button class="btn-settings-danger" onclick="resetAllData()">Réinitialiser toutes les données</button>
+      <div class="settings-label"><span>${t('dangerZone')}</span></div>
+      <button class="btn-settings-danger" onclick="resetAllData()">${t('resetAllData')}</button>
     </div>
   `;
 }
@@ -1154,7 +1320,7 @@ function updatePauseDisplay(){
   const d = document.getElementById('pauseDisplay');
   if(d) d.textContent = formatTime(activePause.remainingSeconds);
   const hint = document.getElementById('pauseRefundHint');
-  if(hint) hint.textContent = 'Fin anticipée : +'+computeRefund()+' pts';
+  if(hint) hint.textContent = t('earlyEnd')+' : +'+computeRefund()+' pts';
 }
 function computeRefund(){
   if(!activePause) return 0;
@@ -1173,7 +1339,7 @@ function finishPause(early){
     const refund = computeRefund();
     if(refund>0){
       state.balance += refund;
-      state.history.unshift({ id:cryptoId(), type:'gain', label:'Fin anticipée : '+activePause.rewardName, delta:refund, balance:state.balance, ts:Date.now() });
+      state.history.unshift({ id:cryptoId(), type:'gain', label:t('earlyEnd')+' : '+activePause.rewardName, delta:refund, balance:state.balance, ts:Date.now() });
       save();
     }
   }
@@ -1374,16 +1540,16 @@ function renderModal(){
     return `
     <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
       <div class="modal-card">
-        <div class="modal-title">Modifier "Fin de journée"</div>
+        <div class="modal-title">${t('modalEditEndOfDay')}</div>
         <label class="modal-field">
-          <span>Coût en points</span>
+          <span>${t('fieldCost')}</span>
           <input type="number" min="1" id="modalEndDayCost" value="${state.endOfDayReward.cost}">
         </label>
         <div class="modal-actions">
           <span></span>
           <div class="modal-actions-right">
-            <button class="btn-modal-cancel" onclick="closeModal()">Annuler</button>
-            <button class="btn-modal-save" onclick="submitModal()">Enregistrer</button>
+            <button class="btn-modal-cancel" onclick="closeModal()">${t('cancel')}</button>
+            <button class="btn-modal-save" onclick="submitModal()">${t('save')}</button>
           </div>
         </div>
       </div>
@@ -1396,9 +1562,9 @@ function renderModal(){
     item = isTask ? state.tasks.find(x=>x.id===modal.id) : state.rewards.find(x=>x.id===modal.id);
     if(!item){ modal=null; return ''; }
   }
-  const title = isEdit ? (isTask?'Modifier la tâche':'Modifier la récompense') : (isTask?'Nouvelle tâche':'Nouvelle récompense');
+  const title = isEdit ? (isTask?t('modalEditTask'):t('modalEditReward')) : (isTask?t('modalNewTask'):t('modalNewReward'));
   const name = item ? item.name : '';
-  const ptsLabel = isTask ? 'Points obtenus' : 'Coût en points';
+  const ptsLabel = isTask ? t('fieldPtsGained') : t('fieldCost');
   const ptsVal = item ? (isTask?item.pts:item.cost) : '';
   const cooldownEnabled = item ? !!item.cooldownEnabled : false;
   const cooldownMinutes = item && item.cooldownMinutes ? item.cooldownMinutes : 0;
@@ -1414,8 +1580,8 @@ function renderModal(){
     <div class="modal-card">
       <div class="modal-title">${title}</div>
       <label class="modal-field">
-        <span>Nom</span>
-        <input type="text" id="modalName" value="${esc(name)}" placeholder="${isTask?'Ex. Sport':'Ex. Temps libre'}">
+        <span>${t('fieldName')}</span>
+        <input type="text" id="modalName" value="${esc(name)}" placeholder="${isTask?t('placeholderTask'):t('placeholderReward')}">
       </label>
       <label class="modal-field">
         <span>${ptsLabel}</span>
@@ -1424,24 +1590,24 @@ function renderModal(){
       <div class="modal-toggle-block">
         <label class="modal-checkbox">
           <input type="checkbox" id="modalCooldownChk" ${cooldownEnabled?'checked':''} onchange="toggleModalRow('modalCooldownChk','modalCooldownRow')">
-          <span>Cooldown avant de pouvoir la refaire</span>
+          <span>${t('cooldownToggle')}</span>
         </label>
         <div class="modal-subfield" id="modalCooldownRow" style="${cooldownEnabled?'display:flex;':'display:none;'}">
-          <span>Durée</span>
+          <span>${t('duration')}</span>
           <input type="number" min="0" id="modalCooldownMin" value="${cooldownMinutes}">
-          <span>min</span>
+          <span>${t('min')}</span>
           <input type="number" min="0" max="59" id="modalCooldownSec" value="${cooldownSeconds}">
-          <span>s</span>
+          <span>${t('sec')}</span>
         </div>
       </div>
       ${isTask ? `
       <div class="modal-toggle-block">
         <label class="modal-checkbox">
           <input type="checkbox" id="modalLimitedUsesChk" ${limitedUses?'checked':''} onchange="toggleModalRow('modalLimitedUsesChk','modalUsesRow')">
-          <span>Nombre d'utilisations limité</span>
+          <span>${t('singleUseToggle')}</span>
         </label>
         <div class="modal-subfield" id="modalUsesRow" style="${limitedUses?'display:flex;':'display:none;'}">
-          <span>Utilisations</span>
+          <span>${t('uses')}</span>
           <input type="number" min="1" id="modalUsesLeft" value="${usesLeft}">
         </div>
       </div>` : ''}
@@ -1449,21 +1615,21 @@ function renderModal(){
       <div class="modal-toggle-block">
         <label class="modal-checkbox">
           <input type="checkbox" id="modalPauseChk" ${pauseEnabled?'checked':''} onchange="toggleModalRow('modalPauseChk','modalPauseRow')">
-          <span>Déclenche une pause à l'échange</span>
+          <span>${t('pauseToggle')}</span>
         </label>
         <div class="modal-subfield" id="modalPauseRow" style="${pauseEnabled?'display:flex;':'display:none;'}">
-          <span>Durée</span>
+          <span>${t('duration')}</span>
           <input type="number" min="0" id="modalPauseMin" value="${pauseMinutes}">
-          <span>min</span>
+          <span>${t('min')}</span>
           <input type="number" min="0" max="59" id="modalPauseSec" value="${pauseSeconds}">
-          <span>s</span>
+          <span>${t('sec')}</span>
         </div>
       </div>` : ''}
       <div class="modal-actions">
-        ${isEdit ? `<button class="btn-modal-delete" onclick="deleteFromModal()">Supprimer</button>` : '<span></span>'}
+        ${isEdit ? `<button class="btn-modal-delete" onclick="deleteFromModal()">${t('delete')}</button>` : '<span></span>'}
         <div class="modal-actions-right">
-          <button class="btn-modal-cancel" onclick="closeModal()">Annuler</button>
-          <button class="btn-modal-save" onclick="submitModal()">${isEdit?'Enregistrer':'Ajouter'}</button>
+          <button class="btn-modal-cancel" onclick="closeModal()">${t('cancel')}</button>
+          <button class="btn-modal-save" onclick="submitModal()">${isEdit?t('save'):t('add')}</button>
         </div>
       </div>
     </div>
@@ -1474,11 +1640,11 @@ function renderPauseOverlay(){
   if(!activePause) return '';
   return `
   <div class="pause-overlay">
-    <button class="pause-close" onclick="endPauseEarly()" title="Terminer la pause">×</button>
-    <div class="pause-label">Pause</div>
+    <button class="pause-close" onclick="endPauseEarly()" title="${t('earlyEnd')}">×</button>
+    <div class="pause-label">${t('pauseLabel')}</div>
     <div class="pause-reward-name">${esc(activePause.rewardName)}</div>
     <div class="pause-display" id="pauseDisplay">${formatTime(activePause.remainingSeconds)}</div>
-    <div class="pause-refund-hint" id="pauseRefundHint">Fin anticipée : +${computeRefund()} pts</div>
+    <div class="pause-refund-hint" id="pauseRefundHint">${t('earlyEnd')} : +${computeRefund()} pts</div>
   </div>`;
 }
 
@@ -1486,29 +1652,29 @@ function renderEndOfDayOverlay(){
   if(!endOfDayScreenActive) return '';
   return `
   <div class="pause-overlay endday-overlay">
-    <div class="pause-label">Fin de journée</div>
-    <div class="pause-reward-name">La journée est close</div>
-    <button class="btn-rallonge" onclick="returnFromEndOfDay()">Rallonge</button>
+    <div class="pause-label">${t('endOfDayScreenTitle')}</div>
+    <div class="pause-reward-name">${t('endOfDayScreenSub')}</div>
+    <button class="btn-rallonge" onclick="returnFromEndOfDay()">${t('rallonge')}</button>
   </div>`;
 }
 
 /* ---------- Rendu des lignes ---------- */
-function taskRowHtml(t){
-  const cdActive = isCooldownActive(t);
-  const remaining = cdActive ? Math.ceil((t.cooldownUntil-Date.now())/1000) : 0;
+function taskRowHtml(tk){
+  const cdActive = isCooldownActive(tk);
+  const remaining = cdActive ? Math.ceil((tk.cooldownUntil-Date.now())/1000) : 0;
   const actionHtml = cdActive
-    ? `<span class="cooldown-chip" data-until="${t.cooldownUntil}">${formatTime(remaining)}</span>`
-    : `<button class="btn-do" onclick="completeTask('${t.id}')">Fait</button>`;
+    ? `<span class="cooldown-chip" data-until="${tk.cooldownUntil}">${formatTime(remaining)}</span>`
+    : `<button class="btn-do" onclick="completeTask('${tk.id}')">${t('done')}</button>`;
   return `
-    <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${t.id}" data-list="task"
+    <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${tk.id}" data-list="task"
       ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
-      <span class="entry-name">${esc(t.name)}${t.limitedUses?' <span class="badge-single">×'+t.usesLeft+'</span>':''}</span>
-      <span class="entry-pts">+${t.pts}</span>
+      <span class="entry-name">${esc(tk.name)}${tk.limitedUses?' <span class="badge-single">×'+tk.usesLeft+'</span>':''}</span>
+      <span class="entry-pts">+${tk.pts}</span>
       <div class="entry-actions">
         ${actionHtml}
-        <button class="btn-edit" title="Modifier"
+        <button class="btn-edit" title="${t('edit')}"
           onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
-          onclick="openEditTaskModal('${t.id}')">✎</button>
+          onclick="openEditTaskModal('${tk.id}')">✎</button>
       </div>
     </div>`;
 }
@@ -1519,7 +1685,7 @@ function rewardRowHtml(r){
   const canAfford = state.balance >= r.cost;
   const actionHtml = cdActive
     ? `<span class="cooldown-chip" data-until="${r.cooldownUntil}">${formatTime(remaining)}</span>`
-    : `<button class="btn-redeem" ${canAfford?'':'disabled'} onclick="redeemReward('${r.id}')">Échanger</button>`;
+    : `<button class="btn-redeem" ${canAfford?'':'disabled'} onclick="redeemReward('${r.id}')">${t('redeem')}</button>`;
   return `
     <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${r.id}" data-list="reward"
       ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
@@ -1527,7 +1693,7 @@ function rewardRowHtml(r){
       <span class="entry-pts">-${r.cost}</span>
       <div class="entry-actions">
         ${actionHtml}
-        <button class="btn-edit" title="Modifier"
+        <button class="btn-edit" title="${t('edit')}"
           onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
           onclick="openEditRewardModal('${r.id}')">✎</button>
       </div>
@@ -1535,7 +1701,7 @@ function rewardRowHtml(r){
 }
 
 function journalGroupsHtml(){
-  if(!state.history.length) return '<div class="empty">Le journal est vide. Termine une tâche pour commencer.</div>';
+  if(!state.history.length) return `<div class="empty">${t('journalEmpty')}</div>`;
   const groups = groupHistoryByDay(state.history);
   const todayKey = dayKey(Date.now());
   return groups.map(g=>{
@@ -1547,7 +1713,7 @@ function journalGroupsHtml(){
         <span class="jtime">${formatEntryTime(h.ts)}</span>
         <span class="jlabel">${esc(h.label)}</span>
         <span class="jdelta ${h.type}">${h.type==='gain'?'+':'-'}${h.delta}</span>
-        <span class="jbalance">solde ${h.balance}</span>
+        <span class="jbalance">${t('solde')} ${h.balance}</span>
       </div>
     `).join('');
     return `
@@ -1555,7 +1721,7 @@ function journalGroupsHtml(){
         <button class="day-header" onclick="toggleDay('${g.key}')">
           <span class="day-chevron ${open?'open':''}">›</span>
           <span class="day-title">${formatDayLabel(g.entries[0].ts)}</span>
-          <span class="day-count">${g.entries.length} mouvement${g.entries.length>1?'s':''}</span>
+          <span class="day-count">${g.entries.length} ${g.entries.length>1?t('movements'):t('movement')}</span>
         </button>
         <div class="day-body" style="${open?'':'display:none;'}">
           ${rowsHtml}
@@ -1568,8 +1734,8 @@ function render(){
   const app = document.getElementById('app');
   const modalSnap = snapshotModalInputs();
 
-  const tasksHtml = state.tasks.length ? state.tasks.map(taskRowHtml).join('') : '<div class="empty">Aucune tâche pour l’instant.</div>';
-  const rewardsHtml = state.rewards.length ? state.rewards.map(rewardRowHtml).join('') : '<div class="empty">Aucune récompense pour l’instant.</div>';
+  const tasksHtml = state.tasks.length ? state.tasks.map(taskRowHtml).join('') : `<div class="empty">${t('noTasks')}</div>`;
+  const rewardsHtml = state.rewards.length ? state.rewards.map(rewardRowHtml).join('') : `<div class="empty">${t('noRewards')}</div>`;
 
   app.innerHTML = `
     ${renderAppMenu()}
@@ -1579,64 +1745,64 @@ function render(){
         <h1>DeepWork</h1>
       </div>
       <div class="balance-block">
-        <div class="balance-label">Solde actuel</div>
+        <div class="balance-label">${t('balanceLabel')}</div>
         <div class="balance-num">${state.balance}</div>
       </div>
     </div>
 
     <div class="chrono-panel">
       <div class="chrono-left">
-        <div class="chrono-eyebrow">Chrono à points</div>
+        <div class="chrono-eyebrow">${t('chronoEyebrow')}</div>
         <div class="chrono-config">
-          <span>Donne</span>
+          <span>${t('chronoGives')}</span>
           <input type="number" min="1" value="${state.chrono.pts}" ${chronoRunning?'disabled':''} onchange="updateChronoPts(this.value)">
-          <span>pts toutes les</span>
+          <span>${t('chronoEvery')}</span>
           <input type="number" min="1" value="${state.chrono.minutes}" ${chronoRunning?'disabled':''} onchange="updateChronoMinutes(this.value)">
-          <span>min</span>
+          <span>${t('chronoMin')}</span>
         </div>
       </div>
       <div class="chrono-right">
         ${state.dayStarted ? `
         <div class="chrono-display" id="chronoDisplay">${formatTime(remainingSeconds)}</div>
         <div class="chrono-buttons">
-          <button class="btn-chrono ${chronoRunning?'running':''}" onclick="toggleChrono()">${chronoRunning?'Pause':'Démarrer'}</button>
-          <button class="btn-chrono-reset" onclick="resetChrono()">Réinitialiser</button>
+          <button class="btn-chrono ${chronoRunning?'running':''}" onclick="toggleChrono()">${chronoRunning?t('pause'):t('start')}</button>
+          <button class="btn-chrono-reset" onclick="resetChrono()">${t('reset')}</button>
         </div>` : `
-        <button class="btn-start-day" onclick="startDay()">Commencer la journée</button>`}
+        <button class="btn-start-day" onclick="startDay()">${t('startDay')}</button>`}
       </div>
     </div>
 
     <div class="columns">
       <div class="panel tasks">
-        <h2>Tâches <span class="tag">gagner</span></h2>
+        <h2>${t('tasksTitle')} <span class="tag">${t('tasksTag')}</span></h2>
         <div id="taskList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'task')">
           ${tasksHtml}
         </div>
-        <button class="btn-add-open" onclick="openAddTaskModal()">+ Ajouter une tâche</button>
+        <button class="btn-add-open" onclick="openAddTaskModal()">${t('addTask')}</button>
       </div>
 
       <div class="panel rewards">
-        <h2>Récompenses <span class="tag">dépenser</span></h2>
+        <h2>${t('rewardsTitle')} <span class="tag">${t('rewardsTag')}</span></h2>
         <div class="end-of-day-block">
           <div class="entry-row">
-            <span class="entry-name">Fin de journée</span>
+            <span class="entry-name">${t('endOfDay')}</span>
             <span class="entry-pts">-${state.endOfDayReward.cost}</span>
             <div class="entry-actions">
-              <button class="btn-redeem" ${state.balance<state.endOfDayReward.cost?'disabled':''} onclick="redeemEndOfDay()">Échanger</button>
-              <button class="btn-edit" title="Modifier le coût" onclick="openEditEndOfDayModal()">✎</button>
+              <button class="btn-redeem" ${state.balance<state.endOfDayReward.cost?'disabled':''} onclick="redeemEndOfDay()">${t('redeem')}</button>
+              <button class="btn-edit" title="${t('edit')}" onclick="openEditEndOfDayModal()">✎</button>
             </div>
           </div>
         </div>
         <div id="rewardList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'reward')">
           ${rewardsHtml}
         </div>
-        <button class="btn-add-open" onclick="openAddRewardModal()">+ Ajouter une récompense</button>
+        <button class="btn-add-open" onclick="openAddRewardModal()">${t('addReward')}</button>
       </div>
     </div>
 
     <div class="journal">
-      <h2>Journal</h2>
-      <div class="sub">Historique des mouvements</div>
+      <h2>${t('journalTitle')}</h2>
+      <div class="sub">${t('journalSub')}</div>
       ${journalGroupsHtml()}
     </div>
 
