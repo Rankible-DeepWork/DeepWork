@@ -1,0 +1,19 @@
+{
+  "name": "DeepWork – Gamified Task & Habit Tracker",
+  "short_name": "DeepWork",
+  "description": "Earn points for completing tasks and habits, then spend them on real rewards and breaks. A free, gamified to-do list that helps you build focus and beat procrastination.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A2E42",
+  "theme_color": "#0A2E42",
+  "lang": "en",
+  "categories": ["productivity", "lifestyle", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
