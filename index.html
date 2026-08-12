@@ -2,6 +2,23 @@
 <html lang="en" data-theme="original">
 <head>
 <meta charset="UTF-8">
+<script>
+(function(){
+  try{
+    var theme;
+    var raw = localStorage.getItem('DeepWorkSave');
+    if(raw){
+      var saved = JSON.parse(raw);
+      theme = saved && saved.theme;
+    }
+    if(!theme){
+      var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      theme = isDark ? 'abyssal' : 'original';
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){ /* on garde le thème par défaut si ça échoue */ }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DeepWork – Gamified Task &amp; Habit Tracker with Points and Rewards</title>
 <meta name="description" content="DeepWork is a free gamified productivity app: earn points for completing tasks and habits, then spend them on real rewards and breaks. Build focus, beat procrastination, and turn your to-do list into a game. Works offline, no account needed.">
@@ -106,43 +123,6 @@
     --navy-hover:#0A3B54;
   }
 
-  html[data-theme="sable"]{
-    --paper:#FBF7EF;
-    --paper-deep:#F2EBDC;
-    --line:#E2D5BC;
-    --ink:#3B342A;
-    --navy:#6B5D48;
-    --gold:#4F94A6;
-    --gold-deep:#3D7A8A;
-    --rust:#C97B4A;
-    --sage:#7FA07A;
-    --sage-deep:#5F8459;
-
-    --radius-scale:0.5;
-    --bg-body:var(--paper);
-    --bg-chrono:var(--navy);
-    --shadow-chrono:none;
-    --shadow-panel:none;
-    --shadow-modal:0 8px 20px rgba(59,52,42,0.12);
-    --shadow-drawer:2px 0 12px rgba(59,52,42,0.1);
-    --on-dark:var(--paper);
-    --masthead-color:var(--ink);
-    --masthead-weight:500;
-    --masthead-size:29px;
-    --engraved-color:var(--navy);
-    --balance-color:var(--navy);
-    --endday-bg:var(--ink);
-    --hover-edit:rgba(59,52,42,0.06);
-    --hover-day:rgba(59,52,42,0.03);
-    --hover-menu-item:rgba(59,52,42,0.05);
-    --cooldown-bg:rgba(59,52,42,0.08);
-    --daypast-bg:rgba(59,52,42,0.03);
-    --gold-hover:#6FB0C0;
-    --rust-hover:#B3693A;
-    --redeem-disabled:#D8C9AE;
-    --navy-hover:#584C3A;
-  }
-
   html[data-theme="original"]{
     --paper:#ECE4D3;
     --paper-deep:#E3D8C1;
@@ -155,19 +135,17 @@
     --sage:#4B6650;
     --sage-deep:#38503D;
 
-    --radius-scale:0.15;
-    --bg-body:var(--paper);
-    --bg-chrono:var(--navy);
-    --shadow-chrono:none;
-    --shadow-panel:none;
-    --shadow-modal:0 12px 28px rgba(0,0,0,0.25);
+    --bg-body:radial-gradient(ellipse 900px 500px at 50% -10%, #F3E9D5 0%, var(--paper) 60%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #3A5568);
+    --shadow-chrono:0 0 40px rgba(169,120,47,0.15), 0 10px 28px rgba(0,0,0,0.25);
+    --shadow-panel:0 6px 20px rgba(0,0,0,0.12);
+    --shadow-modal:0 16px 40px rgba(0,0,0,0.22);
     --shadow-drawer:6px 0 24px rgba(0,0,0,0.18);
     --on-dark:var(--paper);
-    --masthead-color:var(--ink);
-    --masthead-weight:600;
-    --masthead-size:30px;
-    --engraved-color:var(--navy);
-    --balance-color:var(--navy);
+    --masthead-color:var(--gold);
+    --masthead-shadow:0 0 18px rgba(169,120,47,0.35);
+    --engraved-color:#B08A4A;
+    --balance-color:var(--gold);
     --endday-bg:var(--ink);
     --hover-edit:rgba(31,46,42,0.06);
     --hover-day:rgba(31,46,42,0.03);
@@ -335,6 +313,19 @@
     text-align:center;
   }
   .btn-start-day:hover{ background:var(--sage-deep); }
+  .startday-chevrons{
+    display:inline-flex; gap:1px; margin-right:9px; vertical-align:middle;
+  }
+  .startday-chevrons .chev{
+    font-size:16px; font-weight:700; line-height:1;
+    opacity:var(--base-op);
+    animation:chevFlash 2.6s ease-in-out infinite;
+  }
+  @keyframes chevFlash{
+    0%, 100%{ opacity:var(--base-op); }
+    8%{ opacity:1; }
+    20%{ opacity:var(--base-op); }
+  }
 
   .columns{ display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:24px; margin-bottom:28px; }
   @media (max-width:640px){ .columns{grid-template-columns:1fr;} }
@@ -574,6 +565,15 @@
     padding:8px 4px; border-radius:calc(12px * var(--radius-scale));
   }
   .btn-modal-delete:hover{ text-decoration:underline; }
+  .delete-confirm-group{ display:flex; align-items:center; gap:6px; }
+  .btn-delete-cancel{
+    background:transparent; color:var(--ink); opacity:0.55;
+    width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; line-height:1;
+    transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-delete-cancel:hover{ opacity:1; background:var(--hover-edit); }
   .btn-modal-cancel{
     background:transparent; color:var(--ink); opacity:0.7; font-size:12.5px;
     padding:8px 12px; border-radius:calc(12px * var(--radius-scale));
@@ -736,7 +736,6 @@
   }
   .theme-dot-standard{ background:linear-gradient(135deg,#17A6B4,#0B4F6C); }
   .theme-dot-abyssal{ background:linear-gradient(135deg,#2FE3F2,#04283A); }
-  .theme-dot-sable{ background:linear-gradient(135deg,#4F94A6,#F2EBDC); }
   .theme-dot-original{ background:linear-gradient(135deg,#A9782F,#24384A); }
   .theme-swatch-text{ display:flex; flex-direction:column; gap:1px; flex:1; }
   .theme-swatch-label{ font-size:13px; font-weight:600; }
@@ -836,6 +835,152 @@
     from{ opacity:1; visibility:visible; }
     to{ opacity:0; visibility:hidden; }
   }
+
+  /* Fenêtre Notes */
+  .notes-window{
+    position:fixed;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    width:60vw; max-width:504px; min-width:300px;
+    height:75vh; max-height:640px; min-height:380px;
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:calc(20px * var(--radius-scale));
+    box-shadow:0 24px 60px rgba(11,46,58,0.35);
+    z-index:160;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    transition:width 0.2s ease, height 0.2s ease, min-height 0.2s ease;
+  }
+  .notes-window.minimized{ height:auto; min-height:0; max-height:none; width:280px; min-width:0; }
+  .notes-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 10px 14px 18px;
+    border-bottom:1px solid var(--line);
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:15px;
+    cursor:move;
+    user-select:none;
+    flex-shrink:0;
+    gap:8px;
+  }
+  .notes-window.minimized .notes-header{ border-bottom:none; }
+  .notes-header-title{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .notes-header-actions{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
+  .notes-minimize, .notes-close{
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; line-height:1;
+    background:transparent; color:var(--ink); opacity:0.6;
+    transition:background 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+  }
+  .notes-minimize:hover{ background:var(--hover-edit); opacity:1; }
+  .notes-minimize:active, .notes-close:active{ transform:scale(0.9); }
+  .notes-close:hover{ background:#E5484D; color:#fff; opacity:1; }
+  .notes-body{
+    flex:1; overflow-y:auto; padding:16px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--line) transparent;
+  }
+  .notes-body::-webkit-scrollbar{ width:6px; }
+  .notes-body::-webkit-scrollbar-track{ background:transparent; }
+  .notes-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+  .notes-body::-webkit-scrollbar-button{ display:none; width:0; height:0; }
+  .notes-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .note-card{
+    position:relative;
+    aspect-ratio:3/4;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    overflow:hidden;
+    transition:transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+  }
+  /* légère variation de teinte entre les notes, en boucle de 5 pour ne jamais partir en vrille */
+  .note-card:nth-child(5n+1){ filter:hue-rotate(0deg); }
+  .note-card:nth-child(5n+2){ filter:hue-rotate(18deg); }
+  .note-card:nth-child(5n+3){ filter:hue-rotate(-18deg); }
+  .note-card:nth-child(5n+4){ filter:hue-rotate(34deg); }
+  .note-card:nth-child(5n+5){ filter:hue-rotate(-34deg); }
+  .note-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(11,46,58,0.15); }
+  .note-card-open{
+    width:100%; height:100%;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    text-align:left;
+    background:transparent;
+  }
+  .note-card-arrow{
+    position:absolute; bottom:5px;
+    width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    color:var(--ink); opacity:0.4;
+    font-size:15px; font-weight:700; line-height:1;
+    background:var(--paper-deep);
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .note-card-arrow-left{ left:5px; }
+  .note-card-arrow-right{ right:5px; }
+  .note-card-arrow:hover{ opacity:1; background:var(--hover-edit); }
+  .note-card-arrow:disabled{ opacity:0.12; cursor:default; }
+  .note-card-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:13px;
+    margin-bottom:6px; overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap; width:100%;
+  }
+  .note-card-preview{
+    font-size:11.5px; opacity:0.65; line-height:1.4;
+    overflow:hidden; display:-webkit-box;
+    -webkit-line-clamp:5; -webkit-box-orient:vertical;
+    padding-bottom:24px;
+  }
+  .notes-empty{ text-align:center; margin-top:20px; }
+  .notes-footer{
+    flex-shrink:0;
+    padding:14px 16px 18px;
+    border-top:1px solid var(--line);
+    display:flex; justify-content:center;
+  }
+  .notes-footer-edit{ justify-content:space-between; align-items:center; }
+  .btn-add-note{
+    border-radius:999px;
+    padding:12px 34px;
+    background:var(--gold);
+    color:var(--on-dark);
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    letter-spacing:0.3px;
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+  .btn-add-note:hover{ background:var(--gold-hover); }
+  .btn-add-note:active{ transform:scale(0.97); }
+  .note-editor{
+    display:flex; flex-direction:column; gap:10px; height:100%;
+  }
+  .note-editor input[type="text"]{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:15px;
+    padding:9px 10px; border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    background:var(--paper-deep); color:var(--ink);
+  }
+  .note-editor textarea{
+    flex:1; min-height:160px; resize:vertical;
+    padding:10px; border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    background:var(--paper-deep); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.5;
+  }
+  @media (max-width:640px){
+    .notes-window{ width:88vw; max-width:none; height:80vh; }
+  }
 </style>
 
   
@@ -870,12 +1015,21 @@ let dragSrcList = null;
 /* Pause plein écran */
 let activePause = null;
 let chronoWasRunningBeforePause = false;
+let chronoWasRunningBeforeEndOfDay = false;
 
 /* Écran fin de journée */
 let endOfDayScreenActive = false;
 
 /* Menu application */
 let appMenuOpen = false;
+
+/* Fenêtre notes */
+let notesWindowOpen = false;
+let notesWinPos = null;
+let notesView = 'list';
+let notesEditingId = null;
+let noteDeleteConfirming = false;
+let notesMinimized = false;
 let appMenuView = 'main';
 
 /* Journal groupé par jour */
@@ -920,12 +1074,11 @@ const I18N = {
     cooldownToggle:'Cooldown avant de pouvoir la refaire', duration:'Durée', min:'min', sec:'s',
     singleUseToggle:"Nombre d'utilisations limité", uses:'Utilisations',
     pauseToggle:"Déclenche une pause à l'échange",
-    delete:'Supprimer', cancel:'Annuler', save:'Enregistrer', add:'Ajouter',
+    delete:'Supprimer', cancel:'Annuler', save:'Enregistrer', add:'Ajouter', confirm:'Confirmer',
     menu:'Menu', settings:'Paramètres', calculator:'Calculatrice', reminder:'Rappel', notepad:'Bloc-notes', soon:'Bientôt',
     appearance:'Apparence',
     themeStandardLabel:'Standard', themeStandardDesc:'Océan clair et moderne',
     themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Fond sombre, accents lumineux',
-    themeSableLabel:'Sable', themeSableDesc:'Minimaliste, tons chauds',
     themeOriginalLabel:'Original', themeOriginalDesc:'Le tout premier style du carnet',
     language:'Langue', daySection:'Journée',
     langFr:'Français', langEn:'English', langEs:'Español',
@@ -942,6 +1095,16 @@ const I18N = {
     separatorPlaceholder:'Ex. Matin',
     dailyTaskToggle:'Tâche journalière',
     dailyTaskHint:'Revient chaque jour : au lieu d’être supprimée une fois les utilisations épuisées, la tâche se réinitialise automatiquement à la nouvelle journée.',
+    newNote:'Nouvelle note',
+    untitled:'Sans titre',
+    notesEmpty:'Aucune note pour l’instant.',
+    noteTitlePlaceholder:'Titre',
+    noteContentPlaceholder:'Écris quelque chose…',
+    minimize:'Réduire',
+    move:'Déplacer',
+    moveLeft:'Déplacer à gauche',
+    moveRight:'Déplacer à droite',
+    restore:'Agrandir',
     opening:'Ouverture du carnet…',
   },
   en:{
@@ -969,12 +1132,11 @@ const I18N = {
     cooldownToggle:'Cooldown before it can be done again', duration:'Duration', min:'min', sec:'s',
     singleUseToggle:'Limited number of uses', uses:'Uses',
     pauseToggle:'Triggers a break when redeemed',
-    delete:'Delete', cancel:'Cancel', save:'Save', add:'Add',
+    delete:'Delete', cancel:'Cancel', save:'Save', add:'Add', confirm:'Confirm',
     menu:'Menu', settings:'Settings', calculator:'Calculator', reminder:'Reminder', notepad:'Notepad', soon:'Soon',
     appearance:'Appearance',
     themeStandardLabel:'Standard', themeStandardDesc:'Bright, modern ocean',
     themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Dark background, glowing accents',
-    themeSableLabel:'Sand', themeSableDesc:'Minimal, warm tones',
     themeOriginalLabel:'Original', themeOriginalDesc:'The very first journal style',
     language:'Language', daySection:'Day',
     langFr:'Français', langEn:'English', langEs:'Español',
@@ -991,6 +1153,16 @@ const I18N = {
     separatorPlaceholder:'E.g. Morning',
     dailyTaskToggle:'Daily task',
     dailyTaskHint:'Comes back every day: instead of being deleted once its uses run out, the task resets automatically at the new day.',
+    newNote:'New note',
+    untitled:'Untitled',
+    notesEmpty:'No notes yet.',
+    noteTitlePlaceholder:'Title',
+    noteContentPlaceholder:'Write something…',
+    minimize:'Minimize',
+    move:'Move',
+    moveLeft:'Move left',
+    moveRight:'Move right',
+    restore:'Restore',
     opening:'Opening your journal…',
   },
   es:{
@@ -1018,12 +1190,11 @@ const I18N = {
     cooldownToggle:'Espera antes de poder repetirla', duration:'Duración', min:'min', sec:'s',
     singleUseToggle:'Número limitado de usos', uses:'Usos',
     pauseToggle:'Activa una pausa al canjearla',
-    delete:'Eliminar', cancel:'Cancelar', save:'Guardar', add:'Añadir',
+    delete:'Eliminar', cancel:'Cancelar', save:'Guardar', add:'Añadir', confirm:'Confirmar',
     menu:'Menú', settings:'Ajustes', calculator:'Calculadora', reminder:'Recordatorio', notepad:'Notas', soon:'Pronto',
     appearance:'Apariencia',
     themeStandardLabel:'Estándar', themeStandardDesc:'Océano claro y moderno',
     themeAbyssalLabel:'Abisal', themeAbyssalDesc:'Fondo oscuro, acentos brillantes',
-    themeSableLabel:'Arena', themeSableDesc:'Minimalista, tonos cálidos',
     themeOriginalLabel:'Original', themeOriginalDesc:'El primer estilo del diario',
     language:'Idioma', daySection:'Día',
     langFr:'Français', langEn:'English', langEs:'Español',
@@ -1040,6 +1211,16 @@ const I18N = {
     separatorPlaceholder:'Ej. Mañana',
     dailyTaskToggle:'Tarea diaria',
     dailyTaskHint:'Vuelve cada día: en lugar de eliminarse al agotar sus usos, la tarea se reinicia automáticamente en el nuevo día.',
+    newNote:'Nueva nota',
+    untitled:'Sin título',
+    notesEmpty:'Aún no hay notas.',
+    noteTitlePlaceholder:'Título',
+    noteContentPlaceholder:'Escribe algo…',
+    minimize:'Minimizar',
+    move:'Mover',
+    moveLeft:'Mover a la izquierda',
+    moveRight:'Mover a la derecha',
+    restore:'Restaurar',
     opening:'Abriendo tu diario…',
   }
 };
@@ -1052,6 +1233,13 @@ function currentLocale(){
   return LOCALE_MAP[lang] || 'en-US';
 }
 
+function getPreferredTheme(){
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'abyssal';
+  }catch(e){ /* pas grave, on retombe sur Original */ }
+  return 'original';
+}
+
 function defaultState(){
   return {
     balance: 0,
@@ -1059,18 +1247,24 @@ function defaultState(){
     dayStarted: false,
     lastProcessedDayBoundary: null,
     dayStartHour: 5,
-    theme: 'original',
+    theme: getPreferredTheme(),
     endOfDayPaidToday: false,
+    notes: [],
     language: 'en',
     endOfDayReward: { cost: 50 },
     tasks: [
-      { id: cryptoId(), name: 'Sport', pts: 4, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
-      { id: cryptoId(), name: 'Clean desk', pts: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
-      { id: cryptoId(), name: 'Personal work done', pts: 5, cooldownEnabled:true, cooldownMinutes:1, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false }
+      { id: cryptoId(), isSeparator:true, text:'Work' },
+      { id: cryptoId(), name: 'Finish Personal Work', pts: 10, cooldownEnabled:true, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), name: 'Make Progression', pts: 2, cooldownEnabled:true, cooldownMinutes:30, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), isSeparator:true, text:'Life' },
+      { id: cryptoId(), name: 'Workout', pts: 3, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:1, maxUses:1, dailyTask:true },
+      { id: cryptoId(), name: 'Dishwash', pts: 2, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), name: 'Cleaning', pts: 1, cooldownEnabled:true, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:3, maxUses:3, dailyTask:true }
     ],
     rewards: [
-      { id: cryptoId(), name: '30 of free time', cost: 15, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:30, pauseSeconds:0 },
-      { id: cryptoId(), name: 'Joker (5 min)', cost: 8, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:5, pauseSeconds:0 }
+      { id: cryptoId(), name: '1h Free Time', cost: 20, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:60, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Joker (5 min)', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:5, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Snack', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:false, pauseMinutes:15, pauseSeconds:0 }
     ],
     history: []
   };
@@ -1095,8 +1289,9 @@ async function load(){
   if(state.dayStarted===undefined) state.dayStarted = false;
   if(state.lastProcessedDayBoundary===undefined) state.lastProcessedDayBoundary = null;
   if(state.dayStartHour===undefined || state.dayStartHour===null) state.dayStartHour = 5;
-  if(!state.theme) state.theme = 'original';
+  if(!state.theme || state.theme==='sable') state.theme = getPreferredTheme();
   if(state.endOfDayPaidToday===undefined) state.endOfDayPaidToday = false;
+  if(!Array.isArray(state.notes)) state.notes = [];
   if(!state.language) state.language = 'en';
   applyTheme(state.theme);
   document.documentElement.setAttribute('lang', state.language);
@@ -1329,13 +1524,158 @@ function redeemEndOfDay(){
     save();
     trackEvent('fin-journee-achetee');
   }
+  if(chronoRunning){
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    chronoWasRunningBeforeEndOfDay = true;
+  }else{
+    chronoWasRunningBeforeEndOfDay = false;
+  }
   endOfDayScreenActive = true;
   render();
 }
 
 function returnFromEndOfDay(){
   endOfDayScreenActive = false;
+  if(chronoWasRunningBeforeEndOfDay){
+    chronoWasRunningBeforeEndOfDay = false;
+    chronoRunning = true;
+    chronoHandle = setInterval(chronoTick, 1000);
+  }
   render();
+}
+
+function openNotesWindow(){
+  notesWindowOpen = true;
+  notesView = 'list';
+  notesEditingId = null;
+  notesWinPos = null;
+  notesMinimized = false;
+  appMenuOpen = false;
+  render();
+}
+function cleanupEmptyNote(){
+  if(!notesEditingId) return;
+  const n = state.notes.find(x=>x.id===notesEditingId);
+  if(n && !n.title.trim() && !n.content.trim()){
+    state.notes = state.notes.filter(x=>x.id!==notesEditingId);
+    save();
+  }
+  notesEditingId = null;
+}
+function closeNotesWindow(){
+  if(notesView==='edit') cleanupEmptyNote();
+  notesWindowOpen = false;
+  noteDeleteConfirming = false;
+  render();
+}
+function toggleNotesWindow(){
+  if(notesWindowOpen){
+    closeNotesWindow();
+  }else{
+    openNotesWindow();
+  }
+}
+function toggleNotesMinimize(){
+  const win = document.getElementById('notesWindow');
+  let desiredRight = null, desiredTop = null;
+  if(win){
+    const rect = win.getBoundingClientRect();
+    desiredRight = rect.right;
+    desiredTop = rect.top;
+  }
+  notesMinimized = !notesMinimized;
+  render();
+  requestAnimationFrame(function(){
+    const win2 = document.getElementById('notesWindow');
+    if(win2 && desiredRight!==null){
+      const rect2 = win2.getBoundingClientRect();
+      const newLeft = desiredRight - rect2.width;
+      notesWinPos = { x:newLeft, y:desiredTop };
+      win2.style.left = newLeft+'px';
+      win2.style.top = desiredTop+'px';
+      win2.style.transform = 'none';
+    }
+  });
+}
+function openNoteEditor(id){
+  if(id){
+    notesEditingId = id;
+  }else{
+    const fresh = { id:cryptoId(), title:'', content:'', updatedAt:Date.now() };
+    state.notes.unshift(fresh);
+    notesEditingId = fresh.id;
+    save();
+  }
+  notesView = 'edit';
+  noteDeleteConfirming = false;
+  render();
+}
+function backToNotesList(){
+  cleanupEmptyNote();
+  notesView = 'list';
+  noteDeleteConfirming = false;
+  render();
+}
+function autoSaveNote(){
+  if(!notesEditingId) return;
+  const n = state.notes.find(x=>x.id===notesEditingId);
+  if(!n) return;
+  const titleEl = document.getElementById('noteTitleInput');
+  const contentEl = document.getElementById('noteContentInput');
+  n.title = titleEl ? titleEl.value : '';
+  n.content = contentEl ? contentEl.value : '';
+  n.updatedAt = Date.now();
+  save();
+}
+function moveNote(id, direction){
+  const idx = state.notes.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  const newIdx = idx + direction;
+  if(newIdx<0 || newIdx>=state.notes.length) return;
+  const [item] = state.notes.splice(idx,1);
+  state.notes.splice(newIdx,0,item);
+  save(); render();
+}
+
+function askDeleteNoteConfirm(){
+  noteDeleteConfirming = true;
+  render();
+}
+function cancelDeleteNoteConfirm(){
+  noteDeleteConfirming = false;
+  render();
+}
+function deleteNote(){
+  if(!notesEditingId) return;
+  state.notes = state.notes.filter(x=>x.id!==notesEditingId);
+  save();
+  notesEditingId = null;
+  notesView = 'list';
+  noteDeleteConfirming = false;
+  render();
+}
+function startNotesDrag(e){
+  if(e.target.closest('.notes-close, .notes-minimize')) return;
+  const win = document.getElementById('notesWindow');
+  if(!win) return;
+  const rect = win.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const offsetY = e.clientY - rect.top;
+  function onMove(ev){
+    const x = Math.max(4, Math.min(window.innerWidth - 40, ev.clientX - offsetX));
+    const y = Math.max(4, Math.min(window.innerHeight - 40, ev.clientY - offsetY));
+    notesWinPos = { x, y };
+    win.style.left = x+'px';
+    win.style.top = y+'px';
+    win.style.transform = 'none';
+  }
+  function onUp(){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
 }
 
 function toggleAppMenu(){
@@ -1464,7 +1804,7 @@ function renderMenuViewBody(){
     case 'settings-danger': return renderSettingsDanger();
     default: return `
       <div class="app-menu-item soon-item"><span>${t('reminder')}</span><span class="soon">${t('soon')}</span></div>
-      <div class="app-menu-item soon-item"><span>${t('notepad')}</span><span class="soon">${t('soon')}</span></div>
+      <button class="app-menu-item clickable" onclick="toggleNotesWindow()"><span>${t('notepad')}</span><span class="chevron">›</span></button>
       <button class="app-menu-item clickable" onclick="openSettingsView()"><span>${t('settings')}</span><span class="chevron">›</span></button>
     `;
   }
@@ -1492,7 +1832,6 @@ function renderSettingsAppearance(){
   const themes = [
     { id:'standard', label:t('themeStandardLabel'), desc:t('themeStandardDesc') },
     { id:'abyssal', label:t('themeAbyssalLabel'), desc:t('themeAbyssalDesc') },
-    { id:'sable', label:t('themeSableLabel'), desc:t('themeSableDesc') },
     { id:'original', label:t('themeOriginalLabel'), desc:t('themeOriginalDesc') }
   ];
   const themeSwatches = themes.map(th=>`
@@ -1676,7 +2015,7 @@ function onContainerDrop(e, list){
 }
 function finishDrop(targetList, targetId, insertAfter){
   if(!dragSrcId || dragSrcList!==targetList){ resetDrag(); return; }
-  const arr = targetList==='task' ? state.tasks : state.rewards;
+  const arr = targetList==='task' ? state.tasks : targetList==='reward' ? state.rewards : state.notes;
   const fromIdx = arr.findIndex(x=>x.id===dragSrcId);
   if(fromIdx<0){ resetDrag(); return; }
   const [item] = arr.splice(fromIdx,1);
@@ -1699,9 +2038,9 @@ function onRowDragEnd(e){
   resetDrag();
 }
 function resetDrag(){ dragSrcId=null; dragSrcList=null; }
-function armDrag(el){ el.closest('.entry-row, .separator-row').setAttribute('draggable','true'); }
+function armDrag(el){ el.closest('.entry-row, .separator-row, .note-card').setAttribute('draggable','true'); }
 function disarmDrag(el){
-  const row = el.closest('.entry-row, .separator-row');
+  const row = el.closest('.entry-row, .separator-row, .note-card');
   if(!row.classList.contains('dragging')) row.removeAttribute('draggable');
 }
 
@@ -1715,10 +2054,10 @@ function openAddSeparatorModal(){ modal = { type:'add-separator' }; render(); }
 function openEditSeparatorModal(id){ modal = { type:'edit-separator', id }; render(); }
 function closeModal(){ modal = null; render(); }
 
-const MODAL_INPUT_IDS = ['modalName','modalPts','modalCooldownChk','modalCooldownMin','modalCooldownSec','modalLimitedUsesChk','modalUsesLeft','modalDailyTaskChk','modalPauseChk','modalPauseMin','modalPauseSec','modalEndDayCost','modalSeparatorText','settingsDayHour'];
+const MODAL_INPUT_IDS = ['modalName','modalPts','modalCooldownChk','modalCooldownMin','modalCooldownSec','modalLimitedUsesChk','modalUsesLeft','modalDailyTaskChk','modalPauseChk','modalPauseMin','modalPauseSec','modalEndDayCost','modalSeparatorText','settingsDayHour','noteTitleInput','noteContentInput'];
 
 function snapshotModalInputs(){
-  if(!modal && appMenuView!=='settings-day') return null;
+  if(!modal && appMenuView!=='settings-day' && notesView!=='edit') return null;
   const snap = {};
   MODAL_INPUT_IDS.forEach(id=>{
     const el = document.getElementById(id);
@@ -1960,6 +2299,71 @@ function renderModal(){
   </div>`;
 }
 
+function noteCardHtml(n, idx, total){
+  const title = esc(n.title) || t('untitled');
+  const preview = esc((n.content||'').slice(0,140));
+  const canLeft = idx > 0;
+  const canRight = idx < total-1;
+  return `
+  <div class="note-card">
+    <button class="note-card-open" onclick="openNoteEditor('${n.id}')">
+      <div class="note-card-title">${title}</div>
+      <div class="note-card-preview">${preview}</div>
+    </button>
+    <button class="note-card-arrow note-card-arrow-left" onclick="moveNote('${n.id}',-1)" ${canLeft?'':'disabled'} title="${t('moveLeft')}">‹</button>
+    <button class="note-card-arrow note-card-arrow-right" onclick="moveNote('${n.id}',1)" ${canRight?'':'disabled'} title="${t('moveRight')}">›</button>
+  </div>`;
+}
+
+const MINIMIZE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+const RESTORE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+
+function renderNotesWindow(){
+  if(!notesWindowOpen) return '';
+  const posStyle = notesWinPos ? `left:${notesWinPos.x}px; top:${notesWinPos.y}px; transform:none;` : '';
+  let bodyHtml;
+  let footerHtml;
+  if(notesView==='edit'){
+    const n = notesEditingId ? state.notes.find(x=>x.id===notesEditingId) : null;
+    bodyHtml = `
+      <div class="note-editor">
+        <input type="text" id="noteTitleInput" placeholder="${t('noteTitlePlaceholder')}" value="${esc(n?n.title:'')}" oninput="autoSaveNote()">
+        <textarea id="noteContentInput" placeholder="${t('noteContentPlaceholder')}" oninput="autoSaveNote()">${esc(n?n.content:'')}</textarea>
+      </div>`;
+    footerHtml = `
+      <div class="notes-footer notes-footer-edit">
+        ${noteDeleteConfirming
+          ? `<div class="delete-confirm-group">
+               <button class="btn-modal-delete" onclick="deleteNote()">${t('confirm')}</button>
+               <button class="btn-delete-cancel" onclick="cancelDeleteNoteConfirm()" title="${t('cancel')}">×</button>
+             </div>`
+          : `<button class="btn-modal-delete" onclick="askDeleteNoteConfirm()">${t('delete')}</button>`}
+        <div class="modal-actions-right">
+          <button class="btn-modal-save" onclick="backToNotesList()">${t('done')}</button>
+        </div>
+      </div>`;
+  }else{
+    bodyHtml = state.notes.length
+      ? `<div class="notes-grid">${state.notes.map((n,idx)=>noteCardHtml(n,idx,state.notes.length)).join('')}</div>`
+      : `<div class="empty notes-empty">${t('notesEmpty')}</div>`;
+    footerHtml = `
+      <div class="notes-footer">
+        <button class="btn-add-note" onclick="openNoteEditor()">+ ${t('newNote')}</button>
+      </div>`;
+  }
+  return `
+  <div class="notes-window ${notesMinimized?'minimized':''}" id="notesWindow" style="${posStyle}">
+    <div class="notes-header" onmousedown="startNotesDrag(event)">
+      <span class="notes-header-title">${notesView==='edit' ? t('edit') : t('notepad')}</span>
+      <div class="notes-header-actions">
+        <button class="notes-minimize" onclick="toggleNotesMinimize()" title="${notesMinimized?t('restore'):t('minimize')}">${notesMinimized?RESTORE_ICON:MINIMIZE_ICON}</button>
+        <button class="notes-close" onclick="closeNotesWindow()" title="${t('cancel')}">×</button>
+      </div>
+    </div>
+    ${notesMinimized ? '' : `<div class="notes-body">${bodyHtml}</div>${footerHtml}`}
+  </div>`;
+}
+
 function renderPauseOverlay(){
   if(!activePause) return '';
   return `
@@ -2107,7 +2511,7 @@ function render(){
           <button class="btn-chrono ${chronoRunning?'running':''}" onclick="toggleChrono()">${chronoRunning?t('pause'):t('start')}</button>
           <button class="btn-chrono-reset" onclick="resetChrono()">${t('reset')}</button>
         </div>` : `
-        <button class="btn-start-day" onclick="startDay()">${t('startDay')}</button>`}
+        <button class="btn-start-day" onclick="startDay()"><span class="startday-chevrons"><span class="chev" style="--base-op:0.25">›</span><span class="chev" style="--base-op:0.55; animation-delay:0.18s;">›</span><span class="chev" style="--base-op:0.9; animation-delay:0.36s;">›</span></span>${t('startDay')}</button>`}
       </div>
     </div>
 
@@ -2149,6 +2553,7 @@ function render(){
     ${renderModal()}
     ${renderPauseOverlay()}
     ${renderEndOfDayOverlay()}
+    ${renderNotesWindow()}
   `;
   restoreModalInputs(modalSnap);
 }
