@@ -24,7 +24,8 @@
 <meta name="description" content="DeepWork is a free gamified productivity app: earn points for completing tasks and habits, then spend them on real rewards and breaks. Build focus, beat procrastination, and turn your to-do list into a game. Works offline, no account needed.">
 <meta name="keywords" content="task tracker, habit tracker, gamified productivity, points and rewards app, todo list game, focus app, deep work, procrastination app, self discipline app, reward system app">
 <meta name="author" content="DeepWork">
-<link rel="canonical" href="https://rankible-deepwork.github.io/DeepWork/">
+<!-- Remplace l'URL ci-dessous par celle où tu héberges réellement le site (Cloudflare Pages, domaine perso, etc.) -->
+<link rel="canonical" href="VOTRE-URL-ICI">
 <meta name="robots" content="index, follow">
 
 <meta property="og:type" content="website">
@@ -365,9 +366,35 @@
   }
   .entry-row:last-of-type{border-bottom:none;}
   .entry-row.dragging, .separator-row.dragging{opacity:0.35;}
+  .entry-row.drag-hidden, .separator-row.drag-hidden{display:none;}
   .entry-row.is-cooldown{opacity:0.55;}
-  .entry-row.drag-over-top, .separator-row.drag-over-top{ box-shadow: inset 0 2px 0 0 var(--gold); }
-  .entry-row.drag-over-bottom, .separator-row.drag-over-bottom{ box-shadow: inset 0 -2px 0 0 var(--gold); }
+  .drag-placeholder{
+    min-height:42px;
+    margin:4px 0;
+    border:2px dashed var(--gold);
+    border-radius:calc(10px * var(--radius-scale));
+    background:rgba(23,166,180,0.08);
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:0 10px;
+  }
+  .drag-preview-name{
+    font-size:14.5px;
+    font-style:italic;
+    opacity:0.6;
+    overflow-wrap:anywhere;
+    min-width:0;
+  }
+  .drag-preview-pts{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+    opacity:0.6;
+    white-space:nowrap;
+  }
   .entry-name{ font-size:14.5px; flex:1; min-width:0; overflow-wrap:anywhere; }
   .entry-pts{ font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; white-space:nowrap; }
   .tasks .entry-pts{color:var(--sage-deep);}
@@ -636,9 +663,10 @@
     cursor:pointer;
     box-shadow:0 3px 8px rgba(0,0,0,0.22);
     z-index:70;
+    transition:background 0.15s ease, transform 0.1s ease;
   }
   .app-menu-btn:hover{ background:var(--navy-hover); }
-  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); }
+  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); animation:menuBackdropIn 0.25s ease; }
   .app-drawer{
     position:fixed;
     top:0; left:0; bottom:0;
@@ -667,9 +695,10 @@
   .drawer-close, .drawer-back{
     background:transparent; border:none; cursor:pointer;
     font-size:19px; color:var(--ink); opacity:0.55; padding:2px 6px;
+    border-radius:50%; transition:background 0.15s ease, transform 0.1s ease;
   }
   .drawer-close:hover, .drawer-back:hover{ opacity:1; }
-  .app-drawer-body{ padding:12px 16px 20px; overflow-y:auto; flex:1; color:var(--ink); }
+  .app-drawer-body{ padding:12px 16px 20px; overflow-y:auto; flex:1; color:var(--ink); animation:menuItemIn 0.22s ease; }
   .app-menu-item{
     display:flex; align-items:center; gap:8px;
     padding:11px 8px;
@@ -680,6 +709,7 @@
     background:transparent;
     border:none;
     font-family:'Inter',sans-serif;
+    transition:background 0.15s ease, transform 0.1s ease;
   }
   .app-menu-item.soon-item{ opacity:0.42; }
   .app-menu-item.clickable{ cursor:pointer; opacity:1; }
@@ -732,6 +762,7 @@
   .theme-swatch-dot{
     width:28px; height:28px; border-radius:50%; flex-shrink:0;
     box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);
+    transition:transform 0.15s ease;
   }
   .theme-dot-standard{ background:linear-gradient(135deg,#17A6B4,#0B4F6C); }
   .theme-dot-abyssal{ background:linear-gradient(135deg,#2FE3F2,#04283A); }
@@ -743,13 +774,11 @@
 
   /* Animations du menu */
   @keyframes menuBackdropIn{ from{ opacity:0; } to{ opacity:1; } }
-  .app-menu-backdrop{ animation:menuBackdropIn 0.25s ease; }
 
   @keyframes menuItemIn{
     from{ opacity:0; transform:translateX(-12px); }
     to{ opacity:1; transform:translateX(0); }
   }
-  .app-drawer-body{ animation:menuItemIn 0.22s ease; }
   .app-drawer-body > *{ animation:menuItemIn 0.3s cubic-bezier(0.22,0.61,0.36,1) backwards; }
   .app-drawer-body > *:nth-child(1){ animation-delay:0.05s; }
   .app-drawer-body > *:nth-child(2){ animation-delay:0.10s; }
@@ -757,14 +786,10 @@
   .app-drawer-body > *:nth-child(4){ animation-delay:0.20s; }
   .app-drawer-body > *:nth-child(5){ animation-delay:0.25s; }
 
-  .app-menu-item{ transition:background 0.15s ease, transform 0.1s ease; }
   .app-menu-item.clickable:active{ transform:scale(0.97); }
-  .theme-swatch-dot{ transition:transform 0.15s ease; }
   .theme-swatch:hover .theme-swatch-dot{ transform:scale(1.08); }
 
-  .app-menu-btn{ transition:background 0.15s ease, transform 0.1s ease; }
   .app-menu-btn:active{ transform:scale(0.92); }
-  .drawer-close, .drawer-back{ transition:background 0.15s ease, transform 0.1s ease; border-radius:50%; }
   .drawer-close:active, .drawer-back:active{ transform:scale(0.9); }
 
   /* Catégories de paramètres */
@@ -867,7 +892,7 @@
   .notes-header-title{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .notes-header-actions{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
   .notes-minimize, .notes-close{
-    width:28px; height:28px; border-radius:50%;
+    width:30px; height:30px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     font-size:18px; line-height:1;
     background:transparent; color:var(--ink); opacity:0.6;
@@ -917,11 +942,12 @@
   }
   .note-card-arrow{
     position:absolute; bottom:5px;
-    width:22px; height:22px;
+    width:24px; height:24px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
     color:var(--ink); opacity:0.4;
-    font-size:15px; font-weight:700; line-height:1;
+    font-size:16px; font-weight:700; line-height:1;
+    padding:0 0 1px;
     background:var(--paper-deep);
     transition:opacity 0.15s ease, background 0.15s ease;
   }
@@ -1010,6 +1036,7 @@ let modal = null;
 /* Drag & drop */
 let dragSrcId = null;
 let dragSrcList = null;
+let dragPreviewHtml = '';
 
 /* Pause plein écran */
 let activePause = null;
@@ -1242,7 +1269,7 @@ function getPreferredTheme(){
 function defaultState(){
   return {
     balance: 0,
-    chrono: { pts: 2, minutes: 5 },
+    chrono: { pts: 1, minutes: 4 },
     dayStarted: false,
     lastProcessedDayBoundary: null,
     dayStartHour: 5,
@@ -1982,50 +2009,110 @@ function onRowDragStart(e){
   const row = e.currentTarget;
   dragSrcId = row.dataset.id;
   dragSrcList = row.dataset.list;
+  dragPreviewHtml = buildDragPreviewHtml(dragSrcList, dragSrcId);
   e.dataTransfer.effectAllowed = 'move';
   row.classList.add('dragging');
+  // On masque la ligne source juste après le démarrage du drag (setTimeout 0, sinon
+  // certains navigateurs annulent le drag si la source disparaît trop tôt).
+  // Ça évite d'avoir deux repères en même temps (ligne grisée + placeholder) :
+  // seul le placeholder en pointillés indique où l'élément va atterrir.
+  setTimeout(function(){ row.classList.add('drag-hidden'); }, 0);
 }
-function clearDragOverClasses(){
-  document.querySelectorAll('.drag-over-top,.drag-over-bottom').forEach(function(el){
-    el.classList.remove('drag-over-top','drag-over-bottom');
-  });
+function buildDragPreviewHtml(list, id){
+  const arr = list==='task' ? state.tasks : state.rewards;
+  const item = arr.find(function(x){ return x.id===id; });
+  if(!item) return '';
+  if(item.isSeparator){
+    return `<span class="drag-preview-name">${esc(item.text||'')}</span>`;
+  }
+  const ptsHtml = list==='task'
+    ? `<span class="drag-preview-pts">+${item.pts}</span>`
+    : `<span class="drag-preview-pts">-${item.cost}</span>`;
+  return `<span class="drag-preview-name">${esc(item.name)}</span>${ptsHtml}`;
+}
+function placePlaceholder(container, beforeEl){
+  let placeholder = container.querySelector('.drag-placeholder');
+  if(!placeholder){
+    placeholder = document.createElement('div');
+    placeholder.className = 'drag-placeholder';
+    placeholder.innerHTML = dragPreviewHtml;
+  }
+  if(beforeEl) container.insertBefore(placeholder, beforeEl);
+  else container.appendChild(placeholder);
+}
+function cleanupPlaceholder(){
+  document.querySelectorAll('.drag-placeholder').forEach(function(el){ el.remove(); });
 }
 function onRowDragOver(e){
   e.preventDefault();
+  e.stopPropagation();
   const row = e.currentTarget;
   if(!dragSrcId || row.dataset.id===dragSrcId || row.dataset.list!==dragSrcList) return;
   const rect = row.getBoundingClientRect();
   const midpoint = rect.top + rect.height/2;
-  clearDragOverClasses();
-  if(e.clientY < midpoint) row.classList.add('drag-over-top');
-  else row.classList.add('drag-over-bottom');
+  placePlaceholder(row.parentElement, e.clientY < midpoint ? row : row.nextElementSibling);
 }
-function onRowDrop(e){
-  e.preventDefault(); e.stopPropagation();
-  const row = e.currentTarget;
-  const insertAfter = row.classList.contains('drag-over-bottom');
-  clearDragOverClasses();
-  finishDrop(row.dataset.list, row.dataset.id, insertAfter);
+function onContainerDragOver(e, list){
+  e.preventDefault();
+  if(e.target !== e.currentTarget) return;
+  if(!dragSrcId || dragSrcList!==list) return;
+  placePlaceholderByPosition(e.currentTarget, e.clientY);
+}
+function placePlaceholderByPosition(container, clientY){
+  // Le survol tombe ici sur le "fond" du conteneur plutôt que sur une ligne précise :
+  // ça arrive au-dessus de la 1ère ligne, sous la dernière, mais aussi dans la fine
+  // marge qui entoure le placeholder lui-même (elle n'appartient à aucune ligne).
+  // Avant, on renvoyait systématiquement le repère tout en bas dans ce cas, ce qui
+  // provoquait un clignotement dès que la souris frôlait cette marge. On cherche
+  // maintenant la ligne réelle la plus proche pour décider avant/après, comme le
+  // fait déjà onRowDragOver quand on survole une ligne directement.
+  const rows = Array.from(container.children).filter(function(el){
+    return el.dataset && el.dataset.id && el.dataset.id !== dragSrcId;
+  });
+  let target = null;
+  for(let i=0;i<rows.length;i++){
+    const rect = rows[i].getBoundingClientRect();
+    if(clientY < rect.top + rect.height/2){ target = rows[i]; break; }
+  }
+  placePlaceholder(container, target);
 }
 function onContainerDrop(e, list){
   e.preventDefault();
-  clearDragOverClasses();
-  finishDrop(list, null, false);
+  dropAtPlaceholder(list);
 }
-function finishDrop(targetList, targetId, insertAfter){
-  if(!dragSrcId || dragSrcList!==targetList){ resetDrag(); return; }
-  const arr = targetList==='task' ? state.tasks : targetList==='reward' ? state.rewards : state.notes;
+function dropAtPlaceholder(list){
+  const container = document.getElementById(list==='task' ? 'taskList' : 'rewardList');
+  const placeholder = container ? container.querySelector('.drag-placeholder') : null;
+  if(!dragSrcId || dragSrcList!==list || !placeholder){
+    cleanupPlaceholder();
+    resetDrag();
+    document.querySelectorAll('.dragging').forEach(function(el){
+      el.classList.remove('dragging');
+      el.classList.remove('drag-hidden');
+      el.removeAttribute('draggable');
+    });
+    return;
+  }
+  let nextId = null;
+  let sib = placeholder.nextElementSibling;
+  // On ignore aussi la ligne en cours de déplacement : elle est toujours présente
+  // dans le DOM (juste masquée visuellement) tant que le drop n'a pas eu lieu.
+  // Sans ça, si le placeholder atterrit juste devant elle, on la prend comme
+  // "élément suivant", on ne la retrouve plus dans le tableau (déjà retirée juste
+  // au-dessus) et l'élément déplacé finit tout en bas de la liste.
+  while(sib && (!sib.dataset.id || sib.dataset.id===dragSrcId)) sib = sib.nextElementSibling;
+  if(sib) nextId = sib.dataset.id;
+  cleanupPlaceholder();
+  const arr = list==='task' ? state.tasks : state.rewards;
   const fromIdx = arr.findIndex(x=>x.id===dragSrcId);
   if(fromIdx<0){ resetDrag(); return; }
   const [item] = arr.splice(fromIdx,1);
-  if(targetId===null || targetId===dragSrcId){
-    arr.push(item);
-  }else{
-    let toIdx = arr.findIndex(x=>x.id===targetId);
-    if(toIdx<0) toIdx = arr.length;
-    else if(insertAfter) toIdx += 1;
-    arr.splice(toIdx,0,item);
+  let toIdx = arr.length;
+  if(nextId){
+    const idx2 = arr.findIndex(x=>x.id===nextId);
+    if(idx2>=0) toIdx = idx2;
   }
+  arr.splice(toIdx,0,item);
   resetDrag();
   save(); render();
 }
@@ -2033,10 +2120,11 @@ function onRowDragEnd(e){
   const row = e.currentTarget;
   row.removeAttribute('draggable');
   row.classList.remove('dragging');
-  clearDragOverClasses();
+  row.classList.remove('drag-hidden');
+  cleanupPlaceholder();
   resetDrag();
 }
-function resetDrag(){ dragSrcId=null; dragSrcList=null; }
+function resetDrag(){ dragSrcId=null; dragSrcList=null; dragPreviewHtml=''; }
 function armDrag(el){ el.closest('.entry-row, .separator-row, .note-card').setAttribute('draggable','true'); }
 function disarmDrag(el){
   const row = el.closest('.entry-row, .separator-row, .note-card');
@@ -2390,7 +2478,7 @@ function taskRowHtml(tk){
   if(tk.isSeparator){
     return `
     <div class="separator-row" data-id="${tk.id}" data-list="task"
-      ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
       <span class="separator-line"></span>
       <span class="separator-text">${esc(tk.text||'')}</span>
       <span class="separator-line"></span>
@@ -2409,7 +2497,7 @@ function taskRowHtml(tk){
       : `<button class="btn-do" onclick="completeTask('${tk.id}')">${t('done')}</button>`;
   return `
     <div class="entry-row ${(cdActive||exhausted)?'is-cooldown':''}" data-id="${tk.id}" data-list="task"
-      ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
       <span class="entry-name">${esc(tk.name)}${tk.limitedUses?' <span class="badge-single">×'+tk.usesLeft+(tk.dailyTask?' ↻':'')+'</span>':''}</span>
       <span class="entry-pts">+${tk.pts}</span>
       <div class="entry-actions">
@@ -2430,7 +2518,7 @@ function rewardRowHtml(r){
     : `<button class="btn-redeem" ${canAfford?'':'disabled'} onclick="redeemReward('${r.id}')">${t('redeem')}</button>`;
   return `
     <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${r.id}" data-list="reward"
-      ondragover="onRowDragOver(event)" ondrop="onRowDrop(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
       <span class="entry-name">${esc(r.name)}</span>
       <span class="entry-pts">-${r.cost}</span>
       <div class="entry-actions">
@@ -2517,7 +2605,7 @@ function render(){
     <div class="columns">
       <div class="panel tasks">
         <h2>${t('tasksTitle')} <span class="tag">${t('tasksTag')}</span></h2>
-        <div id="taskList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'task')">
+        <div id="taskList" ondragover="onContainerDragOver(event,'task')" ondrop="onContainerDrop(event,'task')">
           ${tasksHtml}
         </div>
         <button class="btn-add-open" onclick="openAddTaskModal()">${t('addTask')}</button>
@@ -2536,7 +2624,7 @@ function render(){
             </div>
           </div>
         </div>
-        <div id="rewardList" ondragover="event.preventDefault()" ondrop="onContainerDrop(event,'reward')">
+        <div id="rewardList" ondragover="onContainerDragOver(event,'reward')" ondrop="onContainerDrop(event,'reward')">
           ${rewardsHtml}
         </div>
         <button class="btn-add-open" onclick="openAddRewardModal()">${t('addReward')}</button>
