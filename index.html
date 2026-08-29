@@ -24,7 +24,8 @@
 <meta name="description" content="DeepWork is a free gamified productivity app: earn points for completing tasks and habits, then spend them on real rewards and breaks. Build focus, beat procrastination, and turn your to-do list into a game. Works offline, no account needed.">
 <meta name="keywords" content="task tracker, habit tracker, gamified productivity, points and rewards app, todo list game, focus app, deep work, procrastination app, self discipline app, reward system app">
 <meta name="author" content="DeepWork">
-<link rel="canonical" href="https://rankible-deepwork.github.io/DeepWork/">
+<!-- Remplace l'URL ci-dessous par celle où tu héberges réellement le site (Cloudflare Pages, domaine perso, etc.) -->
+<link rel="canonical" href="VOTRE-URL-ICI">
 <meta name="robots" content="index, follow">
 
 <meta property="og:type" content="website">
@@ -227,6 +228,24 @@
   }
 
   /* Chrono principal */
+  .chrono-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .chrono-row .chrono-panel{ flex:1; margin-bottom:0; min-width:0; }
+  .streak-badge{
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    white-space:nowrap;
+  }
   .chrono-panel{
     background:var(--bg-chrono);
     color:var(--on-dark);
@@ -354,6 +373,24 @@
     font-weight:400;
   }
 
+  .pinned-box{
+    border:1.5px solid #f2b70566;
+    background:#f2b70514;
+    border-radius:calc(14px * var(--radius-scale));
+    padding:4px 10px;
+    margin-bottom:12px;
+  }
+  .pinned-box-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:#b8880a;
+    opacity:0.85;
+    padding:7px 0 3px;
+  }
+  .pinned-box .entry-row{ background:transparent; }
+
   .entry-row{
     display:flex;
     align-items:center;
@@ -420,6 +457,19 @@
     border-radius:calc(12px * var(--radius-scale));
   }
   .btn-edit:hover{opacity:1; background:var(--hover-edit);}
+  .pin-toggle{
+    background:transparent;
+    color:#9a9a9a;
+    opacity:0.6;
+    line-height:1;
+    padding:5px 6px;
+    border-radius:calc(12px * var(--radius-scale));
+    display:flex;
+    align-items:center;
+    transition:color 0.15s ease, opacity 0.15s ease;
+  }
+  .pin-toggle:hover{ opacity:1; background:var(--hover-edit); }
+  .pin-toggle.is-pinned{ color:#f2b705; opacity:1; }
   .cooldown-chip{
     font-family:'IBM Plex Mono',monospace;
     font-size:11.5px;
@@ -448,7 +498,11 @@
   .separator-row{
     display:flex; align-items:center; gap:8px;
     padding:12px 0 6px;
+    cursor:pointer;
+    transition:opacity 0.15s ease;
   }
+  .separator-row.is-collapsed{ opacity:0.45; }
+  .separator-row.is-collapsed:hover{ opacity:0.65; }
   .separator-line{ flex:1; height:1px; background:var(--line); }
   .separator-text{
     font-family:'IBM Plex Mono',monospace;
@@ -923,12 +977,14 @@
     overflow:hidden;
     transition:transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
   }
-  /* légère variation de teinte entre les notes, en boucle de 5 pour ne jamais partir en vrille */
-  .note-card:nth-child(5n+1){ filter:hue-rotate(0deg); }
-  .note-card:nth-child(5n+2){ filter:hue-rotate(18deg); }
-  .note-card:nth-child(5n+3){ filter:hue-rotate(-18deg); }
-  .note-card:nth-child(5n+4){ filter:hue-rotate(34deg); }
-  .note-card:nth-child(5n+5){ filter:hue-rotate(-34deg); }
+  /* Couleur propre à chaque note (stockée sur la note), en boucle de 5 teintes.
+     Contrairement à nth-child, ça ne dépend plus de la position dans la liste :
+     la couleur reste la même quand on déplace la note. */
+  .note-card.nc0{ filter:hue-rotate(0deg); }
+  .note-card.nc1{ filter:hue-rotate(18deg); }
+  .note-card.nc2{ filter:hue-rotate(-18deg); }
+  .note-card.nc3{ filter:hue-rotate(34deg); }
+  .note-card.nc4{ filter:hue-rotate(-34deg); }
   .note-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(11,46,58,0.15); }
   .note-card-open{
     width:100%; height:100%;
@@ -1028,6 +1084,10 @@ let state = null;
 let chronoRunning = false;
 let chronoHandle = null;
 let remainingSeconds = 0;
+// Horodatage absolu (Date.now()-based) de la fin de l'intervalle en cours.
+// Sert à recalculer le temps réellement écoulé (y compris pendant une veille de
+// l'ordinateur, où setInterval ne tourne pas) plutôt que de compter les ticks un par un.
+let chronoEndsAt = null;
 
 /* Modal ajout / édition */
 let modal = null;
@@ -1061,6 +1121,9 @@ let appMenuView = 'main';
 let explicitOpenDays = new Set();
 let explicitClosedDays = new Set();
 
+/* Tâches : groupes sous un séparateur repliés manuellement (dépliés par défaut) */
+let collapsedSeparators = new Set();
+
 function cryptoId(){ return Math.random().toString(36).slice(2,10); }
 
 function trackEvent(name, data){
@@ -1079,6 +1142,8 @@ const I18N = {
     balanceLabel:'Solde actuel',
     chronoEyebrow:'Chrono à points', chronoGives:'Donne', chronoEvery:'pts toutes les', chronoMin:'min',
     startDay:'Commencer la journée', pause:'Pause', start:'Démarrer', reset:'Réinitialiser',
+    streakLabel:'série', streakBonusLabel:'Série de jours',
+    pin:'Épingler', unpin:'Désépingler', pinnedLabel:'Épinglées',
     tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
     rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
     done:'Fait', redeem:'Échanger', edit:'Modifier',
@@ -1115,6 +1180,7 @@ const I18N = {
     free:'Gratuit',
     doneToday:'Fait aujourd’hui',
     addSeparator:'+ Ajouter un séparateur',
+    expand:'Déplier', collapse:'Replier',
     modalSeparator:'Séparateur',
     separatorTextLabel:'Texte (facultatif)',
     separatorPlaceholder:'Ex. Matin',
@@ -1137,6 +1203,8 @@ const I18N = {
     balanceLabel:'Current balance',
     chronoEyebrow:'Points timer', chronoGives:'Gives', chronoEvery:'pts every', chronoMin:'min',
     startDay:'Start the day', pause:'Pause', start:'Start', reset:'Reset',
+    streakLabel:'streak', streakBonusLabel:'Day streak',
+    pin:'Pin', unpin:'Unpin', pinnedLabel:'Pinned',
     tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
     rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
     done:'Done', redeem:'Redeem', edit:'Edit',
@@ -1173,6 +1241,7 @@ const I18N = {
     free:'Free',
     doneToday:'Done today',
     addSeparator:'+ Add a separator',
+    expand:'Expand', collapse:'Collapse',
     modalSeparator:'Separator',
     separatorTextLabel:'Text (optional)',
     separatorPlaceholder:'E.g. Morning',
@@ -1195,6 +1264,8 @@ const I18N = {
     balanceLabel:'Saldo actual',
     chronoEyebrow:'Cronómetro de puntos', chronoGives:'Da', chronoEvery:'pts cada', chronoMin:'min',
     startDay:'Empezar el día', pause:'Pausa', start:'Iniciar', reset:'Reiniciar',
+    streakLabel:'racha', streakBonusLabel:'Racha de días',
+    pin:'Fijar', unpin:'Desfijar', pinnedLabel:'Fijadas',
     tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
     rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
     done:'Hecho', redeem:'Canjear', edit:'Editar',
@@ -1231,6 +1302,7 @@ const I18N = {
     free:'Gratis',
     doneToday:'Hecho hoy',
     addSeparator:'+ Añadir separador',
+    expand:'Desplegar', collapse:'Plegar',
     modalSeparator:'Separador',
     separatorTextLabel:'Texto (opcional)',
     separatorPlaceholder:'Ej. Mañana',
@@ -1276,7 +1348,8 @@ function defaultState(){
     endOfDayPaidToday: false,
     notes: [],
     language: 'en',
-    endOfDayReward: { cost: 50 },
+    endOfDayReward: { cost: 40 },
+    streak: 0,
     tasks: [
       { id: cryptoId(), isSeparator:true, text:'Work' },
       { id: cryptoId(), name: 'Finish Personal Work', pts: 10, cooldownEnabled:true, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
@@ -1288,6 +1361,7 @@ function defaultState(){
     ],
     rewards: [
       { id: cryptoId(), name: '1h Free Time', cost: 20, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:60, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Watch an Episode', cost: 7, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:25, pauseSeconds:0 },
       { id: cryptoId(), name: 'Joker (5 min)', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:5, pauseSeconds:0 },
       { id: cryptoId(), name: 'Snack', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:false, pauseMinutes:15, pauseSeconds:0 }
     ],
@@ -1317,10 +1391,20 @@ async function load(){
   if(!state.theme || state.theme==='sable') state.theme = getPreferredTheme();
   if(state.endOfDayPaidToday===undefined) state.endOfDayPaidToday = false;
   if(!Array.isArray(state.notes)) state.notes = [];
+  if(state.notes.some(function(n){ return typeof n.color !== 'number'; })){
+    // Migration : les notes sauvegardées avant l'ajout de ce champ n'ont pas de
+    // couleur propre. On leur en attribue une en boucle de 5, en partant de la
+    // plus ancienne (fin du tableau) vers la plus récente (début), pour reproduire
+    // approximativement l'ancien rendu par position tout en la rendant persistante.
+    for(let i=state.notes.length-1, c=0; i>=0; i--, c++){
+      if(typeof state.notes[i].color !== 'number') state.notes[i].color = c % 5;
+    }
+  }
   if(!state.language) state.language = 'en';
   applyTheme(state.theme);
   document.documentElement.setAttribute('lang', state.language);
-  if(!state.endOfDayReward) state.endOfDayReward = { cost:50 };
+  if(!state.endOfDayReward) state.endOfDayReward = { cost:40 };
+  if(typeof state.streak !== 'number') state.streak = 0;
   state.tasks.forEach(t=>{
     if(t.isSeparator) return;
     if(t.cooldownEnabled===undefined) t.cooldownEnabled=false;
@@ -1330,6 +1414,7 @@ async function load(){
     if(t.usesLeft===undefined) t.usesLeft = t.singleUse ? 1 : 1;
     if(t.maxUses===undefined) t.maxUses = t.usesLeft || 1;
     if(t.dailyTask===undefined) t.dailyTask = false;
+    if(t.pinned===undefined) t.pinned = false;
   });
   state.rewards.forEach(r=>{
     if(r.cooldownEnabled===undefined) r.cooldownEnabled=false;
@@ -1409,43 +1494,82 @@ function toggleDay(key){
   }
   render();
 }
+function toggleSeparatorCollapse(id){
+  if(collapsedSeparators.has(id)) collapsedSeparators.delete(id);
+  else collapsedSeparators.add(id);
+  render();
+}
+function toggleTaskPin(id){
+  const tk = state.tasks.find(x=>x.id===id);
+  if(!tk || tk.isSeparator) return;
+  tk.pinned = !tk.pinned;
+  save(); render();
+}
 
 /* ---------- Chrono principal ---------- */
 function toggleChrono(){
   if(chronoRunning){
+    // On fige le temps restant sur sa valeur réelle avant de couper le timer.
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
     clearInterval(chronoHandle);
     chronoRunning = false;
+    chronoEndsAt = null;
     render();
   }else{
     if(remainingSeconds<=0) remainingSeconds = state.chrono.minutes*60;
     chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
+    clearInterval(chronoHandle);
     chronoHandle = setInterval(chronoTick, 1000);
     render();
   }
 }
 function chronoTick(){
-  remainingSeconds -= 1;
-  if(remainingSeconds<=0){
-    state.balance += state.chrono.pts;
-    state.history.unshift({ id: cryptoId(), type:'gain', label:t('chronoJournalLabel')+' ('+state.chrono.minutes+' '+t('min')+')', delta:state.chrono.pts, balance:state.balance, ts:Date.now() });
-    remainingSeconds = state.chrono.minutes*60;
+  if(!chronoRunning || !chronoEndsAt) return;
+  const intervalMs = state.chrono.minutes*60*1000;
+  const now = Date.now();
+  let diff = chronoEndsAt - now;
+  if(diff <= 0){
+    // On a raté un ou plusieurs intervalles (ex : ordi en veille pendant le décompte).
+    // On les rattrape tous d'un coup plutôt que de perdre les points correspondants.
+    let missed = 0;
+    while(diff <= 0){
+      missed++;
+      chronoEndsAt += intervalMs;
+      diff = chronoEndsAt - now;
+    }
+    const gained = missed*state.chrono.pts;
+    state.balance += gained;
+    const label = missed>1
+      ? t('chronoJournalLabel')+' ('+missed+'×'+state.chrono.minutes+' '+t('min')+')'
+      : t('chronoJournalLabel')+' ('+state.chrono.minutes+' '+t('min')+')';
+    state.history.unshift({ id: cryptoId(), type:'gain', label:label, delta:gained, balance:state.balance, ts:Date.now() });
+    remainingSeconds = Math.max(0, Math.ceil(diff/1000));
     save(); render();
     return;
   }
+  remainingSeconds = Math.ceil(diff/1000);
   const el = document.getElementById('chronoDisplay');
   if(el) el.textContent = formatTime(remainingSeconds);
 }
 function resetChrono(){
   clearInterval(chronoHandle);
   chronoRunning = false;
+  chronoEndsAt = null;
   remainingSeconds = state.chrono.minutes*60;
   render();
 }
 function startDay(){
   state.dayStarted = true;
+  // Bonus de série : +1 pt par jour consécutif, plafonné à 5 pts à partir du 5ème jour.
+  state.streak = (state.streak||0) + 1;
+  const bonus = Math.min(state.streak, 5);
+  state.balance += bonus;
+  state.history.unshift({ id: cryptoId(), type:'gain', label:t('streakBonusLabel')+' (×'+state.streak+')', delta:bonus, balance:state.balance, ts:Date.now() });
   remainingSeconds = state.chrono.minutes*60;
   clearInterval(chronoHandle);
   chronoRunning = true;
+  chronoEndsAt = Date.now() + remainingSeconds*1000;
   chronoHandle = setInterval(chronoTick, 1000);
   save(); render();
   trackEvent('journee-demarree');
@@ -1461,9 +1585,10 @@ function checkDayRollover(){
   const nowBoundary = dayBoundaryTs(Date.now());
   if(state.lastProcessedDayBoundary === nowBoundary) return false;
   const isFirstRun = !state.lastProcessedDayBoundary;
+  let daysMissed = 0;
   if(!isFirstRun && nowBoundary > state.lastProcessedDayBoundary){
     const dayMs = 24*60*60*1000;
-    let daysMissed = Math.round((nowBoundary - state.lastProcessedDayBoundary) / dayMs);
+    daysMissed = Math.round((nowBoundary - state.lastProcessedDayBoundary) / dayMs);
     if(daysMissed < 1) daysMissed = 1;
     const before = state.balance;
     for(let i=0;i<daysMissed;i++){ state.balance = Math.floor(state.balance/2); }
@@ -1471,6 +1596,11 @@ function checkDayRollover(){
       const label = daysMissed>1 ? (t('missedDaysLabel')+' ×'+daysMissed+' (-50%'+t('perDay')+')') : t('newDayLabel');
       state.history.unshift({ id:cryptoId(), type:'spend', label:label, delta:(before-state.balance), balance:state.balance, ts:Date.now() });
     }
+  }
+  // Série : si le jour qui vient de se terminer n'a jamais été démarré (ou si plus
+  // d'un jour a été raté d'un coup), la série repart de zéro.
+  if(!isFirstRun && (!state.dayStarted || daysMissed > 1)){
+    state.streak = 0;
   }
   state.lastProcessedDayBoundary = nowBoundary;
   state.dayStarted = false;
@@ -1483,6 +1613,7 @@ function checkDayRollover(){
   });
   clearInterval(chronoHandle);
   chronoRunning = false;
+  chronoEndsAt = null;
   remainingSeconds = state.chrono.minutes*60;
   save();
   return true;
@@ -1507,6 +1638,11 @@ function pauseTotalSeconds(reward){ return (reward.pauseMinutes||0)*60 + (reward
 function completeTask(id){
   const tk = state.tasks.find(x=>x.id===id);
   if(!tk || isCooldownActive(tk)) return;
+  // Une tâche accomplie est toujours désépinglée. Comme l'épinglage n'est qu'un
+  // indicateur d'affichage (la tâche garde sa place dans state.tasks), elle
+  // réapparaît d'elle-même à sa position d'origine dans la liste normale — sauf
+  // si elle est à usage unique et vient d'être retirée du tableau ci-dessous.
+  tk.pinned = false;
   state.balance += tk.pts;
   state.history.unshift({ id: cryptoId(), type:'gain', label:tk.name, delta:tk.pts, balance:state.balance, ts:Date.now() });
   trackEvent('tache-completee', { pts:tk.pts });
@@ -1550,8 +1686,10 @@ function redeemEndOfDay(){
     trackEvent('fin-journee-achetee');
   }
   if(chronoRunning){
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
     clearInterval(chronoHandle);
     chronoRunning = false;
+    chronoEndsAt = null;
     chronoWasRunningBeforeEndOfDay = true;
   }else{
     chronoWasRunningBeforeEndOfDay = false;
@@ -1565,6 +1703,7 @@ function returnFromEndOfDay(){
   if(chronoWasRunningBeforeEndOfDay){
     chronoWasRunningBeforeEndOfDay = false;
     chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
     chronoHandle = setInterval(chronoTick, 1000);
   }
   render();
@@ -1627,7 +1766,7 @@ function openNoteEditor(id){
   if(id){
     notesEditingId = id;
   }else{
-    const fresh = { id:cryptoId(), title:'', content:'', updatedAt:Date.now() };
+    const fresh = { id:cryptoId(), title:'', content:'', updatedAt:Date.now(), color:nextNoteColor() };
     state.notes.unshift(fresh);
     notesEditingId = fresh.id;
     save();
@@ -1635,6 +1774,16 @@ function openNoteEditor(id){
   notesView = 'edit';
   noteDeleteConfirming = false;
   render();
+}
+const NOTE_COLOR_COUNT = 5;
+function nextNoteColor(){
+  // La dernière note créée est toujours en tête du tableau (unshift). On regarde
+  // sa couleur et on prend la suivante dans la boucle de 5 teintes, pour une
+  // rotation stable qui ne dépend pas de l'ordre d'affichage (modifiable via
+  // les flèches) mais bien de l'ordre de création.
+  if(!state.notes.length) return 0;
+  const lastColor = typeof state.notes[0].color === 'number' ? state.notes[0].color : 0;
+  return (lastColor + 1) % NOTE_COLOR_COUNT;
 }
 function backToNotesList(){
   cleanupEmptyNote();
@@ -1931,17 +2080,23 @@ function renderSettingsDanger(){
 /* ---------- Pause plein écran ---------- */
 function startPause(reward, costPaid){
   if(chronoRunning){
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
     clearInterval(chronoHandle);
     chronoRunning = false;
+    chronoEndsAt = null;
     chronoWasRunningBeforePause = true;
   }else{
     chronoWasRunningBeforePause = false;
   }
+  const totalSeconds = pauseTotalSeconds(reward);
   activePause = {
     rewardName: reward.name,
-    totalSeconds: pauseTotalSeconds(reward),
-    remainingSeconds: pauseTotalSeconds(reward),
+    totalSeconds: totalSeconds,
+    remainingSeconds: totalSeconds,
     costPaid: costPaid,
+    // Horodatage de fin absolu : comme pour le chrono, ça permet au décompte de la
+    // pause de continuer correctement même si l'ordi part en veille pendant la pause.
+    endsAt: Date.now() + totalSeconds*1000,
     handle: null
   };
   activePause.handle = setInterval(pauseTick, 1000);
@@ -1949,8 +2104,9 @@ function startPause(reward, costPaid){
 }
 function pauseTick(){
   if(!activePause) return;
-  activePause.remainingSeconds -= 1;
-  if(activePause.remainingSeconds<=0){ finishPause(false); return; }
+  const diff = activePause.endsAt - Date.now();
+  if(diff <= 0){ activePause.remainingSeconds = 0; finishPause(false); return; }
+  activePause.remainingSeconds = Math.ceil(diff/1000);
   updatePauseDisplay();
 }
 function updatePauseDisplay(){
@@ -1984,6 +2140,7 @@ function finishPause(early){
   if(chronoWasRunningBeforePause){
     chronoWasRunningBeforePause = false;
     chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
     chronoHandle = setInterval(chronoTick, 1000);
   }
   render();
@@ -2002,6 +2159,17 @@ function globalTick(){
   if(needsRerender) render();
 }
 setInterval(globalTick, 1000);
+
+// Au réveil de l'onglet (ex : sortie de veille de l'ordi), on recalcule tout de
+// suite plutôt que d'attendre le prochain tick d'1 seconde : ça évite d'avoir un
+// affichage figé pendant un instant, et ça déclenche immédiatement le rattrapage
+// des points/pauses manqués pendant que l'onglet était inactif.
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState !== 'visible') return;
+  if(chronoRunning) chronoTick();
+  if(activePause) pauseTick();
+  globalTick();
+});
 
 /* ---------- Glisser-déposer ---------- */
 function onRowDragStart(e){
@@ -2390,8 +2558,9 @@ function noteCardHtml(n, idx, total){
   const preview = esc((n.content||'').slice(0,140));
   const canLeft = idx > 0;
   const canRight = idx < total-1;
+  const colorClass = 'nc' + (typeof n.color === 'number' ? n.color : 0);
   return `
-  <div class="note-card">
+  <div class="note-card ${colorClass}">
     <button class="note-card-open" onclick="openNoteEditor('${n.id}')">
       <div class="note-card-title">${title}</div>
       <div class="note-card-preview">${preview}</div>
@@ -2403,6 +2572,7 @@ function noteCardHtml(n, idx, total){
 
 const MINIMIZE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
 const RESTORE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+const PIN_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 2a1 1 0 0 1 .78 1.63L15 6.1V12l2.9 3.87A1 1 0 0 1 17.1 17.5H13v4.5a1 1 0 0 1-2 0V17.5H6.9a1 1 0 0 1-.8-1.63L9 12V6.1L7.22 3.63A1 1 0 0 1 8 2h8Z"/></svg>';
 
 function renderNotesWindow(){
   if(!notesWindowOpen) return '';
@@ -2473,17 +2643,22 @@ function renderEndOfDayOverlay(){
 }
 
 /* ---------- Rendu des lignes ---------- */
-function taskRowHtml(tk){
+function taskRowHtml(tk, opts){
+  opts = opts || {};
+  const pinnedView = !!opts.pinnedView;
   if(tk.isSeparator){
+    const collapsed = collapsedSeparators.has(tk.id);
     return `
-    <div class="separator-row" data-id="${tk.id}" data-list="task"
-      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+    <div class="separator-row ${collapsed?'is-collapsed':''}" data-id="${tk.id}" data-list="task"
+      title="${collapsed?t('expand'):t('collapse')}"
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)"
+      onclick="toggleSeparatorCollapse('${tk.id}')">
       <span class="separator-line"></span>
       <span class="separator-text">${esc(tk.text||'')}</span>
       <span class="separator-line"></span>
       <button class="btn-edit sep-edit" title="${t('edit')}"
-        onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
-        onclick="openEditSeparatorModal('${tk.id}')">✎</button>
+        onmousedown="armDrag(this); event.stopPropagation()" onmouseup="disarmDrag(this)"
+        onclick="event.stopPropagation(); openEditSeparatorModal('${tk.id}')">✎</button>
     </div>`;
   }
   const cdActive = isCooldownActive(tk);
@@ -2494,15 +2669,22 @@ function taskRowHtml(tk){
     : exhausted
       ? `<span class="cooldown-chip">${t('doneToday')}</span>`
       : `<button class="btn-do" onclick="completeTask('${tk.id}')">${t('done')}</button>`;
+  // Dans l'encadrement épinglé, la ligne ne doit pas être déplaçable (elle n'a pas
+  // sa place dans la logique de réordonnancement du conteneur #taskList).
+  const dragAttrs = pinnedView ? '' : `ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)"`;
+  const editDragHandlers = pinnedView ? '' : `onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"`;
+  const pinBtn = `<button class="pin-toggle ${tk.pinned?'is-pinned':''}" title="${tk.pinned?t('unpin'):t('pin')}"
+    onclick="toggleTaskPin('${tk.id}')">${PIN_ICON}</button>`;
   return `
     <div class="entry-row ${(cdActive||exhausted)?'is-cooldown':''}" data-id="${tk.id}" data-list="task"
-      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      ${dragAttrs}>
+      ${pinBtn}
       <span class="entry-name">${esc(tk.name)}${tk.limitedUses?' <span class="badge-single">×'+tk.usesLeft+(tk.dailyTask?' ↻':'')+'</span>':''}</span>
       <span class="entry-pts">+${tk.pts}</span>
       <div class="entry-actions">
         ${actionHtml}
         <button class="btn-edit" title="${t('edit')}"
-          onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
+          ${editDragHandlers}
           onclick="openEditTaskModal('${tk.id}')">✎</button>
       </div>
     </div>`;
@@ -2559,11 +2741,39 @@ function journalGroupsHtml(){
   }).join('');
 }
 
+function tasksListHtml(){
+  // Une tâche appartient au groupe du séparateur qui la précède : si ce séparateur
+  // est replié, on n'affiche tout simplement pas la tâche (comme les lignes masquées
+  // pendant un drag). Les séparateurs eux-mêmes restent toujours visibles.
+  // Les tâches épinglées ne sont pas affichées ici : elles vivent dans l'encadrement
+  // épinglé au-dessus (voir pinnedTasksHtml), mais restent à leur place dans le
+  // tableau state.tasks pour retrouver leur position d'origine une fois désépinglées.
+  let collapsed = false;
+  return state.tasks.map(function(tk){
+    if(tk.isSeparator){
+      collapsed = collapsedSeparators.has(tk.id);
+      return taskRowHtml(tk);
+    }
+    if(tk.pinned) return '';
+    if(collapsed) return '';
+    return taskRowHtml(tk);
+  }).join('');
+}
+function pinnedTasksHtml(){
+  const pinned = state.tasks.filter(function(tk){ return !tk.isSeparator && tk.pinned; });
+  if(!pinned.length) return '';
+  return `
+  <div class="pinned-box">
+    <div class="pinned-box-label">${t('pinnedLabel')}</div>
+    ${pinned.map(function(tk){ return taskRowHtml(tk, {pinnedView:true}); }).join('')}
+  </div>`;
+}
+
 function render(){
   const app = document.getElementById('app');
   const modalSnap = snapshotModalInputs();
 
-  const tasksHtml = state.tasks.length ? state.tasks.map(taskRowHtml).join('') : `<div class="empty">${t('noTasks')}</div>`;
+  const tasksHtml = state.tasks.length ? tasksListHtml() : `<div class="empty">${t('noTasks')}</div>`;
   const rewardsHtml = state.rewards.length ? state.rewards.map(rewardRowHtml).join('') : `<div class="empty">${t('noRewards')}</div>`;
 
   app.innerHTML = `
@@ -2579,7 +2789,9 @@ function render(){
       </div>
     </div>
 
-    <div class="chrono-panel">
+    <div class="chrono-row">
+      ${!state.dayStarted && state.streak>0 ? `<div class="streak-badge" title="${t('streakBonusLabel')}">🔥 ${state.streak}</div>` : ''}
+      <div class="chrono-panel">
       <div class="chrono-left">
         <div class="chrono-eyebrow">${t('chronoEyebrow')}</div>
         <div class="chrono-config">
@@ -2599,11 +2811,13 @@ function render(){
         </div>` : `
         <button class="btn-start-day" onclick="startDay()"><span class="startday-chevrons"><span class="chev" style="--base-op:0.25">›</span><span class="chev" style="--base-op:0.55; animation-delay:0.18s;">›</span><span class="chev" style="--base-op:0.9; animation-delay:0.36s;">›</span></span>${t('startDay')}</button>`}
       </div>
+      </div>
     </div>
 
     <div class="columns">
       <div class="panel tasks">
         <h2>${t('tasksTitle')} <span class="tag">${t('tasksTag')}</span></h2>
+        ${pinnedTasksHtml()}
         <div id="taskList" ondragover="onContainerDragOver(event,'task')" ondrop="onContainerDrop(event,'task')">
           ${tasksHtml}
         </div>
