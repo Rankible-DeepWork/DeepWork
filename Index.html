@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="original">
+<head>
+<meta charset="UTF-8">
+<script>
+(function(){
+  try{
+    var theme;
+    var raw = localStorage.getItem('DeepWorkSave');
+    if(raw){
+      var saved = JSON.parse(raw);
+      theme = saved && saved.theme;
+    }
+    if(!theme){
+      var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      theme = isDark ? 'abyssal' : 'original';
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){ /* on garde le thème par défaut si ça échoue */ }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DeepWork – Gamified Task &amp; Habit Tracker with Points and Rewards</title>
+<meta name="description" content="DeepWork is a free gamified productivity app: earn points for completing tasks and habits, then spend them on real rewards and breaks. Build focus, beat procrastination, and turn your to-do list into a game. Works offline, no account needed.">
+<meta name="keywords" content="task tracker, habit tracker, gamified productivity, points and rewards app, todo list game, focus app, deep work, procrastination app, self discipline app, reward system app">
+<meta name="author" content="DeepWork">
+<!-- Remplace l'URL ci-dessous par celle où tu héberges réellement le site (Cloudflare Pages, domaine perso, etc.) -->
+<link rel="canonical" href="VOTRE-URL-ICI">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="DeepWork – Gamified Task &amp; Habit Tracker">
+<meta property="og:description" content="Earn points for tasks and habits, spend them on real rewards and breaks. A free, gamified to-do list that helps you actually get things done.">
+<meta property="og:site_name" content="DeepWork">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepWork – Gamified Task &amp; Habit Tracker">
+<meta name="twitter:description" content="Earn points for tasks and habits, spend them on real rewards and breaks.">
+
+<meta name="theme-color" content="#0A2E42">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAHJklEQVR42q2Xe4xVVxXGf/txXzPMDMPwykRQgSJTWmEIVltC2sQarMRX0TQmtcRAE0yNidJgUm1SoiloTSRUbZuUtpJoWkJpSqNFpCBUhEZEoI2VwdrBlkeRAQZm7uvsvZd/nHPvnDv31j/Uk0zunXPP2d+3Xt9aS0XOiaL5EiCEgARB+O8uBWitUFo33a9h2FYvhhBDZjMZ/h9XFEWAQmvVYIxqRcCHUAc+/vopjp4Y4MrVkTpvQVDUDhJApSyS+nNKhEkTO1jcP4/5fbPqRJTWDSRsK/CTb73D2gc2s/v3R4hGSyC1g6WFE1s5PvlNaXIdBZZ/6hM88v1vMOuDvVSjCJ0KiarlQA38LycG+PSd3+LC+SEK3R1obZrPrv8jTZzq3klI++ApXxqmd+Z0frvjJ9zQ92GqkUNrjaoRQASlFMVShY/dfi8n/zZI56QuqpFDRBpsb0lAjTFo9JNCELJZy7WhYT668CMc2vVzctlMfK5SaADvA8YYtj67i5PHB+iY1MVosQTEDzWC1oCkfkulwAGUIn4v+Yyqjgk9XZz40xs8+8IrGGPwPgDEBJSOX31p9x9RuSxRNWLKpC6qlQjvHEorrNEYrQjetYy5Gl/DkhBMPsUHVMayc9fBhGRsgkbAaI33gXPvDUHWUh4psmjBXJ7e/B2IHD5yjP7rMsXLw7S35RviocYQU/jpB2KgICDWcubcRUQEbfSYB2KiEv+FQFtHO6/sOczNN93Ajl9uxI+Osm7d13hx24+5qX8eUakcC0wTnLQkpdKlGhqzSZOKJSIQAkpDFAK3Lb+PD82YxoE9T7L6q8vZ+ZsD7N1/hGxbjhBCQyEKsQFBAqFujCASEEKSsM2pbJsFGLxzFCYUOHtqkFcPHePSlWt877ubQRtyEzticJWSI2kt5UqNzw5BCA13bPoBSSVPpVKlvXcqbw4M8uhj28h0d2GNwXnfLEOSyojU6SI1qwVRyfe0pqmaB+rFK/UMdRXHrJnTKVeqaKXIWINzHkQQpepCkyajxCPBx4AiKGVA6zjXg4AEIDTIiI1jo5qVRoRsxtLT3UlwriGrGx2tkRDhXRmthBACwXuMNQQBYwza5oFsgqEavKabIxezt/ksg2+/y7zrZlDo7iSqRmhjGjJcKYV3RXz1GuBx10YI5Qr5fA5fjdBaEQ1fpXLxPVChWS9iAg1Bq3/NWMvIxcu8evDPbHhwDdHQFcqlUhLX2Pm+OkpwZbQ2SKnMkqWLGXj911w6fYC137wHNzTE0k/ewhfvWo6vVhNNkFQnTZdhnV5SCd6R65nElief48LZM2x45NtcN2M6GRMHz0dFxFeTLBCUCNN7p/K7vYdZu24jAyffYtuOxznw8lPcfddyopESGJ0yV6WScFzsRUK989uOTh7+wc9YePMi5s7tpVi6xrkLF0mnsyhNMJbnt+9CC6z4/O3csWwpnR0TAPjV87uTZJSmLm5byEDNpiRIFtvdxbEjb3AsnIBCPunn8e/GWlyxxAd6p7Fz+0/pX9AXDx/OETnH24Pv8vKug+Q6J1AplhryMKmC8X1F1VVRBJS2BFfFtreNJY5WiZ4bKiNFcpkML2x7lP4FfRQTmQbI53Lc/+AmildLtE/OUZFxaqhaekBSFAOgUZk8vlrEGIMbLUK5BCYD3tE9bQq/eOaHLO6/nlK5gjEahSKbzbB+w2O8tGMf+SmT8c4nU9J/kGJpkKm4zEQEpQ3G5slKhdVrvgLAubMXmD9vFivvuZO5s2cyWiyRzWbIWAsIDzy0iQ0bnyY/uYfg3dgYlvZALQQigjGGfC6bqFVCQtVyXDCZHJVyYO/e19j0o/u5Y9mtDZa0txUIIbDvwGusf/gJ9u87EoNLSKIauz+Xy9QnJYXCohTeeay13Hj9bI4eOo7WilBrYElmhhAwhQIDpy/wmc/ex/z+PpbespA5s2dgtGbwn2c5ePgER46+CUGTnzJ5bHhRyW5Qjbixb3Z8ng8Ya1DOOfE+kM1m2H/wKLctW01hYle8lNRmTpFxo5amMlqEUrnebFAacjmyE9rQSuG9T6m3whhNafgqf9jzFEs+voBqNcIYjRbAGE0URdy6ZBGrVq2gdOY81hq0VugENJ4NVUwqBArtBdqm9tA2bTJt06bQNrWHfEc7SNwPlAKdAGcyltKZ89y7ekUMHkX1iSieipM8UMmAuvLrD/Hc1p3Q3oYt5NApArzvoqbGVZAQghCVyzAyypfv/hxbn1iPTYBrTa1OoEZCK40xmi1bX+TxLdv566nTFCuJ5CZV0QSd6Edt1K5leyGXoW/OTNas+hKrV34BHwIhBLQaW9Hqi0m9ABMAay0iwt//8Q5Xhq+16GO8z0qbeEOEiRM7mDNrRjxfONdoeQ3TOSetFi7vPcYYrDH/02LqvcclZ7VasFSr9bxBjkJoHr3GvBwbJE2jX13Rx6/m4wn8Gy+8j2kBKFX+AAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="icon-180.png">
+
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DeepWork">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAF7F8;
+    --paper-deep:#DCEFF1;
+    --line:#B7D9DC;
+    --ink:#0B2E3A;
+    --navy:#0B4F6C;
+    --gold:#17A6B4;
+    --gold-deep:#0E8792;
+    --rust:#F2734F;
+    --sage:#2FB6A3;
+    --sage-deep:#1F8E7F;
+
+    --radius-scale:1;
+    --bg-body:linear-gradient(180deg, #F2FBFC 0%, var(--paper) 340px, var(--paper) 100%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #0E6084);
+    --shadow-chrono:0 10px 28px rgba(11,46,58,0.18);
+    --shadow-panel:0 6px 18px rgba(11,46,58,0.06);
+    --shadow-modal:0 12px 28px rgba(11,46,58,0.22);
+    --shadow-drawer:6px 0 24px rgba(11,46,58,0.18);
+    --on-dark:var(--paper);
+    --masthead-color:var(--navy);
+    --masthead-weight:700;
+    --masthead-size:32px;
+    --masthead-shadow:none;
+    --engraved-color:var(--navy);
+    --balance-color:var(--navy);
+    --endday-bg:var(--ink);
+    --hover-edit:rgba(0,0,0,0.06);
+    --hover-day:rgba(0,0,0,0.03);
+    --hover-menu-item:rgba(0,0,0,0.05);
+    --cooldown-bg:rgba(11,46,58,0.1);
+    --daypast-bg:rgba(11,46,58,0.035);
+    --gold-hover:#2FC4D3;
+    --rust-hover:#D65A38;
+    --redeem-disabled:#A9C4C7;
+    --navy-hover:#073B52;
+  }
+
+  html[data-theme="abyssal"]{
+    --paper:#0A141F;
+    --paper-deep:#101F2E;
+    --line:#20384A;
+    --ink:#DCF3F5;
+    --navy:#04283A;
+    --gold:#2FE3F2;
+    --gold-deep:#17B9CC;
+    --rust:#FF8066;
+    --sage:#2FE8C4;
+    --sage-deep:#1FBF9E;
+
+    --bg-body:radial-gradient(ellipse 900px 500px at 50% -10%, #123246 0%, var(--paper) 60%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #0A4A63);
+    --shadow-chrono:0 0 40px rgba(47,227,242,0.12), 0 10px 28px rgba(0,0,0,0.4);
+    --shadow-panel:0 6px 20px rgba(0,0,0,0.35);
+    --shadow-modal:0 16px 40px rgba(0,0,0,0.5);
+    --shadow-drawer:6px 0 24px rgba(0,0,0,0.4);
+    --on-dark:var(--ink);
+    --masthead-color:var(--gold);
+    --masthead-shadow:0 0 18px rgba(47,227,242,0.35);
+    --engraved-color:#5FA9BC;
+    --balance-color:var(--gold);
+    --endday-bg:#020a10;
+    --hover-edit:rgba(255,255,255,0.08);
+    --hover-day:rgba(255,255,255,0.04);
+    --hover-menu-item:rgba(255,255,255,0.07);
+    --cooldown-bg:rgba(255,255,255,0.08);
+    --daypast-bg:rgba(255,255,255,0.025);
+    --gold-hover:#6FF0FA;
+    --rust-hover:#E85F45;
+    --redeem-disabled:#2A4456;
+    --navy-hover:#0A3B54;
+  }
+
+  html[data-theme="original"]{
+    --paper:#ECE4D3;
+    --paper-deep:#E3D8C1;
+    --line:#C9BB9C;
+    --ink:#1F2E2A;
+    --navy:#24384A;
+    --gold:#A9782F;
+    --gold-deep:#8B611F;
+    --rust:#9C4A32;
+    --sage:#4B6650;
+    --sage-deep:#38503D;
+
+    --bg-body:radial-gradient(ellipse 900px 500px at 50% -10%, #F3E9D5 0%, var(--paper) 60%);
+    --bg-chrono:linear-gradient(135deg, var(--navy), #3A5568);
+    --shadow-chrono:0 0 40px rgba(169,120,47,0.15), 0 10px 28px rgba(0,0,0,0.25);
+    --shadow-panel:0 6px 20px rgba(0,0,0,0.12);
+    --shadow-modal:0 16px 40px rgba(0,0,0,0.22);
+    --shadow-drawer:6px 0 24px rgba(0,0,0,0.18);
+    --on-dark:var(--paper);
+    --masthead-color:var(--gold);
+    --masthead-shadow:0 0 18px rgba(169,120,47,0.35);
+    --engraved-color:#B08A4A;
+    --balance-color:var(--gold);
+    --endday-bg:var(--ink);
+    --hover-edit:rgba(31,46,42,0.06);
+    --hover-day:rgba(31,46,42,0.03);
+    --hover-menu-item:rgba(31,46,42,0.05);
+    --cooldown-bg:rgba(31,46,42,0.1);
+    --daypast-bg:rgba(31,46,42,0.035);
+    --gold-hover:#C28F3D;
+    --rust-hover:#83402B;
+    --redeem-disabled:#B9AB8F;
+    --navy-hover:#1A2A37;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-body);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+  .engraved-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    text-align:center;
+    color:var(--engraved-color);
+    margin-bottom:6px;
+    user-select:none;
+  }
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:16px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .masthead h1{
+    font-family:'Outfit',sans-serif;
+    font-weight:var(--masthead-weight);
+    font-size:var(--masthead-size);
+    letter-spacing:0.2px;
+    margin:0;
+    color:var(--masthead-color);
+    text-shadow:var(--masthead-shadow);
+  }
+  .masthead .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+    margin-bottom:4px;
+  }
+  .balance-block{ text-align:right; }
+  .balance-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--balance-color);
+    opacity:0.75;
+  }
+  .balance-num{
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:46px;
+    line-height:1;
+    color:var(--balance-color);
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* Chrono principal */
+  .chrono-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .chrono-row .chrono-panel{ flex:1; margin-bottom:0; min-width:0; }
+  .streak-badge{
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .chrono-panel{
+    background:var(--bg-chrono);
+    color:var(--on-dark);
+    border-radius:calc(22px * var(--radius-scale));
+    padding:22px 24px;
+    margin-bottom:24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    box-shadow:var(--shadow-chrono);
+  }
+  .chrono-left{ display:flex; flex-direction:column; gap:6px; }
+  .chrono-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    opacity:0.65;
+  }
+  .chrono-config{ display:flex; align-items:center; gap:6px; font-size:13.5px; flex-wrap:wrap; }
+  .chrono-config input{
+    width:56px;
+    padding:5px 6px;
+    border:1px solid rgba(236,228,211,0.35);
+    border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:rgba(236,228,211,0.08);
+    color:var(--on-dark);
+  }
+  .chrono-config input:disabled{opacity:0.5;}
+  .chrono-right{ display:flex; align-items:center; gap:18px; }
+  .chrono-display{
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:48px;
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+    min-width:140px;
+    text-align:right;
+  }
+  .chrono-buttons{ display:flex; flex-direction:column; gap:8px; }
+  .btn-chrono{
+    background:var(--gold);
+    color:var(--navy);
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.3px;
+    padding:8px 16px;
+    border-radius:calc(12px * var(--radius-scale));
+    min-width:90px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-chrono:hover{background:var(--gold-hover);}
+  .btn-chrono.running{background:var(--rust);color:#fff;}
+  .btn-chrono.running:hover{background:var(--rust-hover);}
+  .btn-chrono-reset{
+    background:transparent;
+    color:var(--on-dark);
+    opacity:0.55;
+    font-size:11.5px;
+    padding:4px 6px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-chrono-reset:hover{opacity:0.9;}
+  .btn-start-day{
+    background:var(--sage);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    padding:20px 34px;
+    border-radius:calc(12px * var(--radius-scale));
+    border:none;
+    cursor:pointer;
+    min-width:220px;
+    text-align:center;
+  }
+  .btn-start-day:hover{ background:var(--sage-deep); }
+  .startday-chevrons{
+    display:inline-flex; gap:1px; margin-right:9px; vertical-align:middle;
+  }
+  .startday-chevrons .chev{
+    font-size:16px; font-weight:700; line-height:1;
+    opacity:var(--base-op);
+    animation:chevFlash 2.6s ease-in-out infinite;
+  }
+  @keyframes chevFlash{
+    0%, 100%{ opacity:var(--base-op); }
+    8%{ opacity:1; }
+    20%{ opacity:var(--base-op); }
+  }
+
+  .columns{ display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:24px; margin-bottom:28px; }
+  @media (max-width:640px){ .columns{grid-template-columns:1fr;} }
+  .panel{
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:calc(20px * var(--radius-scale));
+    padding:18px 18px 20px;
+    box-shadow:var(--shadow-panel);
+  }
+  .panel h2{
+    font-family:'Outfit',sans-serif;
+    font-size:17px;
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .panel h2 .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    opacity:0.6;
+    font-weight:400;
+  }
+  .panel h2 .h2-right{ display:flex; align-items:center; gap:8px; }
+  .btn-edit-toggle{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    font-size:12.5px;
+    opacity:0.3;
+    padding:3px 5px;
+    border-radius:calc(10px * var(--radius-scale));
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .btn-edit-toggle:hover{ opacity:0.9; background:var(--hover-edit); }
+  .btn-edit-toggle.active{ opacity:0.75; }
+
+  .pinned-box{
+    border:1.5px solid #f2b70566;
+    background:#f2b70514;
+    border-radius:calc(14px * var(--radius-scale));
+    padding:4px 10px;
+    margin-bottom:12px;
+  }
+  .pinned-box-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:#b8880a;
+    opacity:0.85;
+    padding:7px 0 3px;
+  }
+  .pinned-box .entry-row{ background:transparent; }
+
+  .entry-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    transition:opacity 0.15s;
+  }
+  .entry-row:last-of-type{border-bottom:none;}
+  .entry-row.dragging, .separator-row.dragging{opacity:0.35;}
+  .entry-row.drag-hidden, .separator-row.drag-hidden{display:none;}
+  .entry-row.is-cooldown{opacity:0.55;}
+  .drag-placeholder{
+    min-height:42px;
+    margin:4px 0;
+    border:2px dashed var(--gold);
+    border-radius:calc(10px * var(--radius-scale));
+    background:rgba(23,166,180,0.08);
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:0 10px;
+  }
+  .drag-preview-name{
+    font-size:14.5px;
+    font-style:italic;
+    opacity:0.6;
+    overflow-wrap:anywhere;
+    min-width:0;
+  }
+  .drag-preview-pts{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+    opacity:0.6;
+    white-space:nowrap;
+  }
+  .entry-name{ font-size:14.5px; flex:1; min-width:0; overflow-wrap:anywhere; }
+  .entry-pts{ font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; white-space:nowrap; }
+  .tasks .entry-pts{color:var(--sage-deep);}
+  .rewards .entry-pts{color:var(--rust);}
+  .entry-actions{ display:flex; align-items:center; gap:6px; }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; border:none; color:inherit; }
+  .btn-do{
+    background:var(--sage); color:#fff; font-size:11.5px; font-weight:600;
+    letter-spacing:0.3px; padding:6px 10px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-do:hover{background:var(--sage-deep);}
+  .btn-redeem{
+    background:var(--rust); color:#fff; font-size:11.5px; font-weight:600;
+    letter-spacing:0.3px; padding:6px 10px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-redeem:disabled{ background:var(--redeem-disabled); cursor:not-allowed; }
+  .btn-edit{
+    background:transparent;
+    color:var(--ink);
+    opacity:0.55;
+    font-size:15px;
+    line-height:1;
+    padding:5px 7px;
+    border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-edit:hover{opacity:1; background:var(--hover-edit);}
+  /* Masque tous les crayons d'édition individuels (tâches, séparateurs, récompenses,
+     fin de journée) quand la bascule du titre de section est désactivée. Le crayon
+     de bascule lui-même utilise .btn-edit-toggle, une classe distincte, donc il
+     reste toujours visible. */
+  #app.hide-edit-icons .btn-edit{ display:none; }
+  .pin-toggle{
+    background:transparent;
+    color:#9a9a9a;
+    opacity:0.6;
+    line-height:1;
+    padding:5px 6px;
+    border-radius:calc(12px * var(--radius-scale));
+    display:flex;
+    align-items:center;
+    transition:color 0.15s ease, opacity 0.15s ease;
+  }
+  .pin-toggle:hover{ opacity:1; background:var(--hover-edit); }
+  .pin-toggle.is-pinned{ color:#f2b705; opacity:1; }
+  .cooldown-chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink);
+    opacity:0.7;
+    background:var(--cooldown-bg);
+    padding:6px 10px;
+    border-radius:calc(12px * var(--radius-scale));
+    white-space:nowrap;
+    min-width:48px;
+    text-align:center;
+  }
+  .badge-single{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    font-weight:600;
+    color:var(--gold-deep);
+    background:rgba(23,166,180,0.15);
+    padding:2px 5px;
+    border-radius:calc(12px * var(--radius-scale));
+    vertical-align:middle;
+  }
+  .empty{ font-size:13px; opacity:0.6; font-style:italic; padding:6px 0; }
+
+  .separator-row{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 0 6px;
+    cursor:pointer;
+    transition:opacity 0.15s ease;
+  }
+  .separator-row.is-collapsed{ opacity:0.45; }
+  .separator-row.is-collapsed:hover{ opacity:0.65; }
+  .separator-line{ flex:1; height:1px; background:var(--line); }
+  .separator-text{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    opacity:0.65;
+    white-space:nowrap;
+    padding:0 2px;
+  }
+  .sep-edit{ opacity:0.35; }
+  .sep-edit:hover{ opacity:0.9; }
+
+  .btn-add-open{
+    margin-top:12px;
+    width:100%;
+    background:var(--navy);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.2px;
+    padding:9px 0;
+    border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-add-open:hover{background:var(--navy-hover);}
+  .btn-add-secondary{
+    margin-top:6px;
+    width:100%;
+    background:transparent;
+    color:var(--ink);
+    opacity:0.55;
+    font-size:11.5px;
+    font-weight:500;
+    padding:6px 0;
+    border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-add-secondary:hover{ opacity:1; background:var(--hover-edit); }
+  .end-of-day-block{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:6px;
+    margin-bottom:6px;
+    background:rgba(23,166,180,0.07);
+  }
+  .end-of-day-block .entry-row{ border-bottom:none; padding:9px 6px; }
+  .end-of-day-block .entry-name{ font-weight:600; }
+  .end-of-day-hint{
+    font-size:11px;
+    opacity:0.6;
+    padding:0 6px 8px;
+    font-style:italic;
+  }
+
+  .journal{ border:1px solid var(--line); background:var(--paper-deep); border-radius:calc(20px * var(--radius-scale)); padding:18px; box-shadow:var(--shadow-panel); }
+  .journal h2{ font-family:'Outfit',sans-serif; font-size:17px; margin:0 0 4px; }
+  .journal .sub{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px;
+    text-transform:uppercase; opacity:0.55; margin-bottom:10px;
+  }
+  .day-group{ border-bottom:1px solid var(--line); }
+  .day-group:last-child{ border-bottom:none; }
+  .day-header{
+    width:100%;
+    display:flex; align-items:center; gap:10px;
+    background:transparent;
+    padding:9px 2px;
+    font-family:'Inter',sans-serif;
+    text-align:left;
+  }
+  .day-header:hover{ background:var(--hover-day); }
+  .day-chevron{
+    display:inline-block;
+    font-size:14px;
+    color:var(--navy);
+    transition:transform 0.15s;
+    transform:rotate(0deg);
+  }
+  .day-chevron.open{ transform:rotate(90deg); }
+  .day-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:14.5px;
+    text-transform:capitalize; flex:1;
+  }
+  .day-count{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; opacity:0.5;
+  }
+  .day-group.day-past .day-title{ color:var(--ink); opacity:0.75; }
+  .day-group.day-past{ background:var(--daypast-bg); }
+  .day-body{ padding:0 2px 6px; }
+  .jrow{
+    display:grid; grid-template-columns:22px auto 1fr auto auto; align-items:center;
+    gap:12px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px;
+  }
+  .jrow:last-child{border-bottom:none;}
+  .stamp{ width:20px;height:20px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+  .stamp.gain{background:var(--sage);}
+  .stamp.spend{background:var(--rust);}
+  .jtime{ font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:0.55; white-space:nowrap; }
+  .jlabel{overflow-wrap:anywhere;}
+  .jdelta{ font-family:'IBM Plex Mono',monospace; font-weight:600; white-space:nowrap; }
+  .jdelta.gain{color:var(--sage-deep);}
+  .jdelta.spend{color:var(--rust);}
+  .jbalance{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; opacity:0.6; white-space:nowrap; }
+
+  .loading{padding:40px;text-align:center;opacity:0.5;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+
+  /* Modal ajout / édition */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(11,46,58,0.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-card{
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:calc(18px * var(--radius-scale));
+    width:100%;
+    max-width:360px;
+    padding:20px 20px 16px;
+    box-shadow:var(--shadow-modal);
+  }
+  .modal-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:18px;
+    margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:8px;
+  }
+  .modal-field{ display:flex; flex-direction:column; gap:4px; margin-bottom:12px; font-size:12.5px; }
+  .modal-field span{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; opacity:0.65; }
+  .modal-field input{
+    padding:8px 9px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-size:14px; font-family:'Inter',sans-serif; background:var(--paper-deep); color:var(--ink);
+  }
+  .modal-toggle-block{ margin-bottom:12px; padding-top:8px; border-top:1px dashed var(--line); }
+  .modal-checkbox{ display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+  .modal-subfield{ display:flex; align-items:center; gap:6px; margin-top:8px; font-size:12.5px; padding-left:24px; }
+  .modal-subfield input{
+    width:60px; padding:5px 6px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:var(--paper-deep); color:var(--ink);
+  }
+  .modal-subfield-col{ flex-direction:column; align-items:flex-start; gap:0; }
+  .modal-checkbox-nested{ margin-top:10px; font-size:12.5px; }
+  .modal-hint{ font-size:10.5px; opacity:0.6; margin:5px 0 0; line-height:1.4; padding-left:24px; }
+  .modal-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:8px; }
+  .modal-actions-right{ display:flex; gap:8px; }
+  .btn-modal-delete{
+    background:transparent; color:var(--rust); font-size:12px; font-weight:600;
+    padding:8px 4px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-delete:hover{ text-decoration:underline; }
+  .delete-confirm-group{ display:flex; align-items:center; gap:6px; }
+  .btn-delete-cancel{
+    background:transparent; color:var(--ink); opacity:0.55;
+    width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; line-height:1;
+    transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-delete-cancel:hover{ opacity:1; background:var(--hover-edit); }
+  .btn-modal-cancel{
+    background:transparent; color:var(--ink); opacity:0.7; font-size:12.5px;
+    padding:8px 12px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-cancel:hover{opacity:1;}
+  .btn-modal-save{
+    background:var(--sage); color:#fff; font-size:12.5px; font-weight:600;
+    padding:8px 14px; border-radius:calc(12px * var(--radius-scale));
+  }
+  .btn-modal-save:hover{background:var(--sage-deep);}
+
+  /* Ecran de pause */
+  .pause-overlay{
+    position:fixed; inset:0; background:var(--navy); color:var(--on-dark);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:200; gap:10px;
+  }
+  .pause-close{
+    position:absolute; top:20px; right:24px;
+    background:transparent; color:var(--on-dark); opacity:0.7;
+    font-size:28px; line-height:1; padding:6px 10px; border-radius:50%;
+  }
+  .pause-close:hover{opacity:1; background:rgba(236,228,211,0.1);}
+  .pause-label{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:3px;
+    text-transform:uppercase; opacity:0.6;
+  }
+  .pause-reward-name{ font-family:'Outfit',sans-serif; font-size:22px; margin-bottom:8px; }
+  .pause-display{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:88px;
+    font-variant-numeric:tabular-nums; line-height:1;
+  }
+  .pause-refund-hint{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.55; margin-top:14px;
+  }
+  .endday-overlay{ background:var(--endday-bg); }
+  .btn-rallonge{
+    margin-top:26px;
+    background:var(--gold);
+    color:var(--navy);
+    font-weight:700;
+    font-size:13.5px;
+    letter-spacing:0.4px;
+    padding:12px 28px;
+    border-radius:calc(12px * var(--radius-scale));
+    border:none;
+    cursor:pointer;
+  }
+  .btn-rallonge:hover{ background:var(--gold-hover); }
+
+  .app-menu-btn{
+    position:fixed;
+    top:16px; left:16px;
+    width:42px; height:42px;
+    border-radius:50%;
+    background:var(--navy);
+    color:var(--on-dark);
+    font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,0.22);
+    z-index:70;
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+  .app-menu-btn:hover{ background:var(--navy-hover); }
+
+  .menu-fab-stack{
+    position:fixed;
+    top:16px; left:16px;
+    z-index:70;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+  .menu-fab{
+    width:50px; height:50px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, var(--navy-hover), var(--navy));
+    color:var(--on-dark);
+    box-shadow:0 8px 18px rgba(0,0,0,0.36), 0 0 0 3px rgba(255,255,255,0.08) inset;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    animation:menuFabIn 0.24s cubic-bezier(0.22,0.61,0.36,1) backwards;
+  }
+  .menu-fab:hover{ transform:scale(1.09); box-shadow:0 10px 22px rgba(0,0,0,0.44), 0 0 0 3px rgba(255,255,255,0.08) inset; }
+  .menu-fab:active{ transform:scale(0.93); }
+  .menu-fab.disabled{ opacity:0.4; filter:grayscale(1); cursor:not-allowed; }
+  .menu-fab.disabled:hover{ transform:none; box-shadow:0 8px 18px rgba(0,0,0,0.36), 0 0 0 3px rgba(255,255,255,0.08) inset; }
+  .menu-fab-stack .menu-fab:nth-child(1){ animation-delay:0.02s; }
+  .menu-fab-stack .menu-fab:nth-child(2){ animation-delay:0.07s; }
+  .menu-fab-stack .menu-fab:nth-child(3){ animation-delay:0.12s; }
+  .menu-fab-collapse{
+    width:32px; height:32px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper);
+    color:var(--ink);
+    opacity:0.7;
+    font-size:16px;
+    line-height:1;
+    box-shadow:0 3px 9px rgba(0,0,0,0.2);
+    transform:rotate(-90deg);
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .menu-fab-collapse:hover{ opacity:1; background:var(--hover-menu-item); }
+  @keyframes menuFabIn{ from{ opacity:0; transform:translateY(-8px) scale(0.75); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); animation:menuBackdropIn 0.25s ease; }
+  .app-drawer{
+    position:fixed;
+    top:0; left:0; bottom:0;
+    width:280px;
+    max-width:85vw;
+    background:var(--paper);
+    color:var(--ink);
+    border-right:1px solid var(--line);
+    border-radius:0 calc(24px * var(--radius-scale)) calc(24px * var(--radius-scale)) 0;
+    box-shadow:var(--shadow-drawer);
+    transform:translateX(-100%);
+    transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1);
+    z-index:60;
+    display:flex;
+    flex-direction:column;
+  }
+  .app-drawer.open{ transform:translateX(0); }
+  .app-drawer-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 16px 14px;
+    border-bottom:1px solid var(--line);
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:16px;
+    color:var(--ink);
+    min-height:20px;
+  }
+  .drawer-close, .drawer-back{
+    background:transparent; border:none; cursor:pointer;
+    font-size:19px; color:var(--ink); opacity:0.55; padding:2px 6px;
+    border-radius:50%; transition:background 0.15s ease, transform 0.1s ease;
+  }
+  .drawer-close:hover, .drawer-back:hover{ opacity:1; }
+  .app-drawer-body{ padding:12px 16px 20px; overflow-y:auto; flex:1; color:var(--ink); animation:menuItemIn 0.22s ease; }
+  .app-menu-item{
+    display:flex; align-items:center; gap:8px;
+    padding:11px 8px;
+    font-size:13.5px;
+    border-radius:calc(12px * var(--radius-scale));
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:none;
+    font-family:'Inter',sans-serif;
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+  .app-menu-item.soon-item{ opacity:0.42; }
+  .app-menu-item.clickable{ cursor:pointer; opacity:1; }
+  .app-menu-item.clickable:hover{ background:var(--hover-menu-item); }
+  .app-menu-item .chevron{ margin-left:auto; opacity:0.45; }
+  .app-menu-item .soon{
+    margin-left:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    opacity:0.8;
+  }
+  .settings-block{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
+  .settings-block:last-child{ border-bottom:none; }
+  .settings-label{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; opacity:0.75; margin-bottom:2px; }
+  .settings-hour-row{ display:flex; align-items:center; gap:6px; font-weight:400; text-transform:none; letter-spacing:normal; opacity:1; font-size:13px; }
+  .settings-hour-row input{
+    width:56px; padding:6px 7px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-family:'IBM Plex Mono',monospace; font-size:13px; background:var(--paper-deep); color:var(--ink);
+  }
+  .settings-hint{ font-size:11px; opacity:0.55; margin:8px 0 0; line-height:1.4; }
+  .settings-row-buttons{ display:flex; gap:8px; }
+  .btn-settings{
+    background:var(--navy); color:#fff; font-size:12px; font-weight:600;
+    padding:8px 12px; border-radius:calc(12px * var(--radius-scale)); border:none; cursor:pointer; text-align:center;
+  }
+  .btn-settings:hover{ background:var(--navy-hover); }
+  .btn-settings-danger{
+    background:transparent; color:var(--rust); font-size:12px; font-weight:600;
+    padding:9px 4px; border:1px solid var(--rust); border-radius:calc(12px * var(--radius-scale)); cursor:pointer; width:100%;
+  }
+  .btn-settings-danger:hover{ background:rgba(242,115,79,0.08); }
+
+  .theme-swatch-list{ display:flex; flex-direction:column; gap:8px; }
+  .theme-swatch{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 10px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:calc(12px * var(--radius-scale));
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+    transition:background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+  .theme-swatch:hover{ background:var(--paper-deep); }
+  .theme-swatch:active{ transform:scale(0.98); }
+  .theme-swatch.active{ border-color:var(--gold); }
+  .theme-swatch-dot{
+    width:28px; height:28px; border-radius:50%; flex-shrink:0;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);
+    transition:transform 0.15s ease;
+  }
+  .theme-dot-standard{ background:linear-gradient(135deg,#17A6B4,#0B4F6C); }
+  .theme-dot-abyssal{ background:linear-gradient(135deg,#2FE3F2,#04283A); }
+  .theme-dot-original{ background:linear-gradient(135deg,#A9782F,#24384A); }
+  .theme-swatch-text{ display:flex; flex-direction:column; gap:1px; flex:1; }
+  .theme-swatch-label{ font-size:13px; font-weight:600; }
+  .theme-swatch-desc{ font-size:11px; opacity:0.6; }
+  .theme-swatch-check{ color:var(--gold); font-weight:700; font-size:14px; }
+
+  /* Animations du menu */
+  @keyframes menuBackdropIn{ from{ opacity:0; } to{ opacity:1; } }
+
+  @keyframes menuItemIn{
+    from{ opacity:0; transform:translateX(-12px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .app-drawer-body > *{ animation:menuItemIn 0.3s cubic-bezier(0.22,0.61,0.36,1) backwards; }
+  .app-drawer-body > *:nth-child(1){ animation-delay:0.05s; }
+  .app-drawer-body > *:nth-child(2){ animation-delay:0.10s; }
+  .app-drawer-body > *:nth-child(3){ animation-delay:0.15s; }
+  .app-drawer-body > *:nth-child(4){ animation-delay:0.20s; }
+  .app-drawer-body > *:nth-child(5){ animation-delay:0.25s; }
+
+  .app-menu-item.clickable:active{ transform:scale(0.97); }
+  .theme-swatch:hover .theme-swatch-dot{ transform:scale(1.08); }
+
+  .app-menu-btn:active{ transform:scale(0.92); }
+  .drawer-close:active, .drawer-back:active{ transform:scale(0.9); }
+
+  /* Catégories de paramètres */
+  .settings-cat-item{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 10px;
+  }
+  .settings-cat-icon{
+    width:34px; height:34px; flex-shrink:0;
+    border-radius:calc(10px * var(--radius-scale) + 6px);
+    background:var(--paper-deep);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+  }
+  .settings-cat-item .chevron{ opacity:0.4; }
+
+  /* Écran d'intro */
+  .intro-overlay{
+    position:fixed; inset:0; z-index:500;
+    background:var(--bg-chrono, var(--navy));
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:16px;
+    animation:introFadeOut 0.6s ease forwards;
+    animation-delay:1.5s;
+  }
+  .intro-logo{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:15vw;
+    max-font-size:46px; font-size:min(46px, 12vw);
+    color:var(--on-dark, var(--paper));
+    letter-spacing:0.5px;
+    opacity:0;
+    animation:introLogoIn 0.8s cubic-bezier(0.22,0.61,0.36,1) forwards;
+    animation-delay:0.15s;
+  }
+  .intro-tagline{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold); opacity:0;
+    animation:introTagIn 0.6s ease forwards;
+    animation-delay:0.55s;
+  }
+  .intro-bar{
+    width:64px; height:3px; border-radius:2px; overflow:hidden;
+    background:rgba(255,255,255,0.15);
+    opacity:0;
+    animation:introTagIn 0.4s ease forwards;
+    animation-delay:0.75s;
+  }
+  .intro-bar-fill{
+    width:100%; height:100%;
+    background:var(--gold);
+    transform:translateX(-100%);
+    animation:introBarFill 0.7s cubic-bezier(0.22,0.61,0.36,1) forwards;
+    animation-delay:0.85s;
+  }
+  @keyframes introLogoIn{
+    from{ opacity:0; transform:translateY(16px) scale(0.94); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes introTagIn{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:0.85; transform:translateY(0); }
+  }
+  @keyframes introBarFill{
+    to{ transform:translateX(0); }
+  }
+  @keyframes introFadeOut{
+    from{ opacity:1; visibility:visible; }
+    to{ opacity:0; visibility:hidden; }
+  }
+
+  /* Fenêtre Notes */
+  .notes-window{
+    position:fixed;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    width:60vw; max-width:504px; min-width:300px;
+    height:75vh; max-height:640px; min-height:380px;
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:calc(20px * var(--radius-scale));
+    box-shadow:0 24px 60px rgba(11,46,58,0.35);
+    z-index:160;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    transition:width 0.2s ease, height 0.2s ease, min-height 0.2s ease;
+  }
+  .notes-window.minimized{ height:auto; min-height:0; max-height:none; width:280px; min-width:0; }
+  .notes-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 10px 14px 18px;
+    border-bottom:1px solid var(--line);
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:15px;
+    cursor:move;
+    user-select:none;
+    flex-shrink:0;
+    gap:8px;
+  }
+  .notes-window.minimized .notes-header{ border-bottom:none; }
+  .notes-header-title{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .notes-header-actions{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
+  .notes-minimize, .notes-close{
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; line-height:1;
+    background:transparent; color:var(--ink); opacity:0.6;
+    transition:background 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+  }
+  .notes-minimize:hover{ background:var(--hover-edit); opacity:1; }
+  .notes-minimize:active, .notes-close:active{ transform:scale(0.9); }
+  .notes-close:hover{ background:#E5484D; color:#fff; opacity:1; }
+  .notes-body{
+    flex:1; overflow-y:auto; padding:16px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--line) transparent;
+  }
+  .notes-body::-webkit-scrollbar{ width:6px; }
+  .notes-body::-webkit-scrollbar-track{ background:transparent; }
+  .notes-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+  .notes-body::-webkit-scrollbar-button{ display:none; width:0; height:0; }
+  .notes-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .note-card{
+    position:relative;
+    aspect-ratio:3/4;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    overflow:hidden;
+    transition:transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+  }
+  /* Couleur propre à chaque note (stockée sur la note), en boucle de 5 teintes.
+     Contrairement à nth-child, ça ne dépend plus de la position dans la liste :
+     la couleur reste la même quand on déplace la note. */
+  .note-card.nc0{ filter:hue-rotate(0deg); }
+  .note-card.nc1{ filter:hue-rotate(18deg); }
+  .note-card.nc2{ filter:hue-rotate(-18deg); }
+  .note-card.nc3{ filter:hue-rotate(34deg); }
+  .note-card.nc4{ filter:hue-rotate(-34deg); }
+  .note-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(11,46,58,0.15); }
+  .note-card-open{
+    width:100%; height:100%;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    text-align:left;
+    background:transparent;
+  }
+  .note-card-arrow{
+    position:absolute; bottom:5px;
+    width:24px; height:24px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    color:var(--ink); opacity:0.4;
+    font-size:16px; font-weight:700; line-height:1;
+    padding:0 0 1px;
+    background:var(--paper-deep);
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .note-card-arrow-left{ left:5px; }
+  .note-card-arrow-right{ right:5px; }
+  .note-card-arrow:hover{ opacity:1; background:var(--hover-edit); }
+  .note-card-arrow:disabled{ opacity:0.12; cursor:default; }
+  .note-card-title{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:13px;
+    margin-bottom:6px; overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap; width:100%;
+  }
+  .note-card-preview{
+    font-size:11.5px; opacity:0.65; line-height:1.4;
+    overflow:hidden; display:-webkit-box;
+    -webkit-line-clamp:5; -webkit-box-orient:vertical;
+    padding-bottom:24px;
+  }
+  .notes-empty{ text-align:center; margin-top:20px; }
+  .notes-footer{
+    flex-shrink:0;
+    padding:14px 16px 18px;
+    border-top:1px solid var(--line);
+    display:flex; justify-content:center;
+  }
+  .notes-footer-edit{ justify-content:space-between; align-items:center; }
+  .btn-add-note{
+    border-radius:999px;
+    padding:12px 34px;
+    background:var(--gold);
+    color:var(--on-dark);
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    letter-spacing:0.3px;
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+  .btn-add-note:hover{ background:var(--gold-hover); }
+  .btn-add-note:active{ transform:scale(0.97); }
+  .note-editor{
+    display:flex; flex-direction:column; gap:10px; height:100%;
+  }
+  .note-editor input[type="text"]{
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:15px;
+    padding:9px 10px; border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    background:var(--paper-deep); color:var(--ink);
+  }
+  .note-editor textarea{
+    flex:1; min-height:160px; resize:vertical;
+    padding:10px; border:1px solid var(--line);
+    border-radius:calc(10px * var(--radius-scale));
+    background:var(--paper-deep); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.5;
+  }
+  @media (max-width:640px){
+    .notes-window{ width:88vw; max-width:none; height:80vh; }
+  }
+</style>
+
+  
+<script defer src="https://cloud.umami.is/script.js" data-website-id="f0f5e9d4-b689-40e3-8a8f-99cdbb6ad3c3"></script>
+</head>
+<body>
+<div class="intro-overlay" id="introOverlay">
+  <div class="intro-logo">DeepWork</div>
+  <div class="intro-tagline">Focus. Earn. Rest.</div>
+  <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+</div>
+<div class="wrap" id="app">
+  <div class="loading">Opening…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'DeepWorkSave';
+let state = null;
+
+/* Chrono principal (haut de page) */
+let chronoRunning = false;
+let chronoHandle = null;
+let remainingSeconds = 0;
+// Horodatage absolu (Date.now()-based) de la fin de l'intervalle en cours.
+// Sert à recalculer le temps réellement écoulé (y compris pendant une veille de
+// l'ordinateur, où setInterval ne tourne pas) plutôt que de compter les ticks un par un.
+let chronoEndsAt = null;
+
+/* Modal ajout / édition */
+let modal = null;
+
+/* Drag & drop */
+let dragSrcId = null;
+let dragSrcList = null;
+let dragPreviewHtml = '';
+
+/* Pause plein écran */
+let activePause = null;
+let chronoWasRunningBeforePause = false;
+let chronoWasRunningBeforeEndOfDay = false;
+
+/* Écran fin de journée */
+let endOfDayScreenActive = false;
+
+/* Menu application */
+let appMenuOpen = false;
+
+/* Fenêtre notes */
+let notesWindowOpen = false;
+let notesWinPos = null;
+let notesView = 'list';
+let notesEditingId = null;
+let noteDeleteConfirming = false;
+let notesMinimized = false;
+let appMenuView = 'main';
+
+/* Journal groupé par jour */
+let explicitOpenDays = new Set();
+let explicitClosedDays = new Set();
+
+/* Tâches : groupes sous un séparateur repliés manuellement (dépliés par défaut) */
+let collapsedSeparators = new Set();
+
+/* Affichage/masquage global des crayons d'édition à côté de chaque action */
+let showEditIcons = true;
+function toggleEditIcons(){
+  showEditIcons = !showEditIcons;
+  render();
+}
+
+function cryptoId(){ return Math.random().toString(36).slice(2,10); }
+
+function trackEvent(name, data){
+  try{
+    if(window.umami && typeof window.umami.track==='function'){
+      if(data) window.umami.track(name, data); else window.umami.track(name);
+    }
+  }catch(e){ /* pas grave si bloqué (ex. bloqueur de pub) */ }
+}
+
+/* ---------- i18n ---------- */
+const LOCALE_MAP = { fr:'fr-FR', en:'en-US', es:'es-ES' };
+const I18N = {
+  fr:{
+    appName:'DeepWork', tagline:'Carnet de points',
+    balanceLabel:'Solde actuel',
+    chronoEyebrow:'Chrono à points', chronoGives:'Donne', chronoEvery:'pts toutes les', chronoMin:'min',
+    startDay:'Commencer la journée', pause:'Pause', start:'Démarrer', reset:'Réinitialiser',
+    streakLabel:'série', streakBonusLabel:'Série de jours',
+    pin:'Épingler', unpin:'Désépingler', pinnedLabel:'Épinglées',
+    toggleEditIcons:'Afficher/masquer les crayons d’édition',
+    endOfDayUnlockLabel:'Déverrouillée à partir de', endOfDayLockedUntil:'Disponible à partir de',
+    tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
+    rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
+    done:'Fait', redeem:'Échanger', edit:'Modifier',
+    noTasks:'Aucune tâche pour l’instant.', noRewards:'Aucune récompense pour l’instant.',
+    endOfDay:'Fin de journée',
+    journalTitle:'Journal', journalSub:'Historique des mouvements', journalEmpty:'Le journal est vide. Termine une tâche pour commencer.',
+    today:"Aujourd'hui", yesterday:'Hier', movement:'mouvement', movements:'mouvements',
+    solde:'solde',
+    newDayLabel:'Nouvelle journée (-50%)', missedDaysLabel:'Journées manquées', perDay:'/jour',
+    chronoJournalLabel:'Chrono',
+    pauseLabel:'Pause', earlyEnd:'Fin anticipée', pauseOf:'Pause :',
+    endOfDayScreenTitle:'Fin de journée', endOfDayScreenSub:'La journée est close', rallonge:'Rallonge',
+    modalNewTask:'Nouvelle tâche', modalEditTask:'Modifier la tâche',
+    modalNewReward:'Nouvelle récompense', modalEditReward:'Modifier la récompense',
+    modalEditEndOfDay:'Modifier "Fin de journée"',
+    fieldName:'Nom', fieldPtsGained:'Points obtenus', fieldCost:'Coût en points',
+    placeholderTask:'Ex. Sport', placeholderReward:'Ex. Temps libre',
+    cooldownToggle:'Cooldown avant de pouvoir la refaire', duration:'Durée', min:'min', sec:'s',
+    singleUseToggle:"Nombre d'utilisations limité", uses:'Utilisations',
+    pauseToggle:"Déclenche une pause à l'échange",
+    delete:'Supprimer', cancel:'Annuler', save:'Enregistrer', add:'Ajouter', confirm:'Confirmer',
+    menu:'Menu', settings:'Paramètres', calculator:'Calculatrice', reminder:'Rappel', notepad:'Bloc-notes', soon:'Bientôt',
+    appearance:'Apparence',
+    themeStandardLabel:'Standard', themeStandardDesc:'Océan clair et moderne',
+    themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Fond sombre, accents lumineux',
+    themeOriginalLabel:'Original', themeOriginalDesc:'Le tout premier style du carnet',
+    language:'Langue', daySection:'Journée',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Heure de début de journée',
+    dayStartHint:'Le solde de points est réduit de moitié à chaque passage de cette heure.',
+    backup:'Sauvegarde', export:'Exporter', import:'Importer',
+    dangerZone:'Zone sensible', resetAllData:'Réinitialiser toutes les données',
+    resetConfirm:'Réinitialiser toutes les données ? Cette action est irréversible.',
+    free:'Gratuit',
+    doneToday:'Fait aujourd’hui',
+    addSeparator:'+ Ajouter un séparateur',
+    expand:'Déplier', collapse:'Replier',
+    modalSeparator:'Séparateur',
+    separatorTextLabel:'Texte (facultatif)',
+    separatorPlaceholder:'Ex. Matin',
+    dailyTaskToggle:'Tâche journalière',
+    dailyTaskHint:'Revient chaque jour : au lieu d’être supprimée une fois les utilisations épuisées, la tâche se réinitialise automatiquement à la nouvelle journée.',
+    newNote:'Nouvelle note',
+    untitled:'Sans titre',
+    notesEmpty:'Aucune note pour l’instant.',
+    noteTitlePlaceholder:'Titre',
+    noteContentPlaceholder:'Écris quelque chose…',
+    minimize:'Réduire',
+    move:'Déplacer',
+    moveLeft:'Déplacer à gauche',
+    moveRight:'Déplacer à droite',
+    restore:'Agrandir',
+    opening:'Ouverture du carnet…',
+  },
+  en:{
+    appName:'DeepWork', tagline:'Points Journal',
+    balanceLabel:'Current balance',
+    chronoEyebrow:'Points timer', chronoGives:'Gives', chronoEvery:'pts every', chronoMin:'min',
+    startDay:'Start the day', pause:'Pause', start:'Start', reset:'Reset',
+    streakLabel:'streak', streakBonusLabel:'Day streak',
+    pin:'Pin', unpin:'Unpin', pinnedLabel:'Pinned',
+    toggleEditIcons:'Show/hide edit pencils',
+    endOfDayUnlockLabel:'Unlocked from', endOfDayLockedUntil:'Available from',
+    tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
+    rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
+    done:'Done', redeem:'Redeem', edit:'Edit',
+    noTasks:'No tasks yet.', noRewards:'No rewards yet.',
+    endOfDay:'End of day',
+    journalTitle:'Journal', journalSub:'Activity history', journalEmpty:'The journal is empty. Complete a task to get started.',
+    today:'Today', yesterday:'Yesterday', movement:'entry', movements:'entries',
+    solde:'balance',
+    newDayLabel:'New day (-50%)', missedDaysLabel:'Missed days', perDay:'/day',
+    chronoJournalLabel:'Timer',
+    pauseLabel:'Break', earlyEnd:'Early end', pauseOf:'Break:',
+    endOfDayScreenTitle:'End of day', endOfDayScreenSub:'The day is closed', rallonge:'Extra time',
+    modalNewTask:'New task', modalEditTask:'Edit task',
+    modalNewReward:'New reward', modalEditReward:'Edit reward',
+    modalEditEndOfDay:'Edit "End of day"',
+    fieldName:'Name', fieldPtsGained:'Points earned', fieldCost:'Cost in points',
+    placeholderTask:'E.g. Workout', placeholderReward:'E.g. Free time',
+    cooldownToggle:'Cooldown before it can be done again', duration:'Duration', min:'min', sec:'s',
+    singleUseToggle:'Limited number of uses', uses:'Uses',
+    pauseToggle:'Triggers a break when redeemed',
+    delete:'Delete', cancel:'Cancel', save:'Save', add:'Add', confirm:'Confirm',
+    menu:'Menu', settings:'Settings', calculator:'Calculator', reminder:'Reminder', notepad:'Notepad', soon:'Soon',
+    appearance:'Appearance',
+    themeStandardLabel:'Standard', themeStandardDesc:'Bright, modern ocean',
+    themeAbyssalLabel:'Abyssal', themeAbyssalDesc:'Dark background, glowing accents',
+    themeOriginalLabel:'Original', themeOriginalDesc:'The very first journal style',
+    language:'Language', daySection:'Day',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Day start hour',
+    dayStartHint:'Your point balance is cut in half every time this hour passes.',
+    backup:'Backup', export:'Export', import:'Import',
+    dangerZone:'Danger zone', resetAllData:'Reset all data',
+    resetConfirm:'Reset all data? This action cannot be undone.',
+    free:'Free',
+    doneToday:'Done today',
+    addSeparator:'+ Add a separator',
+    expand:'Expand', collapse:'Collapse',
+    modalSeparator:'Separator',
+    separatorTextLabel:'Text (optional)',
+    separatorPlaceholder:'E.g. Morning',
+    dailyTaskToggle:'Daily task',
+    dailyTaskHint:'Comes back every day: instead of being deleted once its uses run out, the task resets automatically at the new day.',
+    newNote:'New note',
+    untitled:'Untitled',
+    notesEmpty:'No notes yet.',
+    noteTitlePlaceholder:'Title',
+    noteContentPlaceholder:'Write something…',
+    minimize:'Minimize',
+    move:'Move',
+    moveLeft:'Move left',
+    moveRight:'Move right',
+    restore:'Restore',
+    opening:'Opening your journal…',
+  },
+  es:{
+    appName:'DeepWork', tagline:'Diario de puntos',
+    balanceLabel:'Saldo actual',
+    chronoEyebrow:'Cronómetro de puntos', chronoGives:'Da', chronoEvery:'pts cada', chronoMin:'min',
+    startDay:'Empezar el día', pause:'Pausa', start:'Iniciar', reset:'Reiniciar',
+    streakLabel:'racha', streakBonusLabel:'Racha de días',
+    pin:'Fijar', unpin:'Desfijar', pinnedLabel:'Fijadas',
+    toggleEditIcons:'Mostrar/ocultar lápices de edición',
+    endOfDayUnlockLabel:'Desbloqueada a partir de', endOfDayLockedUntil:'Disponible a partir de',
+    tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
+    rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
+    done:'Hecho', redeem:'Canjear', edit:'Editar',
+    noTasks:'Aún no hay tareas.', noRewards:'Aún no hay recompensas.',
+    endOfDay:'Fin del día',
+    journalTitle:'Diario', journalSub:'Historial de movimientos', journalEmpty:'El diario está vacío. Completa una tarea para empezar.',
+    today:'Hoy', yesterday:'Ayer', movement:'movimiento', movements:'movimientos',
+    solde:'saldo',
+    newDayLabel:'Nuevo día (-50%)', missedDaysLabel:'Días perdidos', perDay:'/día',
+    chronoJournalLabel:'Cronómetro',
+    pauseLabel:'Pausa', earlyEnd:'Fin anticipado', pauseOf:'Pausa:',
+    endOfDayScreenTitle:'Fin del día', endOfDayScreenSub:'El día está cerrado', rallonge:'Tiempo extra',
+    modalNewTask:'Nueva tarea', modalEditTask:'Editar tarea',
+    modalNewReward:'Nueva recompensa', modalEditReward:'Editar recompensa',
+    modalEditEndOfDay:'Editar "Fin del día"',
+    fieldName:'Nombre', fieldPtsGained:'Puntos obtenidos', fieldCost:'Coste en puntos',
+    placeholderTask:'Ej. Deporte', placeholderReward:'Ej. Tiempo libre',
+    cooldownToggle:'Espera antes de poder repetirla', duration:'Duración', min:'min', sec:'s',
+    singleUseToggle:'Número limitado de usos', uses:'Usos',
+    pauseToggle:'Activa una pausa al canjearla',
+    delete:'Eliminar', cancel:'Cancelar', save:'Guardar', add:'Añadir', confirm:'Confirmar',
+    menu:'Menú', settings:'Ajustes', calculator:'Calculadora', reminder:'Recordatorio', notepad:'Notas', soon:'Pronto',
+    appearance:'Apariencia',
+    themeStandardLabel:'Estándar', themeStandardDesc:'Océano claro y moderno',
+    themeAbyssalLabel:'Abisal', themeAbyssalDesc:'Fondo oscuro, acentos brillantes',
+    themeOriginalLabel:'Original', themeOriginalDesc:'El primer estilo del diario',
+    language:'Idioma', daySection:'Día',
+    langFr:'Français', langEn:'English', langEs:'Español',
+    dayStartHourLabel:'Hora de inicio del día',
+    dayStartHint:'El saldo de puntos se reduce a la mitad cada vez que pasa esta hora.',
+    backup:'Copia de seguridad', export:'Exportar', import:'Importar',
+    dangerZone:'Zona sensible', resetAllData:'Restablecer todos los datos',
+    resetConfirm:'¿Restablecer todos los datos? Esta acción no se puede deshacer.',
+    free:'Gratis',
+    doneToday:'Hecho hoy',
+    addSeparator:'+ Añadir separador',
+    expand:'Desplegar', collapse:'Plegar',
+    modalSeparator:'Separador',
+    separatorTextLabel:'Texto (opcional)',
+    separatorPlaceholder:'Ej. Mañana',
+    dailyTaskToggle:'Tarea diaria',
+    dailyTaskHint:'Vuelve cada día: en lugar de eliminarse al agotar sus usos, la tarea se reinicia automáticamente en el nuevo día.',
+    newNote:'Nueva nota',
+    untitled:'Sin título',
+    notesEmpty:'Aún no hay notas.',
+    noteTitlePlaceholder:'Título',
+    noteContentPlaceholder:'Escribe algo…',
+    minimize:'Minimizar',
+    move:'Mover',
+    moveLeft:'Mover a la izquierda',
+    moveRight:'Mover a la derecha',
+    restore:'Restaurar',
+    opening:'Abriendo tu diario…',
+  }
+};
+function t(key){
+  const lang = (state && state.language) || 'en';
+  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+}
+function currentLocale(){
+  const lang = (state && state.language) || 'en';
+  return LOCALE_MAP[lang] || 'en-US';
+}
+
+function getPreferredTheme(){
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'abyssal';
+  }catch(e){ /* pas grave, on retombe sur Original */ }
+  return 'original';
+}
+
+function defaultState(){
+  return {
+    balance: 0,
+    chrono: { pts: 1, minutes: 4 },
+    dayStarted: false,
+    lastProcessedDayBoundary: null,
+    dayStartHour: 5,
+    theme: getPreferredTheme(),
+    endOfDayPaidToday: false,
+    notes: [],
+    language: 'en',
+    endOfDayReward: { cost: 40, unlockHour: 19 },
+    streak: 0,
+    tasks: [
+      { id: cryptoId(), isSeparator:true, text:'Work' },
+      { id: cryptoId(), name: 'Finish Personal Work', pts: 10, cooldownEnabled:true, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), name: 'Make Progression', pts: 2, cooldownEnabled:true, cooldownMinutes:30, cooldownSeconds:0, cooldownUntil:null, limitedUses:false, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), isSeparator:true, text:'Life' },
+      { id: cryptoId(), name: 'Workout', pts: 3, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:1, maxUses:1, dailyTask:true },
+      { id: cryptoId(), name: 'Dishwash', pts: 2, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:1, maxUses:1, dailyTask:false },
+      { id: cryptoId(), name: 'Cleaning', pts: 1, cooldownEnabled:true, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, limitedUses:true, usesLeft:3, maxUses:3, dailyTask:true }
+    ],
+    rewards: [
+      { id: cryptoId(), name: '1h Free Time', cost: 20, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:60, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Watch an Episode', cost: 7, cooldownEnabled:false, cooldownMinutes:15, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:25, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Joker (5 min)', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:true, pauseMinutes:5, pauseSeconds:0 },
+      { id: cryptoId(), name: 'Snack', cost: 2, cooldownEnabled:true, cooldownMinutes:120, cooldownSeconds:0, cooldownUntil:null, pauseEnabled:false, pauseMinutes:15, pauseSeconds:0 }
+    ],
+    history: []
+  };
+}
+
+async function load(){
+  try{
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){
+      const legacy = localStorage.getItem('carnet-points-data');
+      if(legacy){
+        raw = legacy;
+        localStorage.setItem(STORAGE_KEY, legacy);
+        localStorage.removeItem('carnet-points-data');
+      }
+    }
+    state = raw ? JSON.parse(raw) : defaultState();
+  }catch(e){
+    state = defaultState();
+  }
+  if(!state.chrono) state.chrono = { pts:2, minutes:5 };
+  if(state.dayStarted===undefined) state.dayStarted = false;
+  if(state.lastProcessedDayBoundary===undefined) state.lastProcessedDayBoundary = null;
+  if(state.dayStartHour===undefined || state.dayStartHour===null) state.dayStartHour = 5;
+  if(!state.theme || state.theme==='sable') state.theme = getPreferredTheme();
+  if(state.endOfDayPaidToday===undefined) state.endOfDayPaidToday = false;
+  if(!Array.isArray(state.notes)) state.notes = [];
+  if(state.notes.some(function(n){ return typeof n.color !== 'number'; })){
+    // Migration : les notes sauvegardées avant l'ajout de ce champ n'ont pas de
+    // couleur propre. On leur en attribue une en boucle de 5, en partant de la
+    // plus ancienne (fin du tableau) vers la plus récente (début), pour reproduire
+    // approximativement l'ancien rendu par position tout en la rendant persistante.
+    for(let i=state.notes.length-1, c=0; i>=0; i--, c++){
+      if(typeof state.notes[i].color !== 'number') state.notes[i].color = c % 5;
+    }
+  }
+  if(!state.language) state.language = 'en';
+  applyTheme(state.theme);
+  document.documentElement.setAttribute('lang', state.language);
+  if(!state.endOfDayReward) state.endOfDayReward = { cost:40, unlockHour:19 };
+  if(state.endOfDayReward.unlockHour===undefined || state.endOfDayReward.unlockHour===null) state.endOfDayReward.unlockHour = 19;
+  if(typeof state.streak !== 'number') state.streak = 0;
+  state.tasks.forEach(t=>{
+    if(t.isSeparator) return;
+    if(t.cooldownEnabled===undefined) t.cooldownEnabled=false;
+    if(!t.cooldownMinutes) t.cooldownMinutes=15;
+    if(t.cooldownSeconds===undefined) t.cooldownSeconds=0;
+    if(t.limitedUses===undefined) t.limitedUses = !!t.singleUse;
+    if(t.usesLeft===undefined) t.usesLeft = t.singleUse ? 1 : 1;
+    if(t.maxUses===undefined) t.maxUses = t.usesLeft || 1;
+    if(t.dailyTask===undefined) t.dailyTask = false;
+    if(t.pinned===undefined) t.pinned = false;
+  });
+  state.rewards.forEach(r=>{
+    if(r.cooldownEnabled===undefined) r.cooldownEnabled=false;
+    if(!r.cooldownMinutes) r.cooldownMinutes=15;
+    if(r.cooldownSeconds===undefined) r.cooldownSeconds=0;
+    if(r.pauseEnabled===undefined) r.pauseEnabled=false;
+    if(!r.pauseMinutes) r.pauseMinutes=15;
+    if(r.pauseSeconds===undefined) r.pauseSeconds=0;
+  });
+  remainingSeconds = state.chrono.minutes*60;
+  checkDayRollover();
+  render();
+}
+
+async function save(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){ console.error('Erreur de sauvegarde', e); }
+}
+
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function formatTime(sec){
+  sec = Math.max(0, sec);
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return m+':'+s;
+}
+
+function isCooldownActive(item){ return item.cooldownUntil && item.cooldownUntil > Date.now(); }
+
+function formatTodayLong(){
+  return new Date().toLocaleDateString(currentLocale(), { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+function dayKey(ts){
+  const d = new Date(ts);
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function formatDayLabel(ts){
+  const d = new Date(ts);
+  const today = new Date();
+  if(d.toDateString()===today.toDateString()) return t('today');
+  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  if(d.toDateString()===yesterday.toDateString()) return t('yesterday');
+  return d.toLocaleDateString(currentLocale(), { weekday:'long', day:'numeric', month:'long' });
+}
+function formatEntryTime(ts){
+  return new Date(ts).toLocaleTimeString(currentLocale(), { hour:'2-digit', minute:'2-digit' });
+}
+function groupHistoryByDay(history){
+  const groups = [];
+  let currentKey = null, currentGroup = null;
+  history.forEach(h=>{
+    const key = dayKey(h.ts);
+    if(key !== currentKey){
+      currentGroup = { key, entries: [] };
+      groups.push(currentGroup);
+      currentKey = key;
+    }
+    currentGroup.entries.push(h);
+  });
+  return groups;
+}
+function isDayOpen(key, isToday){
+  if(explicitClosedDays.has(key)) return false;
+  if(explicitOpenDays.has(key)) return true;
+  return isToday;
+}
+function toggleDay(key){
+  const isToday = key === dayKey(Date.now());
+  if(isDayOpen(key, isToday)){
+    explicitClosedDays.add(key);
+    explicitOpenDays.delete(key);
+  }else{
+    explicitOpenDays.add(key);
+    explicitClosedDays.delete(key);
+  }
+  render();
+}
+function toggleSeparatorCollapse(id){
+  if(collapsedSeparators.has(id)) collapsedSeparators.delete(id);
+  else collapsedSeparators.add(id);
+  render();
+}
+function toggleTaskPin(id){
+  const tk = state.tasks.find(x=>x.id===id);
+  if(!tk || tk.isSeparator) return;
+  tk.pinned = !tk.pinned;
+  save(); render();
+}
+
+/* ---------- Chrono principal ---------- */
+function toggleChrono(){
+  if(chronoRunning){
+    // On fige le temps restant sur sa valeur réelle avant de couper le timer.
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    chronoEndsAt = null;
+    render();
+  }else{
+    if(remainingSeconds<=0) remainingSeconds = state.chrono.minutes*60;
+    chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
+    clearInterval(chronoHandle);
+    chronoHandle = setInterval(chronoTick, 1000);
+    render();
+  }
+}
+function chronoTick(){
+  if(!chronoRunning || !chronoEndsAt) return;
+  const intervalMs = state.chrono.minutes*60*1000;
+  const now = Date.now();
+  let diff = chronoEndsAt - now;
+  if(diff <= 0){
+    // On a raté un ou plusieurs intervalles (ex : ordi en veille pendant le décompte).
+    // On les rattrape tous d'un coup plutôt que de perdre les points correspondants.
+    let missed = 0;
+    while(diff <= 0){
+      missed++;
+      chronoEndsAt += intervalMs;
+      diff = chronoEndsAt - now;
+    }
+    const gained = missed*state.chrono.pts;
+    state.balance += gained;
+    const label = missed>1
+      ? t('chronoJournalLabel')+' ('+missed+'×'+state.chrono.minutes+' '+t('min')+')'
+      : t('chronoJournalLabel')+' ('+state.chrono.minutes+' '+t('min')+')';
+    state.history.unshift({ id: cryptoId(), type:'gain', label:label, delta:gained, balance:state.balance, ts:Date.now() });
+    remainingSeconds = Math.max(0, Math.ceil(diff/1000));
+    save(); render();
+    return;
+  }
+  remainingSeconds = Math.ceil(diff/1000);
+  const el = document.getElementById('chronoDisplay');
+  if(el) el.textContent = formatTime(remainingSeconds);
+}
+function resetChrono(){
+  clearInterval(chronoHandle);
+  chronoRunning = false;
+  chronoEndsAt = null;
+  remainingSeconds = state.chrono.minutes*60;
+  render();
+}
+function startDay(){
+  state.dayStarted = true;
+  // Bonus de série : +1 pt par jour consécutif, plafonné à 5 pts à partir du 5ème jour.
+  state.streak = (state.streak||0) + 1;
+  const bonus = Math.min(state.streak, 5);
+  state.balance += bonus;
+  state.history.unshift({ id: cryptoId(), type:'gain', label:t('streakBonusLabel')+' (×'+state.streak+')', delta:bonus, balance:state.balance, ts:Date.now() });
+  remainingSeconds = state.chrono.minutes*60;
+  clearInterval(chronoHandle);
+  chronoRunning = true;
+  chronoEndsAt = Date.now() + remainingSeconds*1000;
+  chronoHandle = setInterval(chronoTick, 1000);
+  save(); render();
+  trackEvent('journee-demarree');
+}
+function dayBoundaryTs(ts){
+  const hour = (state && state.dayStartHour!==undefined && state.dayStartHour!==null) ? state.dayStartHour : 5;
+  const d = new Date(ts);
+  if(d.getHours() < hour) d.setDate(d.getDate()-1);
+  d.setHours(hour,0,0,0);
+  return d.getTime();
+}
+function checkDayRollover(){
+  const nowBoundary = dayBoundaryTs(Date.now());
+  if(state.lastProcessedDayBoundary === nowBoundary) return false;
+  const isFirstRun = !state.lastProcessedDayBoundary;
+  let daysMissed = 0;
+  if(!isFirstRun && nowBoundary > state.lastProcessedDayBoundary){
+    const dayMs = 24*60*60*1000;
+    daysMissed = Math.round((nowBoundary - state.lastProcessedDayBoundary) / dayMs);
+    if(daysMissed < 1) daysMissed = 1;
+    const before = state.balance;
+    for(let i=0;i<daysMissed;i++){ state.balance = Math.floor(state.balance/2); }
+    if(before !== state.balance){
+      const label = daysMissed>1 ? (t('missedDaysLabel')+' ×'+daysMissed+' (-50%'+t('perDay')+')') : t('newDayLabel');
+      state.history.unshift({ id:cryptoId(), type:'spend', label:label, delta:(before-state.balance), balance:state.balance, ts:Date.now() });
+    }
+  }
+  // Série : si le jour qui vient de se terminer n'a jamais été démarré (ou si plus
+  // d'un jour a été raté d'un coup), la série repart de zéro.
+  if(!isFirstRun && (!state.dayStarted || daysMissed > 1)){
+    state.streak = 0;
+  }
+  state.lastProcessedDayBoundary = nowBoundary;
+  state.dayStarted = false;
+  state.endOfDayPaidToday = false;
+  state.tasks.forEach(tk=>{
+    if(tk.dailyTask){
+      tk.usesLeft = tk.maxUses || 1;
+      tk.cooldownUntil = null;
+    }
+  });
+  clearInterval(chronoHandle);
+  chronoRunning = false;
+  chronoEndsAt = null;
+  remainingSeconds = state.chrono.minutes*60;
+  save();
+  return true;
+}
+function updateChronoPts(val){
+  const n = parseInt(val,10);
+  if(n>0){ state.chrono.pts = n; save(); }
+}
+function updateChronoMinutes(val){
+  const n = parseInt(val,10);
+  if(n>0){
+    state.chrono.minutes = n;
+    if(!chronoRunning) remainingSeconds = n*60;
+    save(); render();
+  }
+}
+
+function cooldownMs(item){ return ((item.cooldownMinutes||0)*60 + (item.cooldownSeconds||0)) * 1000; }
+function pauseTotalSeconds(reward){ return (reward.pauseMinutes||0)*60 + (reward.pauseSeconds||0); }
+
+/* ---------- Actions tâches / récompenses ---------- */
+function completeTask(id){
+  const tk = state.tasks.find(x=>x.id===id);
+  if(!tk || isCooldownActive(tk)) return;
+  // Une tâche accomplie est toujours désépinglée. Comme l'épinglage n'est qu'un
+  // indicateur d'affichage (la tâche garde sa place dans state.tasks), elle
+  // réapparaît d'elle-même à sa position d'origine dans la liste normale — sauf
+  // si elle est à usage unique et vient d'être retirée du tableau ci-dessous.
+  tk.pinned = false;
+  state.balance += tk.pts;
+  state.history.unshift({ id: cryptoId(), type:'gain', label:tk.name, delta:tk.pts, balance:state.balance, ts:Date.now() });
+  trackEvent('tache-completee', { pts:tk.pts });
+  if(tk.limitedUses){
+    tk.usesLeft = (tk.usesLeft||1) - 1;
+    if(tk.usesLeft <= 0){
+      if(!tk.dailyTask){
+        state.tasks = state.tasks.filter(x=>x.id!==id);
+        save(); render();
+        return;
+      }
+    }
+  }
+  if(tk.cooldownEnabled && cooldownMs(tk)>0){
+    tk.cooldownUntil = Date.now() + cooldownMs(tk);
+  }
+  save(); render();
+}
+
+function redeemReward(id){
+  const r = state.rewards.find(x=>x.id===id);
+  if(!r || isCooldownActive(r) || state.balance < r.cost) return;
+  state.balance -= r.cost;
+  state.history.unshift({ id: cryptoId(), type:'spend', label:r.name, delta:r.cost, balance:state.balance, ts:Date.now() });
+  trackEvent('recompense-echangee', { cost:r.cost });
+  if(r.cooldownEnabled && cooldownMs(r)>0){ r.cooldownUntil = Date.now() + cooldownMs(r); }
+  save();
+  if(r.pauseEnabled && pauseTotalSeconds(r)>0){ startPause(r, r.cost); }
+  else { render(); }
+}
+
+function endOfDayUnlocked(){
+  // Une fois payée aujourd'hui, la fin de journée reste accessible librement
+  // (le bouton sert alors juste à revenir sur l'écran de fin de journée).
+  if(state.endOfDayPaidToday) return true;
+  const h = (state.endOfDayReward && state.endOfDayReward.unlockHour!=null) ? state.endOfDayReward.unlockHour : 19;
+  return new Date().getHours() >= h;
+}
+function redeemEndOfDay(){
+  const rw = state.endOfDayReward;
+  if(!rw) return;
+  if(!state.endOfDayPaidToday){
+    if(!endOfDayUnlocked()) return;
+    if(state.balance < rw.cost) return;
+    state.balance -= rw.cost;
+    state.history.unshift({ id: cryptoId(), type:'spend', label:t('endOfDay'), delta:rw.cost, balance:state.balance, ts:Date.now() });
+    state.endOfDayPaidToday = true;
+    save();
+    trackEvent('fin-journee-achetee');
+  }
+  if(chronoRunning){
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    chronoEndsAt = null;
+    chronoWasRunningBeforeEndOfDay = true;
+  }else{
+    chronoWasRunningBeforeEndOfDay = false;
+  }
+  endOfDayScreenActive = true;
+  render();
+}
+
+function returnFromEndOfDay(){
+  endOfDayScreenActive = false;
+  if(chronoWasRunningBeforeEndOfDay){
+    chronoWasRunningBeforeEndOfDay = false;
+    chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
+    chronoHandle = setInterval(chronoTick, 1000);
+  }
+  render();
+}
+
+function openNotesWindow(){
+  notesWindowOpen = true;
+  notesView = 'list';
+  notesEditingId = null;
+  notesWinPos = null;
+  notesMinimized = false;
+  appMenuOpen = false;
+  render();
+}
+function cleanupEmptyNote(){
+  if(!notesEditingId) return;
+  const n = state.notes.find(x=>x.id===notesEditingId);
+  if(n && !n.title.trim() && !n.content.trim()){
+    state.notes = state.notes.filter(x=>x.id!==notesEditingId);
+    save();
+  }
+  notesEditingId = null;
+}
+function closeNotesWindow(){
+  if(notesView==='edit') cleanupEmptyNote();
+  notesWindowOpen = false;
+  noteDeleteConfirming = false;
+  render();
+}
+function toggleNotesWindow(){
+  if(notesWindowOpen){
+    closeNotesWindow();
+  }else{
+    openNotesWindow();
+  }
+}
+function toggleNotesMinimize(){
+  const win = document.getElementById('notesWindow');
+  let desiredRight = null, desiredTop = null;
+  if(win){
+    const rect = win.getBoundingClientRect();
+    desiredRight = rect.right;
+    desiredTop = rect.top;
+  }
+  notesMinimized = !notesMinimized;
+  render();
+  requestAnimationFrame(function(){
+    const win2 = document.getElementById('notesWindow');
+    if(win2 && desiredRight!==null){
+      const rect2 = win2.getBoundingClientRect();
+      const newLeft = desiredRight - rect2.width;
+      notesWinPos = { x:newLeft, y:desiredTop };
+      win2.style.left = newLeft+'px';
+      win2.style.top = desiredTop+'px';
+      win2.style.transform = 'none';
+    }
+  });
+}
+function openNoteEditor(id){
+  if(id){
+    notesEditingId = id;
+  }else{
+    const fresh = { id:cryptoId(), title:'', content:'', updatedAt:Date.now(), color:nextNoteColor() };
+    state.notes.unshift(fresh);
+    notesEditingId = fresh.id;
+    save();
+  }
+  notesView = 'edit';
+  noteDeleteConfirming = false;
+  render();
+}
+const NOTE_COLOR_COUNT = 5;
+function nextNoteColor(){
+  // La dernière note créée est toujours en tête du tableau (unshift). On regarde
+  // sa couleur et on prend la suivante dans la boucle de 5 teintes, pour une
+  // rotation stable qui ne dépend pas de l'ordre d'affichage (modifiable via
+  // les flèches) mais bien de l'ordre de création.
+  if(!state.notes.length) return 0;
+  const lastColor = typeof state.notes[0].color === 'number' ? state.notes[0].color : 0;
+  return (lastColor + 1) % NOTE_COLOR_COUNT;
+}
+function backToNotesList(){
+  cleanupEmptyNote();
+  notesView = 'list';
+  noteDeleteConfirming = false;
+  render();
+}
+function autoSaveNote(){
+  if(!notesEditingId) return;
+  const n = state.notes.find(x=>x.id===notesEditingId);
+  if(!n) return;
+  const titleEl = document.getElementById('noteTitleInput');
+  const contentEl = document.getElementById('noteContentInput');
+  n.title = titleEl ? titleEl.value : '';
+  n.content = contentEl ? contentEl.value : '';
+  n.updatedAt = Date.now();
+  save();
+}
+function moveNote(id, direction){
+  const idx = state.notes.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  const newIdx = idx + direction;
+  if(newIdx<0 || newIdx>=state.notes.length) return;
+  const [item] = state.notes.splice(idx,1);
+  state.notes.splice(newIdx,0,item);
+  save(); render();
+}
+
+function askDeleteNoteConfirm(){
+  noteDeleteConfirming = true;
+  render();
+}
+function cancelDeleteNoteConfirm(){
+  noteDeleteConfirming = false;
+  render();
+}
+function deleteNote(){
+  if(!notesEditingId) return;
+  state.notes = state.notes.filter(x=>x.id!==notesEditingId);
+  save();
+  notesEditingId = null;
+  notesView = 'list';
+  noteDeleteConfirming = false;
+  render();
+}
+function startNotesDrag(e){
+  if(e.target.closest('.notes-close, .notes-minimize')) return;
+  const win = document.getElementById('notesWindow');
+  if(!win) return;
+  const rect = win.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const offsetY = e.clientY - rect.top;
+  function onMove(ev){
+    const x = Math.max(4, Math.min(window.innerWidth - 40, ev.clientX - offsetX));
+    const y = Math.max(4, Math.min(window.innerHeight - 40, ev.clientY - offsetY));
+    notesWinPos = { x, y };
+    win.style.left = x+'px';
+    win.style.top = y+'px';
+    win.style.transform = 'none';
+  }
+  function onUp(){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function toggleAppMenu(){
+  appMenuOpen = !appMenuOpen;
+  if(appMenuOpen) appMenuView = 'main';
+  render();
+}
+function closeAppMenu(){
+  appMenuOpen = false;
+  render();
+}
+const MENU_PARENT = {
+  'settings':'main',
+  'settings-appearance':'settings',
+  'settings-language':'settings',
+  'settings-day':'settings',
+  'settings-backup':'settings',
+  'settings-danger':'settings'
+};
+function openSettingsView(){ openMenuView('settings'); }
+function openMenuView(view){
+  appMenuView = view;
+  render();
+}
+function goBackMenu(){
+  appMenuView = MENU_PARENT[appMenuView] || 'main';
+  render();
+}
+function menuTitle(){
+  switch(appMenuView){
+    case 'settings': return t('settings');
+    case 'settings-appearance': return t('appearance');
+    case 'settings-language': return t('language');
+    case 'settings-day': return t('daySection');
+    case 'settings-backup': return t('backup');
+    case 'settings-danger': return t('dangerZone');
+    default: return t('menu');
+  }
+}
+
+function updateDayStartHour(val){
+  const h = parseInt(val,10);
+  if(isNaN(h) || h<0 || h>23) return;
+  state.dayStartHour = h;
+  /* Recalage de la référence pour ne pas déclencher un malus juste en changeant l'heure */
+  state.lastProcessedDayBoundary = dayBoundaryTs(Date.now());
+  save();
+}
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+}
+function setTheme(theme){
+  state.theme = theme;
+  applyTheme(theme);
+  save(); render();
+  trackEvent('theme-change', { theme });
+}
+function setLang(lang){
+  state.language = lang;
+  document.documentElement.setAttribute('lang', lang);
+  save(); render();
+  trackEvent('lang-change', { lang });
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'DeepWorkSave.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importDataFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.rewards)){
+        state = parsed;
+        save(); render();
+      }
+    }catch(err){ console.error('Fichier de sauvegarde invalide', err); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function resetAllData(){
+  if(!confirm(t('resetConfirm'))) return;
+  state = defaultState();
+  save(); render();
+}
+
+function renderAppMenu(){
+  let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="${t('menu')}" onclick="toggleAppMenu()">☰</button>`;
+  if(!appMenuOpen) return html;
+  if(appMenuView==='main'){
+    html += renderMenuFab();
+  }else{
+    html += `<div class="app-drawer open">`;
+    html += `<div class="app-drawer-header">`;
+    html += `<button class="drawer-back" onclick="goBackMenu()" title="Back">‹</button><span>${menuTitle()}</span>`;
+    html += `<button class="drawer-close" onclick="closeAppMenu()" title="Close">×</button>`;
+    html += `</div>`;
+    html += `<div class="app-drawer-body">`;
+    html += renderMenuViewBody();
+    html += `</div></div>`;
+  }
+  html += `<div class="app-menu-backdrop" onclick="closeAppMenu()"></div>`;
+  return html;
+}
+
+function renderMenuFab(){
+  return `
+  <div class="menu-fab-stack">
+    <button class="menu-fab" title="${t('settings')}" onclick="openSettingsView()">${GEAR_ICON}</button>
+    <button class="menu-fab" title="${t('notepad')}" onclick="toggleNotesWindow()">${NOTEPAD_ICON}</button>
+    <button class="menu-fab disabled" title="${t('reminder')} — ${t('soon')}" disabled>${BELL_ICON}</button>
+    <button class="menu-fab-collapse" title="${t('menu')}" onclick="closeAppMenu()">›</button>
+  </div>`;
+}
+
+function renderMenuViewBody(){
+  switch(appMenuView){
+    case 'settings': return renderSettingsHome();
+    case 'settings-appearance': return renderSettingsAppearance();
+    case 'settings-language': return renderSettingsLanguage();
+    case 'settings-day': return renderSettingsDay();
+    case 'settings-backup': return renderSettingsBackup();
+    case 'settings-danger': return renderSettingsDanger();
+    default: return '';
+  }
+}
+
+function renderSettingsHome(){
+  const cats = [
+    { view:'settings-appearance', label:t('appearance'), icon:'🎨' },
+    { view:'settings-language', label:t('language'), icon:'🌐' },
+    { view:'settings-day', label:t('daySection'), icon:'🕔' },
+    { view:'settings-backup', label:t('backup'), icon:'💾' },
+    { view:'settings-danger', label:t('dangerZone'), icon:'⚠️' }
+  ];
+  return cats.map(c=>`
+    <button class="app-menu-item clickable settings-cat-item" onclick="openMenuView('${c.view}')">
+      <span class="settings-cat-icon">${c.icon}</span>
+      <span>${c.label}</span>
+      <span class="chevron">›</span>
+    </button>
+  `).join('');
+}
+
+function renderSettingsAppearance(){
+  const theme = state.theme || 'standard';
+  const themes = [
+    { id:'standard', label:t('themeStandardLabel'), desc:t('themeStandardDesc') },
+    { id:'abyssal', label:t('themeAbyssalLabel'), desc:t('themeAbyssalDesc') },
+    { id:'original', label:t('themeOriginalLabel'), desc:t('themeOriginalDesc') }
+  ];
+  const themeSwatches = themes.map(th=>`
+    <button class="theme-swatch ${theme===th.id?'active':''}" data-theme-swatch="${th.id}" onclick="setTheme('${th.id}')">
+      <span class="theme-swatch-dot theme-dot-${th.id}"></span>
+      <span class="theme-swatch-text">
+        <span class="theme-swatch-label">${th.label}</span>
+        <span class="theme-swatch-desc">${th.desc}</span>
+      </span>
+      ${theme===th.id ? '<span class="theme-swatch-check">✓</span>' : ''}
+    </button>
+  `).join('');
+  return `<div class="settings-block"><div class="theme-swatch-list">${themeSwatches}</div></div>`;
+}
+
+function renderSettingsLanguage(){
+  const lang = state.language || 'en';
+  const languages = [
+    { id:'en', label:t('langEn') },
+    { id:'fr', label:t('langFr') },
+    { id:'es', label:t('langEs') }
+  ];
+  const langSwatches = languages.map(lg=>`
+    <button class="theme-swatch lang-swatch ${lang===lg.id?'active':''}" onclick="setLang('${lg.id}')">
+      <span class="theme-swatch-text">
+        <span class="theme-swatch-label">${lg.label}</span>
+      </span>
+      ${lang===lg.id ? '<span class="theme-swatch-check">✓</span>' : ''}
+    </button>
+  `).join('');
+  return `<div class="settings-block"><div class="theme-swatch-list">${langSwatches}</div></div>`;
+}
+
+function renderSettingsDay(){
+  const hour = state.dayStartHour!==undefined ? state.dayStartHour : 5;
+  return `
+    <div class="settings-block">
+      <label class="settings-label">
+        <span>${t('dayStartHourLabel')}</span>
+        <div class="settings-hour-row">
+          <input type="number" min="0" max="23" id="settingsDayHour" value="${hour}" onchange="updateDayStartHour(this.value)">
+          <span>h 00</span>
+        </div>
+      </label>
+      <p class="settings-hint">${t('dayStartHint')}</p>
+    </div>
+  `;
+}
+
+function renderSettingsBackup(){
+  return `
+    <div class="settings-block">
+      <div class="settings-row-buttons">
+        <button class="btn-settings" onclick="exportData()">${t('export')}</button>
+        <label class="btn-settings" style="cursor:pointer;">
+          ${t('import')}
+          <input type="file" accept="application/json" style="display:none;" onchange="importDataFile(this)">
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+function renderSettingsDanger(){
+  return `
+    <div class="settings-block">
+      <button class="btn-settings-danger" onclick="resetAllData()">${t('resetAllData')}</button>
+    </div>
+  `;
+}
+
+/* ---------- Pause plein écran ---------- */
+function startPause(reward, costPaid){
+  if(chronoRunning){
+    if(chronoEndsAt) remainingSeconds = Math.max(0, Math.ceil((chronoEndsAt-Date.now())/1000));
+    clearInterval(chronoHandle);
+    chronoRunning = false;
+    chronoEndsAt = null;
+    chronoWasRunningBeforePause = true;
+  }else{
+    chronoWasRunningBeforePause = false;
+  }
+  const totalSeconds = pauseTotalSeconds(reward);
+  activePause = {
+    rewardName: reward.name,
+    totalSeconds: totalSeconds,
+    remainingSeconds: totalSeconds,
+    costPaid: costPaid,
+    // Horodatage de fin absolu : comme pour le chrono, ça permet au décompte de la
+    // pause de continuer correctement même si l'ordi part en veille pendant la pause.
+    endsAt: Date.now() + totalSeconds*1000,
+    handle: null
+  };
+  activePause.handle = setInterval(pauseTick, 1000);
+  render();
+}
+function pauseTick(){
+  if(!activePause) return;
+  const diff = activePause.endsAt - Date.now();
+  if(diff <= 0){ activePause.remainingSeconds = 0; finishPause(false); return; }
+  activePause.remainingSeconds = Math.ceil(diff/1000);
+  updatePauseDisplay();
+}
+function updatePauseDisplay(){
+  const d = document.getElementById('pauseDisplay');
+  if(d) d.textContent = formatTime(activePause.remainingSeconds);
+  const hint = document.getElementById('pauseRefundHint');
+  if(hint) hint.textContent = t('earlyEnd')+' : +'+computeRefund()+' pts';
+}
+function computeRefund(){
+  if(!activePause) return 0;
+  const ratio = activePause.remainingSeconds / activePause.totalSeconds;
+  const raw = activePause.costPaid * ratio;
+  const penalty = activePause.costPaid * 0.20;
+  let refund = Math.round(raw - penalty);
+  if(refund < 0) refund = 0;
+  return refund;
+}
+function endPauseEarly(){ finishPause(true); }
+function finishPause(early){
+  if(!activePause) return;
+  clearInterval(activePause.handle);
+  if(early){
+    const refund = computeRefund();
+    if(refund>0){
+      state.balance += refund;
+      state.history.unshift({ id:cryptoId(), type:'gain', label:t('earlyEnd')+' : '+activePause.rewardName, delta:refund, balance:state.balance, ts:Date.now() });
+      save();
+    }
+  }
+  activePause = null;
+  if(chronoWasRunningBeforePause){
+    chronoWasRunningBeforePause = false;
+    chronoRunning = true;
+    chronoEndsAt = Date.now() + remainingSeconds*1000;
+    chronoHandle = setInterval(chronoTick, 1000);
+  }
+  render();
+}
+
+/* ---------- Tick global (cooldowns) ---------- */
+function globalTick(){
+  let needsRerender = false;
+  if(checkDayRollover()) needsRerender = true;
+  document.querySelectorAll('.cooldown-chip[data-until]').forEach(function(el){
+    const until = parseInt(el.dataset.until,10);
+    const remaining = until - Date.now();
+    if(remaining<=0){ needsRerender = true; }
+    else{ el.textContent = formatTime(Math.ceil(remaining/1000)); }
+  });
+  if(needsRerender) render();
+}
+setInterval(globalTick, 1000);
+
+// Au réveil de l'onglet (ex : sortie de veille de l'ordi), on recalcule tout de
+// suite plutôt que d'attendre le prochain tick d'1 seconde : ça évite d'avoir un
+// affichage figé pendant un instant, et ça déclenche immédiatement le rattrapage
+// des points/pauses manqués pendant que l'onglet était inactif.
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState !== 'visible') return;
+  if(chronoRunning) chronoTick();
+  if(activePause) pauseTick();
+  globalTick();
+});
+
+/* ---------- Glisser-déposer ---------- */
+function onRowDragStart(e){
+  const row = e.currentTarget;
+  dragSrcId = row.dataset.id;
+  dragSrcList = row.dataset.list;
+  dragPreviewHtml = buildDragPreviewHtml(dragSrcList, dragSrcId);
+  e.dataTransfer.effectAllowed = 'move';
+  row.classList.add('dragging');
+  // On masque la ligne source juste après le démarrage du drag (setTimeout 0, sinon
+  // certains navigateurs annulent le drag si la source disparaît trop tôt).
+  // Ça évite d'avoir deux repères en même temps (ligne grisée + placeholder) :
+  // seul le placeholder en pointillés indique où l'élément va atterrir.
+  setTimeout(function(){ row.classList.add('drag-hidden'); }, 0);
+}
+function buildDragPreviewHtml(list, id){
+  const arr = list==='task' ? state.tasks : state.rewards;
+  const item = arr.find(function(x){ return x.id===id; });
+  if(!item) return '';
+  if(item.isSeparator){
+    return `<span class="drag-preview-name">${esc(item.text||'')}</span>`;
+  }
+  const ptsHtml = list==='task'
+    ? `<span class="drag-preview-pts">+${item.pts}</span>`
+    : `<span class="drag-preview-pts">-${item.cost}</span>`;
+  return `<span class="drag-preview-name">${esc(item.name)}</span>${ptsHtml}`;
+}
+function placePlaceholder(container, beforeEl){
+  let placeholder = container.querySelector('.drag-placeholder');
+  if(!placeholder){
+    placeholder = document.createElement('div');
+    placeholder.className = 'drag-placeholder';
+    placeholder.innerHTML = dragPreviewHtml;
+  }
+  if(beforeEl) container.insertBefore(placeholder, beforeEl);
+  else container.appendChild(placeholder);
+}
+function cleanupPlaceholder(){
+  document.querySelectorAll('.drag-placeholder').forEach(function(el){ el.remove(); });
+}
+function onRowDragOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  const row = e.currentTarget;
+  if(!dragSrcId || row.dataset.id===dragSrcId || row.dataset.list!==dragSrcList) return;
+  const rect = row.getBoundingClientRect();
+  const midpoint = rect.top + rect.height/2;
+  placePlaceholder(row.parentElement, e.clientY < midpoint ? row : row.nextElementSibling);
+}
+function onContainerDragOver(e, list){
+  e.preventDefault();
+  if(e.target !== e.currentTarget) return;
+  if(!dragSrcId || dragSrcList!==list) return;
+  placePlaceholderByPosition(e.currentTarget, e.clientY);
+}
+function placePlaceholderByPosition(container, clientY){
+  // Le survol tombe ici sur le "fond" du conteneur plutôt que sur une ligne précise :
+  // ça arrive au-dessus de la 1ère ligne, sous la dernière, mais aussi dans la fine
+  // marge qui entoure le placeholder lui-même (elle n'appartient à aucune ligne).
+  // Avant, on renvoyait systématiquement le repère tout en bas dans ce cas, ce qui
+  // provoquait un clignotement dès que la souris frôlait cette marge. On cherche
+  // maintenant la ligne réelle la plus proche pour décider avant/après, comme le
+  // fait déjà onRowDragOver quand on survole une ligne directement.
+  const rows = Array.from(container.children).filter(function(el){
+    return el.dataset && el.dataset.id && el.dataset.id !== dragSrcId;
+  });
+  let target = null;
+  for(let i=0;i<rows.length;i++){
+    const rect = rows[i].getBoundingClientRect();
+    if(clientY < rect.top + rect.height/2){ target = rows[i]; break; }
+  }
+  placePlaceholder(container, target);
+}
+function onContainerDrop(e, list){
+  e.preventDefault();
+  dropAtPlaceholder(list);
+}
+function dropAtPlaceholder(list){
+  const container = document.getElementById(list==='task' ? 'taskList' : 'rewardList');
+  const placeholder = container ? container.querySelector('.drag-placeholder') : null;
+  if(!dragSrcId || dragSrcList!==list || !placeholder){
+    cleanupPlaceholder();
+    resetDrag();
+    document.querySelectorAll('.dragging').forEach(function(el){
+      el.classList.remove('dragging');
+      el.classList.remove('drag-hidden');
+      el.removeAttribute('draggable');
+    });
+    return;
+  }
+  let nextId = null;
+  let sib = placeholder.nextElementSibling;
+  // On ignore aussi la ligne en cours de déplacement : elle est toujours présente
+  // dans le DOM (juste masquée visuellement) tant que le drop n'a pas eu lieu.
+  // Sans ça, si le placeholder atterrit juste devant elle, on la prend comme
+  // "élément suivant", on ne la retrouve plus dans le tableau (déjà retirée juste
+  // au-dessus) et l'élément déplacé finit tout en bas de la liste.
+  while(sib && (!sib.dataset.id || sib.dataset.id===dragSrcId)) sib = sib.nextElementSibling;
+  if(sib) nextId = sib.dataset.id;
+  cleanupPlaceholder();
+  const arr = list==='task' ? state.tasks : state.rewards;
+  const fromIdx = arr.findIndex(x=>x.id===dragSrcId);
+  if(fromIdx<0){ resetDrag(); return; }
+  const [item] = arr.splice(fromIdx,1);
+  let toIdx = arr.length;
+  if(nextId){
+    const idx2 = arr.findIndex(x=>x.id===nextId);
+    if(idx2>=0) toIdx = idx2;
+  }
+  arr.splice(toIdx,0,item);
+  resetDrag();
+  save(); render();
+}
+function onRowDragEnd(e){
+  const row = e.currentTarget;
+  row.removeAttribute('draggable');
+  row.classList.remove('dragging');
+  row.classList.remove('drag-hidden');
+  cleanupPlaceholder();
+  resetDrag();
+}
+function resetDrag(){ dragSrcId=null; dragSrcList=null; dragPreviewHtml=''; }
+function armDrag(el){ el.closest('.entry-row, .separator-row, .note-card').setAttribute('draggable','true'); }
+function disarmDrag(el){
+  const row = el.closest('.entry-row, .separator-row, .note-card');
+  if(!row.classList.contains('dragging')) row.removeAttribute('draggable');
+}
+
+/* ---------- Modal ajout / édition ---------- */
+function openAddTaskModal(){ modal = { type:'add-task' }; render(); }
+function openAddRewardModal(){ modal = { type:'add-reward' }; render(); }
+function openEditTaskModal(id){ modal = { type:'edit-task', id }; render(); }
+function openEditRewardModal(id){ modal = { type:'edit-reward', id }; render(); }
+function openEditEndOfDayModal(){ modal = { type:'edit-endofday' }; render(); }
+function openAddSeparatorModal(){ modal = { type:'add-separator' }; render(); }
+function openEditSeparatorModal(id){ modal = { type:'edit-separator', id }; render(); }
+function closeModal(){ modal = null; render(); }
+
+const MODAL_INPUT_IDS = ['modalName','modalPts','modalCooldownChk','modalCooldownMin','modalCooldownSec','modalLimitedUsesChk','modalUsesLeft','modalDailyTaskChk','modalPauseChk','modalPauseMin','modalPauseSec','modalEndDayCost','modalSeparatorText','settingsDayHour','noteTitleInput','noteContentInput'];
+
+function snapshotModalInputs(){
+  if(!modal && appMenuView!=='settings-day' && notesView!=='edit') return null;
+  const snap = {};
+  MODAL_INPUT_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) snap[id] = (el.type==='checkbox') ? el.checked : el.value;
+  });
+  return snap;
+}
+
+function restoreModalInputs(snap){
+  if(!snap) return;
+  Object.keys(snap).forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type==='checkbox') el.checked = snap[id];
+    else el.value = snap[id];
+  });
+  ['modalCooldownChk','modalLimitedUsesChk','modalPauseChk'].forEach(chkId=>{
+    const chk = document.getElementById(chkId);
+    if(!chk) return;
+    const rowId = chkId==='modalCooldownChk' ? 'modalCooldownRow' : chkId==='modalLimitedUsesChk' ? 'modalUsesRow' : 'modalPauseRow';
+    const row = document.getElementById(rowId);
+    if(row) row.style.display = chk.checked ? 'flex' : 'none';
+  });
+}
+
+function toggleModalRow(chkId, rowId){
+  const chk = document.getElementById(chkId);
+  document.getElementById(rowId).style.display = chk.checked ? 'flex' : 'none';
+}
+
+function submitModal(){
+  if(!modal) return;
+  if(modal.type==='edit-endofday'){
+    const cost = parseInt(document.getElementById('modalEndDayCost').value,10);
+    if(!(cost>0)) return;
+    let unlockHour = parseInt(document.getElementById('modalEndDayUnlockHour').value,10);
+    if(isNaN(unlockHour) || unlockHour<0 || unlockHour>23) unlockHour = state.endOfDayReward.unlockHour;
+    state.endOfDayReward.cost = cost;
+    state.endOfDayReward.unlockHour = unlockHour;
+    modal = null;
+    save(); render();
+    return;
+  }
+  if(modal.type==='add-separator' || modal.type==='edit-separator'){
+    const text = document.getElementById('modalSeparatorText').value.trim();
+    if(modal.type==='edit-separator'){
+      const item = state.tasks.find(x=>x.id===modal.id);
+      if(item) item.text = text;
+    }else{
+      state.tasks.push({ id:cryptoId(), isSeparator:true, text });
+    }
+    modal = null;
+    save(); render();
+    return;
+  }
+  const isTask = modal.type.indexOf('task')>=0;
+  const isEdit = modal.type.indexOf('edit')===0;
+  const name = document.getElementById('modalName').value.trim();
+  const pts = parseInt(document.getElementById('modalPts').value,10);
+  if(!name || !(pts>0)) return;
+  const cooldownEnabled = document.getElementById('modalCooldownChk').checked;
+  const cooldownMinutes = parseInt(document.getElementById('modalCooldownMin').value,10) || 0;
+  const cooldownSeconds = Math.min(59, Math.max(0, parseInt(document.getElementById('modalCooldownSec').value,10) || 0));
+  let limitedUses = false, usesLeft = 1, dailyTask = false;
+  if(isTask){
+    limitedUses = document.getElementById('modalLimitedUsesChk').checked;
+    usesLeft = Math.max(1, parseInt(document.getElementById('modalUsesLeft').value,10) || 1);
+    dailyTask = limitedUses && document.getElementById('modalDailyTaskChk').checked;
+  }
+  let pauseEnabled=false, pauseMinutes=15, pauseSeconds=0;
+  if(!isTask){
+    pauseEnabled = document.getElementById('modalPauseChk').checked;
+    pauseMinutes = parseInt(document.getElementById('modalPauseMin').value,10) || 0;
+    pauseSeconds = Math.min(59, Math.max(0, parseInt(document.getElementById('modalPauseSec').value,10) || 0));
+  }
+  if(isEdit){
+    const arr = isTask ? state.tasks : state.rewards;
+    const item = arr.find(x=>x.id===modal.id);
+    if(!item){ modal=null; render(); return; }
+    item.name = name;
+    if(isTask) item.pts = pts; else item.cost = pts;
+    item.cooldownEnabled = cooldownEnabled;
+    item.cooldownMinutes = cooldownMinutes;
+    item.cooldownSeconds = cooldownSeconds;
+    if(isTask){ item.limitedUses = limitedUses; item.usesLeft = usesLeft; item.maxUses = usesLeft; item.dailyTask = dailyTask; }
+    if(!isTask){ item.pauseEnabled = pauseEnabled; item.pauseMinutes = pauseMinutes; item.pauseSeconds = pauseSeconds; }
+  }else{
+    const newItem = isTask
+      ? { id:cryptoId(), name, pts, cooldownEnabled, cooldownMinutes, cooldownSeconds, cooldownUntil:null, limitedUses, usesLeft, maxUses:usesLeft, dailyTask }
+      : { id:cryptoId(), name, cost:pts, cooldownEnabled, cooldownMinutes, cooldownSeconds, cooldownUntil:null, pauseEnabled, pauseMinutes, pauseSeconds };
+    (isTask?state.tasks:state.rewards).push(newItem);
+    trackEvent(isTask ? 'tache-creee' : 'recompense-creee', { pts });
+  }
+  modal = null;
+  save(); render();
+}
+
+function deleteFromModal(){
+  if(!modal || !modal.id) return;
+  if(modal.type==='edit-separator'){
+    state.tasks = state.tasks.filter(x=>x.id!==modal.id);
+    modal = null;
+    save(); render();
+    return;
+  }
+  const isTask = modal.type.indexOf('task')>=0;
+  if(isTask) state.tasks = state.tasks.filter(x=>x.id!==modal.id);
+  else state.rewards = state.rewards.filter(x=>x.id!==modal.id);
+  modal = null;
+  save(); render();
+}
+
+function renderModal(){
+  if(!modal) return '';
+  if(modal.type==='edit-endofday'){
+    return `
+    <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
+      <div class="modal-card">
+        <div class="modal-title">${t('modalEditEndOfDay')}</div>
+        <label class="modal-field">
+          <span>${t('fieldCost')}</span>
+          <input type="number" min="1" id="modalEndDayCost" value="${state.endOfDayReward.cost}">
+        </label>
+        <label class="modal-field">
+          <span>${t('endOfDayUnlockLabel')}</span>
+          <div class="settings-hour-row">
+            <input type="number" min="0" max="23" id="modalEndDayUnlockHour" value="${state.endOfDayReward.unlockHour}">
+            <span>h 00</span>
+          </div>
+        </label>
+        <div class="modal-actions">
+          <span></span>
+          <div class="modal-actions-right">
+            <button class="btn-modal-cancel" onclick="closeModal()">${t('cancel')}</button>
+            <button class="btn-modal-save" onclick="submitModal()">${t('save')}</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  if(modal.type==='add-separator' || modal.type==='edit-separator'){
+    const isEditSep = modal.type==='edit-separator';
+    const item = isEditSep ? state.tasks.find(x=>x.id===modal.id) : null;
+    if(isEditSep && !item){ modal=null; return ''; }
+    return `
+    <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
+      <div class="modal-card">
+        <div class="modal-title">${t('modalSeparator')}</div>
+        <label class="modal-field">
+          <span>${t('separatorTextLabel')}</span>
+          <input type="text" id="modalSeparatorText" value="${esc(item?item.text||'':'')}" placeholder="${t('separatorPlaceholder')}">
+        </label>
+        <div class="modal-actions">
+          ${isEditSep ? `<button class="btn-modal-delete" onclick="deleteFromModal()">${t('delete')}</button>` : '<span></span>'}
+          <div class="modal-actions-right">
+            <button class="btn-modal-cancel" onclick="closeModal()">${t('cancel')}</button>
+            <button class="btn-modal-save" onclick="submitModal()">${isEditSep?t('save'):t('add')}</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  const isTask = modal.type.indexOf('task')>=0;
+  const isEdit = modal.type.indexOf('edit')===0;
+  let item = null;
+  if(isEdit){
+    item = isTask ? state.tasks.find(x=>x.id===modal.id) : state.rewards.find(x=>x.id===modal.id);
+    if(!item){ modal=null; return ''; }
+  }
+  const title = isEdit ? (isTask?t('modalEditTask'):t('modalEditReward')) : (isTask?t('modalNewTask'):t('modalNewReward'));
+  const name = item ? item.name : '';
+  const ptsLabel = isTask ? t('fieldPtsGained') : t('fieldCost');
+  const ptsVal = item ? (isTask?item.pts:item.cost) : '';
+  const cooldownEnabled = item ? !!item.cooldownEnabled : false;
+  const cooldownMinutes = item && item.cooldownMinutes ? item.cooldownMinutes : 0;
+  const cooldownSeconds = item && item.cooldownSeconds ? item.cooldownSeconds : 0;
+  const pauseEnabled = item ? !!item.pauseEnabled : false;
+  const pauseMinutes = item && item.pauseMinutes ? item.pauseMinutes : 15;
+  const pauseSeconds = item && item.pauseSeconds ? item.pauseSeconds : 0;
+  const limitedUses = item ? !!item.limitedUses : false;
+  const usesLeft = item && item.usesLeft ? item.usesLeft : 1;
+  const dailyTask = item ? !!item.dailyTask : false;
+
+  return `
+  <div class="modal-backdrop" onmousedown="if(event.target===this) closeModal()">
+    <div class="modal-card">
+      <div class="modal-title">${title}</div>
+      <label class="modal-field">
+        <span>${t('fieldName')}</span>
+        <input type="text" id="modalName" value="${esc(name)}" placeholder="${isTask?t('placeholderTask'):t('placeholderReward')}">
+      </label>
+      <label class="modal-field">
+        <span>${ptsLabel}</span>
+        <input type="number" min="1" id="modalPts" value="${ptsVal}">
+      </label>
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalCooldownChk" ${cooldownEnabled?'checked':''} onchange="toggleModalRow('modalCooldownChk','modalCooldownRow')">
+          <span>${t('cooldownToggle')}</span>
+        </label>
+        <div class="modal-subfield" id="modalCooldownRow" style="${cooldownEnabled?'display:flex;':'display:none;'}">
+          <span>${t('duration')}</span>
+          <input type="number" min="0" id="modalCooldownMin" value="${cooldownMinutes}">
+          <span>${t('min')}</span>
+          <input type="number" min="0" max="59" id="modalCooldownSec" value="${cooldownSeconds}">
+          <span>${t('sec')}</span>
+        </div>
+      </div>
+      ${isTask ? `
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalLimitedUsesChk" ${limitedUses?'checked':''} onchange="toggleModalRow('modalLimitedUsesChk','modalUsesRow')">
+          <span>${t('singleUseToggle')}</span>
+        </label>
+        <div class="modal-subfield modal-subfield-col" id="modalUsesRow" style="${limitedUses?'display:flex;':'display:none;'}">
+          <div class="modal-subfield">
+            <span>${t('uses')}</span>
+            <input type="number" min="1" id="modalUsesLeft" value="${usesLeft}">
+          </div>
+          <label class="modal-checkbox modal-checkbox-nested">
+            <input type="checkbox" id="modalDailyTaskChk" ${dailyTask?'checked':''}>
+            <span>${t('dailyTaskToggle')}</span>
+          </label>
+          <p class="modal-hint">${t('dailyTaskHint')}</p>
+        </div>
+      </div>` : ''}
+      ${!isTask ? `
+      <div class="modal-toggle-block">
+        <label class="modal-checkbox">
+          <input type="checkbox" id="modalPauseChk" ${pauseEnabled?'checked':''} onchange="toggleModalRow('modalPauseChk','modalPauseRow')">
+          <span>${t('pauseToggle')}</span>
+        </label>
+        <div class="modal-subfield" id="modalPauseRow" style="${pauseEnabled?'display:flex;':'display:none;'}">
+          <span>${t('duration')}</span>
+          <input type="number" min="0" id="modalPauseMin" value="${pauseMinutes}">
+          <span>${t('min')}</span>
+          <input type="number" min="0" max="59" id="modalPauseSec" value="${pauseSeconds}">
+          <span>${t('sec')}</span>
+        </div>
+      </div>` : ''}
+      <div class="modal-actions">
+        ${isEdit ? `<button class="btn-modal-delete" onclick="deleteFromModal()">${t('delete')}</button>` : '<span></span>'}
+        <div class="modal-actions-right">
+          <button class="btn-modal-cancel" onclick="closeModal()">${t('cancel')}</button>
+          <button class="btn-modal-save" onclick="submitModal()">${isEdit?t('save'):t('add')}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function noteCardHtml(n, idx, total){
+  const title = esc(n.title) || t('untitled');
+  const preview = esc((n.content||'').slice(0,140));
+  const canLeft = idx > 0;
+  const canRight = idx < total-1;
+  const colorClass = 'nc' + (typeof n.color === 'number' ? n.color : 0);
+  return `
+  <div class="note-card ${colorClass}">
+    <button class="note-card-open" onclick="openNoteEditor('${n.id}')">
+      <div class="note-card-title">${title}</div>
+      <div class="note-card-preview">${preview}</div>
+    </button>
+    <button class="note-card-arrow note-card-arrow-left" onclick="moveNote('${n.id}',-1)" ${canLeft?'':'disabled'} title="${t('moveLeft')}">‹</button>
+    <button class="note-card-arrow note-card-arrow-right" onclick="moveNote('${n.id}',1)" ${canRight?'':'disabled'} title="${t('moveRight')}">›</button>
+  </div>`;
+}
+
+const MINIMIZE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+const RESTORE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+const PIN_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 2a1 1 0 0 1 .78 1.63L15 6.1V12l2.9 3.87A1 1 0 0 1 17.1 17.5H13v4.5a1 1 0 0 1-2 0V17.5H6.9a1 1 0 0 1-.8-1.63L9 12V6.1L7.22 3.63A1 1 0 0 1 8 2h8Z"/></svg>';
+const GEAR_ICON = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
+const NOTEPAD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>';
+const BELL_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
+
+function renderNotesWindow(){
+  if(!notesWindowOpen) return '';
+  const posStyle = notesWinPos ? `left:${notesWinPos.x}px; top:${notesWinPos.y}px; transform:none;` : '';
+  let bodyHtml;
+  let footerHtml;
+  if(notesView==='edit'){
+    const n = notesEditingId ? state.notes.find(x=>x.id===notesEditingId) : null;
+    bodyHtml = `
+      <div class="note-editor">
+        <input type="text" id="noteTitleInput" placeholder="${t('noteTitlePlaceholder')}" value="${esc(n?n.title:'')}" oninput="autoSaveNote()">
+        <textarea id="noteContentInput" placeholder="${t('noteContentPlaceholder')}" oninput="autoSaveNote()">${esc(n?n.content:'')}</textarea>
+      </div>`;
+    footerHtml = `
+      <div class="notes-footer notes-footer-edit">
+        ${noteDeleteConfirming
+          ? `<div class="delete-confirm-group">
+               <button class="btn-modal-delete" onclick="deleteNote()">${t('confirm')}</button>
+               <button class="btn-delete-cancel" onclick="cancelDeleteNoteConfirm()" title="${t('cancel')}">×</button>
+             </div>`
+          : `<button class="btn-modal-delete" onclick="askDeleteNoteConfirm()">${t('delete')}</button>`}
+        <div class="modal-actions-right">
+          <button class="btn-modal-save" onclick="backToNotesList()">${t('done')}</button>
+        </div>
+      </div>`;
+  }else{
+    bodyHtml = state.notes.length
+      ? `<div class="notes-grid">${state.notes.map((n,idx)=>noteCardHtml(n,idx,state.notes.length)).join('')}</div>`
+      : `<div class="empty notes-empty">${t('notesEmpty')}</div>`;
+    footerHtml = `
+      <div class="notes-footer">
+        <button class="btn-add-note" onclick="openNoteEditor()">+ ${t('newNote')}</button>
+      </div>`;
+  }
+  return `
+  <div class="notes-window ${notesMinimized?'minimized':''}" id="notesWindow" style="${posStyle}">
+    <div class="notes-header" onmousedown="startNotesDrag(event)">
+      <span class="notes-header-title">${notesView==='edit' ? t('edit') : t('notepad')}</span>
+      <div class="notes-header-actions">
+        <button class="notes-minimize" onclick="toggleNotesMinimize()" title="${notesMinimized?t('restore'):t('minimize')}">${notesMinimized?RESTORE_ICON:MINIMIZE_ICON}</button>
+        <button class="notes-close" onclick="closeNotesWindow()" title="${t('cancel')}">×</button>
+      </div>
+    </div>
+    ${notesMinimized ? '' : `<div class="notes-body">${bodyHtml}</div>${footerHtml}`}
+  </div>`;
+}
+
+function renderPauseOverlay(){
+  if(!activePause) return '';
+  return `
+  <div class="pause-overlay">
+    <button class="pause-close" onclick="endPauseEarly()" title="${t('earlyEnd')}">×</button>
+    <div class="pause-label">${t('pauseLabel')}</div>
+    <div class="pause-reward-name">${esc(activePause.rewardName)}</div>
+    <div class="pause-display" id="pauseDisplay">${formatTime(activePause.remainingSeconds)}</div>
+    <div class="pause-refund-hint" id="pauseRefundHint">${t('earlyEnd')} : +${computeRefund()} pts</div>
+  </div>`;
+}
+
+function renderEndOfDayOverlay(){
+  if(!endOfDayScreenActive) return '';
+  return `
+  <div class="pause-overlay endday-overlay">
+    <div class="pause-label">${t('endOfDayScreenTitle')}</div>
+    <div class="pause-reward-name">${t('endOfDayScreenSub')}</div>
+    <button class="btn-rallonge" onclick="returnFromEndOfDay()">${t('rallonge')}</button>
+  </div>`;
+}
+
+/* ---------- Rendu des lignes ---------- */
+function taskRowHtml(tk, opts){
+  opts = opts || {};
+  const pinnedView = !!opts.pinnedView;
+  if(tk.isSeparator){
+    const collapsed = collapsedSeparators.has(tk.id);
+    return `
+    <div class="separator-row ${collapsed?'is-collapsed':''}" data-id="${tk.id}" data-list="task"
+      title="${collapsed?t('expand'):t('collapse')}"
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)"
+      onclick="toggleSeparatorCollapse('${tk.id}')">
+      <span class="separator-line"></span>
+      <span class="separator-text">${esc(tk.text||'')}</span>
+      <span class="separator-line"></span>
+      <button class="btn-edit sep-edit" title="${t('edit')}"
+        onmousedown="armDrag(this); event.stopPropagation()" onmouseup="disarmDrag(this)"
+        onclick="event.stopPropagation(); openEditSeparatorModal('${tk.id}')">✎</button>
+    </div>`;
+  }
+  const cdActive = isCooldownActive(tk);
+  const exhausted = !cdActive && tk.limitedUses && tk.usesLeft<=0;
+  const remaining = cdActive ? Math.ceil((tk.cooldownUntil-Date.now())/1000) : 0;
+  const actionHtml = cdActive
+    ? `<span class="cooldown-chip" data-until="${tk.cooldownUntil}">${formatTime(remaining)}</span>`
+    : exhausted
+      ? `<span class="cooldown-chip">${t('doneToday')}</span>`
+      : `<button class="btn-do" onclick="completeTask('${tk.id}')">${t('done')}</button>`;
+  // Dans l'encadrement épinglé, la ligne ne doit pas être déplaçable (elle n'a pas
+  // sa place dans la logique de réordonnancement du conteneur #taskList).
+  const dragAttrs = pinnedView ? '' : `ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)"`;
+  const editDragHandlers = pinnedView ? '' : `onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"`;
+  const pinBtn = `<button class="pin-toggle ${tk.pinned?'is-pinned':''}" title="${tk.pinned?t('unpin'):t('pin')}"
+    onclick="toggleTaskPin('${tk.id}')">${PIN_ICON}</button>`;
+  return `
+    <div class="entry-row ${(cdActive||exhausted)?'is-cooldown':''}" data-id="${tk.id}" data-list="task"
+      ${dragAttrs}>
+      ${pinBtn}
+      <span class="entry-name">${esc(tk.name)}${tk.limitedUses?' <span class="badge-single">×'+tk.usesLeft+(tk.dailyTask?' ↻':'')+'</span>':''}</span>
+      <span class="entry-pts">+${tk.pts}</span>
+      <div class="entry-actions">
+        ${actionHtml}
+        <button class="btn-edit" title="${t('edit')}"
+          ${editDragHandlers}
+          onclick="openEditTaskModal('${tk.id}')">✎</button>
+      </div>
+    </div>`;
+}
+
+function rewardRowHtml(r){
+  const cdActive = isCooldownActive(r);
+  const remaining = cdActive ? Math.ceil((r.cooldownUntil-Date.now())/1000) : 0;
+  const canAfford = state.balance >= r.cost;
+  const actionHtml = cdActive
+    ? `<span class="cooldown-chip" data-until="${r.cooldownUntil}">${formatTime(remaining)}</span>`
+    : `<button class="btn-redeem" ${canAfford?'':'disabled'} onclick="redeemReward('${r.id}')">${t('redeem')}</button>`;
+  return `
+    <div class="entry-row ${cdActive?'is-cooldown':''}" data-id="${r.id}" data-list="reward"
+      ondragover="onRowDragOver(event)" ondragend="onRowDragEnd(event)" ondragstart="onRowDragStart(event)">
+      <span class="entry-name">${esc(r.name)}</span>
+      <span class="entry-pts">-${r.cost}</span>
+      <div class="entry-actions">
+        ${actionHtml}
+        <button class="btn-edit" title="${t('edit')}"
+          onmousedown="armDrag(this)" onmouseup="disarmDrag(this)"
+          onclick="openEditRewardModal('${r.id}')">✎</button>
+      </div>
+    </div>`;
+}
+
+function journalGroupsHtml(){
+  if(!state.history.length) return `<div class="empty">${t('journalEmpty')}</div>`;
+  const groups = groupHistoryByDay(state.history);
+  const todayKey = dayKey(Date.now());
+  return groups.map(g=>{
+    const isToday = g.key === todayKey;
+    const open = isDayOpen(g.key, isToday);
+    const rowsHtml = g.entries.map(h=>`
+      <div class="jrow">
+        <span class="stamp ${h.type}">${h.type==='gain'?'+':'−'}</span>
+        <span class="jtime">${formatEntryTime(h.ts)}</span>
+        <span class="jlabel">${esc(h.label)}</span>
+        <span class="jdelta ${h.type}">${h.type==='gain'?'+':'-'}${h.delta}</span>
+        <span class="jbalance">${t('solde')} ${h.balance}</span>
+      </div>
+    `).join('');
+    return `
+      <div class="day-group ${isToday?'':'day-past'}">
+        <button class="day-header" onclick="toggleDay('${g.key}')">
+          <span class="day-chevron ${open?'open':''}">›</span>
+          <span class="day-title">${formatDayLabel(g.entries[0].ts)}</span>
+          <span class="day-count">${g.entries.length} ${g.entries.length>1?t('movements'):t('movement')}</span>
+        </button>
+        <div class="day-body" style="${open?'':'display:none;'}">
+          ${rowsHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function tasksListHtml(){
+  // Une tâche appartient au groupe du séparateur qui la précède : si ce séparateur
+  // est replié, on n'affiche tout simplement pas la tâche (comme les lignes masquées
+  // pendant un drag). Les séparateurs eux-mêmes restent toujours visibles.
+  // Les tâches épinglées ne sont pas affichées ici : elles vivent dans l'encadrement
+  // épinglé au-dessus (voir pinnedTasksHtml), mais restent à leur place dans le
+  // tableau state.tasks pour retrouver leur position d'origine une fois désépinglées.
+  let collapsed = false;
+  return state.tasks.map(function(tk){
+    if(tk.isSeparator){
+      collapsed = collapsedSeparators.has(tk.id);
+      return taskRowHtml(tk);
+    }
+    if(tk.pinned) return '';
+    if(collapsed) return '';
+    return taskRowHtml(tk);
+  }).join('');
+}
+function pinnedTasksHtml(){
+  const pinned = state.tasks.filter(function(tk){ return !tk.isSeparator && tk.pinned; });
+  if(!pinned.length) return '';
+  return `
+  <div class="pinned-box">
+    <div class="pinned-box-label">${t('pinnedLabel')}</div>
+    ${pinned.map(function(tk){ return taskRowHtml(tk, {pinnedView:true}); }).join('')}
+  </div>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.classList.toggle('hide-edit-icons', !showEditIcons);
+  const modalSnap = snapshotModalInputs();
+
+  const tasksHtml = state.tasks.length ? tasksListHtml() : `<div class="empty">${t('noTasks')}</div>`;
+  const rewardsHtml = state.rewards.length ? state.rewards.map(rewardRowHtml).join('') : `<div class="empty">${t('noRewards')}</div>`;
+
+  app.innerHTML = `
+    ${renderAppMenu()}
+    <div class="engraved-date">${formatTodayLong()}</div>
+    <div class="masthead">
+      <div>
+        <h1>DeepWork</h1>
+      </div>
+      <div class="balance-block">
+        <div class="balance-label">${t('balanceLabel')}</div>
+        <div class="balance-num">${state.balance}</div>
+      </div>
+    </div>
+
+    <div class="chrono-row">
+      ${!state.dayStarted && state.streak>0 ? `<div class="streak-badge" title="${t('streakBonusLabel')}">🔥 ${state.streak}</div>` : ''}
+      <div class="chrono-panel">
+      <div class="chrono-left">
+        <div class="chrono-eyebrow">${t('chronoEyebrow')}</div>
+        <div class="chrono-config">
+          <span>${t('chronoGives')}</span>
+          <input type="number" min="1" value="${state.chrono.pts}" ${chronoRunning?'disabled':''} onchange="updateChronoPts(this.value)">
+          <span>${t('chronoEvery')}</span>
+          <input type="number" min="1" value="${state.chrono.minutes}" ${chronoRunning?'disabled':''} onchange="updateChronoMinutes(this.value)">
+          <span>${t('chronoMin')}</span>
+        </div>
+      </div>
+      <div class="chrono-right">
+        ${state.dayStarted ? `
+        <div class="chrono-display" id="chronoDisplay">${formatTime(remainingSeconds)}</div>
+        <div class="chrono-buttons">
+          <button class="btn-chrono ${chronoRunning?'running':''}" onclick="toggleChrono()">${chronoRunning?t('pause'):t('start')}</button>
+          <button class="btn-chrono-reset" onclick="resetChrono()">${t('reset')}</button>
+        </div>` : `
+        <button class="btn-start-day" onclick="startDay()"><span class="startday-chevrons"><span class="chev" style="--base-op:0.25">›</span><span class="chev" style="--base-op:0.55; animation-delay:0.18s;">›</span><span class="chev" style="--base-op:0.9; animation-delay:0.36s;">›</span></span>${t('startDay')}</button>`}
+      </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="panel tasks">
+        <h2><span>${t('tasksTitle')}</span>
+          <span class="h2-right">
+            <span class="tag">${t('tasksTag')}</span>
+            <button class="btn-edit-toggle ${showEditIcons?'active':''}" title="${t('toggleEditIcons')}" onclick="toggleEditIcons()">✎</button>
+          </span>
+        </h2>
+        ${pinnedTasksHtml()}
+        <div id="taskList" ondragover="onContainerDragOver(event,'task')" ondrop="onContainerDrop(event,'task')">
+          ${tasksHtml}
+        </div>
+        <button class="btn-add-open" onclick="openAddTaskModal()">${t('addTask')}</button>
+        <button class="btn-add-secondary" onclick="openAddSeparatorModal()">${t('addSeparator')}</button>
+      </div>
+
+      <div class="panel rewards">
+        <h2><span>${t('rewardsTitle')}</span>
+          <span class="h2-right">
+            <span class="tag">${t('rewardsTag')}</span>
+            <button class="btn-edit-toggle ${showEditIcons?'active':''}" title="${t('toggleEditIcons')}" onclick="toggleEditIcons()">✎</button>
+          </span>
+        </h2>
+        <div class="end-of-day-block">
+          <div class="entry-row">
+            <span class="entry-name">${t('endOfDay')}</span>
+            <span class="entry-pts">${state.endOfDayPaidToday ? t('free') : '-'+state.endOfDayReward.cost}</span>
+            <div class="entry-actions">
+              <button class="btn-redeem" ${(!state.endOfDayPaidToday && (state.balance<state.endOfDayReward.cost || !endOfDayUnlocked()))?'disabled':''} onclick="redeemEndOfDay()">${t('redeem')}</button>
+              <button class="btn-edit" title="${t('edit')}" onclick="openEditEndOfDayModal()">✎</button>
+            </div>
+          </div>
+          ${(!state.endOfDayPaidToday && !endOfDayUnlocked()) ? `<div class="end-of-day-hint">${t('endOfDayLockedUntil')} ${String(state.endOfDayReward.unlockHour).padStart(2,'0')}h00</div>` : ''}
+        </div>
+        <div id="rewardList" ondragover="onContainerDragOver(event,'reward')" ondrop="onContainerDrop(event,'reward')">
+          ${rewardsHtml}
+        </div>
+        <button class="btn-add-open" onclick="openAddRewardModal()">${t('addReward')}</button>
+      </div>
+    </div>
+
+    <div class="journal">
+      <h2>${t('journalTitle')}</h2>
+      <div class="sub">${t('journalSub')}</div>
+      ${journalGroupsHtml()}
+    </div>
+
+    ${renderModal()}
+    ${renderPauseOverlay()}
+    ${renderEndOfDayOverlay()}
+    ${renderNotesWindow()}
+  `;
+  restoreModalInputs(modalSnap);
+}
+
+load();
+setTimeout(function(){
+  const introEl = document.getElementById('introOverlay');
+  if(introEl) introEl.remove();
+}, 2300);
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(){ /* pas grave hors ligne/local */ });
+  });
+}
+</script>
+</body>
+</html>
