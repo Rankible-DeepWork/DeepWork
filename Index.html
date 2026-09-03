@@ -200,14 +200,6 @@
     color:var(--masthead-color);
     text-shadow:var(--masthead-shadow);
   }
-  .masthead .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--gold-deep);
-    margin-bottom:4px;
-  }
   .balance-block{ text-align:right; }
   .balance-label{
     font-family:'IBM Plex Mono',monospace;
@@ -788,7 +780,14 @@
   }
   .menu-fab-collapse:hover{ opacity:1; background:var(--hover-menu-item); }
   @keyframes menuFabIn{ from{ opacity:0; transform:translateY(-8px) scale(0.75); } to{ opacity:1; transform:translateY(0) scale(1); } }
-  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); animation:menuBackdropIn 0.25s ease; }
+  .app-menu-backdrop{
+    position:fixed; inset:0; z-index:55;
+    background:rgba(11,46,58,0.14);
+    animation:menuBackdropIn 0.25s ease;
+    /* Purement visuel : on laisse les clics traverser jusqu'au contenu en dessous,
+       pour que l'ouverture du menu n'empêche plus d'interagir avec le reste de la page. */
+    pointer-events:none;
+  }
   .app-drawer{
     position:fixed;
     top:0; left:0; bottom:0;
@@ -833,18 +832,9 @@
     font-family:'Inter',sans-serif;
     transition:background 0.15s ease, transform 0.1s ease;
   }
-  .app-menu-item.soon-item{ opacity:0.42; }
   .app-menu-item.clickable{ cursor:pointer; opacity:1; }
   .app-menu-item.clickable:hover{ background:var(--hover-menu-item); }
   .app-menu-item .chevron{ margin-left:auto; opacity:0.45; }
-  .app-menu-item .soon{
-    margin-left:auto;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:9px;
-    letter-spacing:0.5px;
-    text-transform:uppercase;
-    opacity:0.8;
-  }
   .settings-block{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
   .settings-block:last-child{ border-bottom:none; }
   .settings-label{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; opacity:0.75; margin-bottom:2px; }
@@ -2056,7 +2046,7 @@ function renderAppMenu(){
     html += renderMenuViewBody();
     html += `</div></div>`;
   }
-  html += `<div class="app-menu-backdrop" onclick="closeAppMenu()"></div>`;
+  html += `<div class="app-menu-backdrop"></div>`;
   return html;
 }
 
