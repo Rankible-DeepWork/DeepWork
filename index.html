@@ -200,14 +200,6 @@
     color:var(--masthead-color);
     text-shadow:var(--masthead-shadow);
   }
-  .masthead .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--gold-deep);
-    margin-bottom:4px;
-  }
   .balance-block{ text-align:right; }
   .balance-label{
     font-family:'IBM Plex Mono',monospace;
@@ -371,6 +363,19 @@
     opacity:0.6;
     font-weight:400;
   }
+  .panel h2 .h2-right{ display:flex; align-items:center; gap:8px; }
+  .btn-edit-toggle{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    font-size:12.5px;
+    opacity:0.3;
+    padding:3px 5px;
+    border-radius:calc(10px * var(--radius-scale));
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .btn-edit-toggle:hover{ opacity:0.9; background:var(--hover-edit); }
+  .btn-edit-toggle.active{ opacity:0.75; }
 
   .pinned-box{
     border:1.5px solid #f2b70566;
@@ -456,6 +461,11 @@
     border-radius:calc(12px * var(--radius-scale));
   }
   .btn-edit:hover{opacity:1; background:var(--hover-edit);}
+  /* Masque tous les crayons d'édition individuels (tâches, séparateurs, récompenses,
+     fin de journée) quand la bascule du titre de section est désactivée. Le crayon
+     de bascule lui-même utilise .btn-edit-toggle, une classe distincte, donc il
+     reste toujours visible. */
+  #app.hide-edit-icons .btn-edit{ display:none; }
   .pin-toggle{
     background:transparent;
     color:#9a9a9a;
@@ -547,6 +557,12 @@
   }
   .end-of-day-block .entry-row{ border-bottom:none; padding:9px 6px; }
   .end-of-day-block .entry-name{ font-weight:600; }
+  .end-of-day-hint{
+    font-size:11px;
+    opacity:0.6;
+    padding:0 6px 8px;
+    font-style:italic;
+  }
 
   .journal{ border:1px solid var(--line); background:var(--paper-deep); border-radius:calc(20px * var(--radius-scale)); padding:18px; box-shadow:var(--shadow-panel); }
   .journal h2{ font-family:'Outfit',sans-serif; font-size:17px; margin:0 0 4px; }
@@ -718,7 +734,60 @@
     transition:background 0.15s ease, transform 0.1s ease;
   }
   .app-menu-btn:hover{ background:var(--navy-hover); }
-  .app-menu-backdrop{ position:fixed; inset:0; z-index:55; background:rgba(11,46,58,0.28); animation:menuBackdropIn 0.25s ease; }
+
+  .menu-fab-stack{
+    position:fixed;
+    top:16px; left:16px;
+    z-index:70;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+  .menu-fab{
+    width:50px; height:50px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, var(--navy-hover), var(--navy));
+    color:var(--on-dark);
+    box-shadow:0 8px 18px rgba(0,0,0,0.36), 0 0 0 3px rgba(255,255,255,0.08) inset;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    animation:menuFabIn 0.24s cubic-bezier(0.22,0.61,0.36,1) backwards;
+  }
+  .menu-fab:hover{ transform:scale(1.09); box-shadow:0 10px 22px rgba(0,0,0,0.44), 0 0 0 3px rgba(255,255,255,0.08) inset; }
+  .menu-fab:active{ transform:scale(0.93); }
+  .menu-fab.disabled{ opacity:0.4; filter:grayscale(1); cursor:not-allowed; }
+  .menu-fab.disabled:hover{ transform:none; box-shadow:0 8px 18px rgba(0,0,0,0.36), 0 0 0 3px rgba(255,255,255,0.08) inset; }
+  .menu-fab-stack .menu-fab:nth-child(1){ animation-delay:0.02s; }
+  .menu-fab-stack .menu-fab:nth-child(2){ animation-delay:0.07s; }
+  .menu-fab-stack .menu-fab:nth-child(3){ animation-delay:0.12s; }
+  .menu-fab-collapse{
+    width:32px; height:32px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper);
+    color:var(--ink);
+    opacity:0.7;
+    font-size:16px;
+    line-height:1;
+    box-shadow:0 3px 9px rgba(0,0,0,0.2);
+    transform:rotate(-90deg);
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .menu-fab-collapse:hover{ opacity:1; background:var(--hover-menu-item); }
+  @keyframes menuFabIn{ from{ opacity:0; transform:translateY(-8px) scale(0.75); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .app-menu-backdrop{
+    position:fixed; inset:0; z-index:55;
+    background:rgba(11,46,58,0.14);
+    animation:menuBackdropIn 0.25s ease;
+    /* Purement visuel : on laisse les clics traverser jusqu'au contenu en dessous,
+       pour que l'ouverture du menu n'empêche plus d'interagir avec le reste de la page. */
+    pointer-events:none;
+  }
   .app-drawer{
     position:fixed;
     top:0; left:0; bottom:0;
@@ -763,18 +832,9 @@
     font-family:'Inter',sans-serif;
     transition:background 0.15s ease, transform 0.1s ease;
   }
-  .app-menu-item.soon-item{ opacity:0.42; }
   .app-menu-item.clickable{ cursor:pointer; opacity:1; }
   .app-menu-item.clickable:hover{ background:var(--hover-menu-item); }
   .app-menu-item .chevron{ margin-left:auto; opacity:0.45; }
-  .app-menu-item .soon{
-    margin-left:auto;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:9px;
-    letter-spacing:0.5px;
-    text-transform:uppercase;
-    opacity:0.8;
-  }
   .settings-block{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
   .settings-block:last-child{ border-bottom:none; }
   .settings-label{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; opacity:0.75; margin-bottom:2px; }
@@ -784,6 +844,18 @@
     font-family:'IBM Plex Mono',monospace; font-size:13px; background:var(--paper-deep); color:var(--ink);
   }
   .settings-hint{ font-size:11px; opacity:0.55; margin:8px 0 0; line-height:1.4; }
+  .settings-label input[type="email"], .settings-label input[type="password"]{
+    width:100%; box-sizing:border-box;
+    padding:9px 10px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:400; text-transform:none; letter-spacing:normal;
+    background:var(--paper-deep); color:var(--ink);
+  }
+  .auth-error{ font-size:12px; color:var(--rust); margin:2px 0 4px; line-height:1.4; }
+  .account-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:#3fb950; flex-shrink:0; margin-left:auto;
+  }
+  .account-dot + .chevron{ margin-left:6px; }
   .settings-row-buttons{ display:flex; gap:8px; }
   .btn-settings{
     background:var(--navy); color:#fff; font-size:12px; font-weight:600;
@@ -1064,6 +1136,9 @@
 
   
 <script defer src="https://cloud.umami.is/script.js" data-website-id="f0f5e9d4-b689-40e3-8a8f-99cdbb6ad3c3"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="intro-overlay" id="introOverlay">
@@ -1078,6 +1153,23 @@
 <script>
 const STORAGE_KEY = 'DeepWorkSave';
 let state = null;
+
+/* ---------- Firebase (comptes + synchronisation cloud) ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAimjLyjaGPjwUDC6dCI6Vcf0ZpzTIahFA",
+  authDomain: "deepwork-work.firebaseapp.com",
+  projectId: "deepwork-work",
+  storageBucket: "deepwork-work.firebasestorage.app",
+  messagingSenderId: "252203618794",
+  appId: "1:252203618794:web:1e38bf6d36d9118edc2293"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fbDb = firebase.firestore();
+let currentUser = null;      // objet Firebase User, ou null si pas connecté
+let authError = '';          // message d'erreur affiché dans le formulaire de connexion
+let authBusy = false;        // désactive les boutons pendant une requête en cours
+let cloudSyncing = false;    // true pendant une synchro (lecture/écriture Firestore)
 
 /* Chrono principal (haut de page) */
 let chronoRunning = false;
@@ -1123,6 +1215,13 @@ let explicitClosedDays = new Set();
 /* Tâches : groupes sous un séparateur repliés manuellement (dépliés par défaut) */
 let collapsedSeparators = new Set();
 
+/* Affichage/masquage global des crayons d'édition à côté de chaque action */
+let showEditIcons = true;
+function toggleEditIcons(){
+  showEditIcons = !showEditIcons;
+  render();
+}
+
 function cryptoId(){ return Math.random().toString(36).slice(2,10); }
 
 function trackEvent(name, data){
@@ -1143,6 +1242,21 @@ const I18N = {
     startDay:'Commencer la journée', pause:'Pause', start:'Démarrer', reset:'Réinitialiser',
     streakLabel:'série', streakBonusLabel:'Série de jours',
     pin:'Épingler', unpin:'Désépingler', pinnedLabel:'Épinglées',
+    toggleEditIcons:'Afficher/masquer les crayons d’édition',
+    endOfDayUnlockLabel:'Déverrouillée à partir de', endOfDayLockedUntil:'Disponible à partir de',
+    account:'Compte',
+    authEmailLabel:'Adresse email', authPasswordLabel:'Mot de passe',
+    authSignInBtn:'Se connecter', authSignUpBtn:'Créer un compte', authSignOutBtn:'Se déconnecter',
+    authFillFields:'Remplis l’email et le mot de passe.',
+    authErrEmailInUse:'Un compte existe déjà avec cet email.',
+    authErrInvalidEmail:'Adresse email invalide.',
+    authErrWeakPassword:'Mot de passe trop court (6 caractères minimum).',
+    authErrWrongCreds:'Email ou mot de passe incorrect.',
+    authErrTooMany:'Trop de tentatives, réessaie plus tard.',
+    authErrGeneric:'Une erreur est survenue, réessaie.',
+    authSyncing:'Synchronisation…',
+    authSyncedAs:'Connecté en tant que',
+    authLocalOnlyHint:'Sans compte, tes données restent uniquement sur cet appareil. Connecte-toi pour les synchroniser entre tes appareils.',
     tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
     rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
     done:'Fait', redeem:'Échanger', edit:'Modifier',
@@ -1204,6 +1318,21 @@ const I18N = {
     startDay:'Start the day', pause:'Pause', start:'Start', reset:'Reset',
     streakLabel:'streak', streakBonusLabel:'Day streak',
     pin:'Pin', unpin:'Unpin', pinnedLabel:'Pinned',
+    toggleEditIcons:'Show/hide edit pencils',
+    endOfDayUnlockLabel:'Unlocked from', endOfDayLockedUntil:'Available from',
+    account:'Account',
+    authEmailLabel:'Email address', authPasswordLabel:'Password',
+    authSignInBtn:'Sign in', authSignUpBtn:'Create account', authSignOutBtn:'Sign out',
+    authFillFields:'Fill in the email and password.',
+    authErrEmailInUse:'An account already exists with this email.',
+    authErrInvalidEmail:'Invalid email address.',
+    authErrWeakPassword:'Password too short (6 characters minimum).',
+    authErrWrongCreds:'Wrong email or password.',
+    authErrTooMany:'Too many attempts, try again later.',
+    authErrGeneric:'Something went wrong, please try again.',
+    authSyncing:'Syncing…',
+    authSyncedAs:'Signed in as',
+    authLocalOnlyHint:'Without an account, your data stays only on this device. Sign in to sync it across your devices.',
     tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
     rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
     done:'Done', redeem:'Redeem', edit:'Edit',
@@ -1265,6 +1394,21 @@ const I18N = {
     startDay:'Empezar el día', pause:'Pausa', start:'Iniciar', reset:'Reiniciar',
     streakLabel:'racha', streakBonusLabel:'Racha de días',
     pin:'Fijar', unpin:'Desfijar', pinnedLabel:'Fijadas',
+    toggleEditIcons:'Mostrar/ocultar lápices de edición',
+    endOfDayUnlockLabel:'Desbloqueada a partir de', endOfDayLockedUntil:'Disponible a partir de',
+    account:'Cuenta',
+    authEmailLabel:'Correo electrónico', authPasswordLabel:'Contraseña',
+    authSignInBtn:'Iniciar sesión', authSignUpBtn:'Crear cuenta', authSignOutBtn:'Cerrar sesión',
+    authFillFields:'Completa el email y la contraseña.',
+    authErrEmailInUse:'Ya existe una cuenta con este email.',
+    authErrInvalidEmail:'Dirección de email inválida.',
+    authErrWeakPassword:'Contraseña demasiado corta (mínimo 6 caracteres).',
+    authErrWrongCreds:'Email o contraseña incorrectos.',
+    authErrTooMany:'Demasiados intentos, prueba más tarde.',
+    authErrGeneric:'Ocurrió un error, inténtalo de nuevo.',
+    authSyncing:'Sincronizando…',
+    authSyncedAs:'Conectado como',
+    authLocalOnlyHint:'Sin cuenta, tus datos quedan solo en este dispositivo. Inicia sesión para sincronizarlos entre tus dispositivos.',
     tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
     rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
     done:'Hecho', redeem:'Canjear', edit:'Editar',
@@ -1347,7 +1491,7 @@ function defaultState(){
     endOfDayPaidToday: false,
     notes: [],
     language: 'en',
-    endOfDayReward: { cost: 40 },
+    endOfDayReward: { cost: 40, unlockHour: 19 },
     streak: 0,
     tasks: [
       { id: cryptoId(), isSeparator:true, text:'Work' },
@@ -1383,6 +1527,13 @@ async function load(){
   }catch(e){
     state = defaultState();
   }
+  applyStateMigrations();
+  remainingSeconds = state.chrono.minutes*60;
+  checkDayRollover();
+  render();
+}
+
+function applyStateMigrations(){
   if(!state.chrono) state.chrono = { pts:2, minutes:5 };
   if(state.dayStarted===undefined) state.dayStarted = false;
   if(state.lastProcessedDayBoundary===undefined) state.lastProcessedDayBoundary = null;
@@ -1402,7 +1553,8 @@ async function load(){
   if(!state.language) state.language = 'en';
   applyTheme(state.theme);
   document.documentElement.setAttribute('lang', state.language);
-  if(!state.endOfDayReward) state.endOfDayReward = { cost:40 };
+  if(!state.endOfDayReward) state.endOfDayReward = { cost:40, unlockHour:19 };
+  if(state.endOfDayReward.unlockHour===undefined || state.endOfDayReward.unlockHour===null) state.endOfDayReward.unlockHour = 19;
   if(typeof state.streak !== 'number') state.streak = 0;
   state.tasks.forEach(t=>{
     if(t.isSeparator) return;
@@ -1423,16 +1575,81 @@ async function load(){
     if(!r.pauseMinutes) r.pauseMinutes=15;
     if(r.pauseSeconds===undefined) r.pauseSeconds=0;
   });
-  remainingSeconds = state.chrono.minutes*60;
-  checkDayRollover();
-  render();
 }
 
 async function save(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){ console.error('Erreur de sauvegarde', e); }
+  // Si un compte est connecté, on répercute aussi l'état vers Firestore (sans
+  // bloquer l'interface : on n'attend pas la fin de l'écriture réseau).
+  if(currentUser) pushToCloud();
 }
+
+/* ---------- Comptes (Firebase Auth) + synchronisation (Firestore) ---------- */
+function translateAuthError(err){
+  const code = err && err.code;
+  const map = {
+    'auth/email-already-in-use': t('authErrEmailInUse'),
+    'auth/invalid-email': t('authErrInvalidEmail'),
+    'auth/weak-password': t('authErrWeakPassword'),
+    'auth/user-not-found': t('authErrWrongCreds'),
+    'auth/wrong-password': t('authErrWrongCreds'),
+    'auth/invalid-credential': t('authErrWrongCreds'),
+    'auth/too-many-requests': t('authErrTooMany')
+  };
+  return (code && map[code]) || t('authErrGeneric');
+}
+function authSignUp(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pw = document.getElementById('authPassword').value;
+  if(!email || !pw){ authError = t('authFillFields'); render(); return; }
+  authBusy = true; authError = ''; render();
+  fbAuth.createUserWithEmailAndPassword(email, pw)
+    .catch(function(err){ authError = translateAuthError(err); })
+    .then(function(){ authBusy = false; render(); });
+}
+function authSignIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pw = document.getElementById('authPassword').value;
+  if(!email || !pw){ authError = t('authFillFields'); render(); return; }
+  authBusy = true; authError = ''; render();
+  fbAuth.signInWithEmailAndPassword(email, pw)
+    .catch(function(err){ authError = translateAuthError(err); })
+    .then(function(){ authBusy = false; render(); });
+}
+function authSignOut(){
+  fbAuth.signOut();
+}
+async function pushToCloud(){
+  if(!currentUser) return;
+  try{
+    await fbDb.collection('users').doc(currentUser.uid).set({ state: state, updatedAt: Date.now() });
+  }catch(e){ console.error('Erreur d’envoi vers Firebase', e); }
+}
+async function syncFromCloud(uid){
+  cloudSyncing = true; render();
+  try{
+    const doc = await fbDb.collection('users').doc(uid).get();
+    if(doc.exists && doc.data() && doc.data().state){
+      state = doc.data().state;
+      applyStateMigrations();
+      remainingSeconds = state.chrono.minutes*60;
+      checkDayRollover();
+    }else{
+      // Pas encore de copie cloud pour ce compte : on pousse l'état local actuel
+      // comme point de départ (ex. première connexion depuis cet appareil).
+      await pushToCloud();
+    }
+  }catch(e){ console.error('Erreur de synchronisation Firebase', e); }
+  cloudSyncing = false;
+  render();
+}
+fbAuth.onAuthStateChanged(function(user){
+  currentUser = user;
+  if(user) syncFromCloud(user.uid);
+  else render();
+});
 
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
@@ -1673,10 +1890,18 @@ function redeemReward(id){
   else { render(); }
 }
 
+function endOfDayUnlocked(){
+  // Une fois payée aujourd'hui, la fin de journée reste accessible librement
+  // (le bouton sert alors juste à revenir sur l'écran de fin de journée).
+  if(state.endOfDayPaidToday) return true;
+  const h = (state.endOfDayReward && state.endOfDayReward.unlockHour!=null) ? state.endOfDayReward.unlockHour : 19;
+  return new Date().getHours() >= h;
+}
 function redeemEndOfDay(){
   const rw = state.endOfDayReward;
   if(!rw) return;
   if(!state.endOfDayPaidToday){
+    if(!endOfDayUnlocked()) return;
     if(state.balance < rw.cost) return;
     state.balance -= rw.cost;
     state.history.unshift({ id: cryptoId(), type:'spend', label:t('endOfDay'), delta:rw.cost, balance:state.balance, ts:Date.now() });
@@ -1865,6 +2090,7 @@ const MENU_PARENT = {
   'settings-appearance':'settings',
   'settings-language':'settings',
   'settings-day':'settings',
+  'settings-account':'settings',
   'settings-backup':'settings',
   'settings-danger':'settings'
 };
@@ -1883,6 +2109,7 @@ function menuTitle(){
     case 'settings-appearance': return t('appearance');
     case 'settings-language': return t('language');
     case 'settings-day': return t('daySection');
+    case 'settings-account': return t('account');
     case 'settings-backup': return t('backup');
     case 'settings-danger': return t('dangerZone');
     default: return t('menu');
@@ -1951,20 +2178,31 @@ function resetAllData(){
 
 function renderAppMenu(){
   let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="${t('menu')}" onclick="toggleAppMenu()">☰</button>`;
-  html += `<div class="app-drawer ${appMenuOpen?'open':''}">`;
-  html += `<div class="app-drawer-header">`;
-  if(appMenuView!=='main'){
-    html += `<button class="drawer-back" onclick="goBackMenu()" title="Back">‹</button><span>${menuTitle()}</span>`;
+  if(!appMenuOpen) return html;
+  if(appMenuView==='main'){
+    html += renderMenuFab();
   }else{
-    html += `<span>${t('menu')}</span>`;
+    html += `<div class="app-drawer open">`;
+    html += `<div class="app-drawer-header">`;
+    html += `<button class="drawer-back" onclick="goBackMenu()" title="Back">‹</button><span>${menuTitle()}</span>`;
+    html += `<button class="drawer-close" onclick="closeAppMenu()" title="Close">×</button>`;
+    html += `</div>`;
+    html += `<div class="app-drawer-body">`;
+    html += renderMenuViewBody();
+    html += `</div></div>`;
   }
-  html += `<button class="drawer-close" onclick="closeAppMenu()" title="Close">×</button>`;
-  html += `</div>`;
-  html += `<div class="app-drawer-body">`;
-  html += renderMenuViewBody();
-  html += `</div></div>`;
-  if(appMenuOpen) html += `<div class="app-menu-backdrop" onclick="closeAppMenu()"></div>`;
+  html += `<div class="app-menu-backdrop"></div>`;
   return html;
+}
+
+function renderMenuFab(){
+  return `
+  <div class="menu-fab-stack">
+    <button class="menu-fab" title="${t('settings')}" onclick="openSettingsView()">${GEAR_ICON}</button>
+    <button class="menu-fab" title="${t('notepad')}" onclick="toggleNotesWindow()">${NOTEPAD_ICON}</button>
+    <button class="menu-fab disabled" title="${t('reminder')} — ${t('soon')}" disabled>${BELL_ICON}</button>
+    <button class="menu-fab-collapse" title="${t('menu')}" onclick="closeAppMenu()">›</button>
+  </div>`;
 }
 
 function renderMenuViewBody(){
@@ -1973,13 +2211,10 @@ function renderMenuViewBody(){
     case 'settings-appearance': return renderSettingsAppearance();
     case 'settings-language': return renderSettingsLanguage();
     case 'settings-day': return renderSettingsDay();
+    case 'settings-account': return renderSettingsAccount();
     case 'settings-backup': return renderSettingsBackup();
     case 'settings-danger': return renderSettingsDanger();
-    default: return `
-      <div class="app-menu-item soon-item"><span>${t('reminder')}</span><span class="soon">${t('soon')}</span></div>
-      <button class="app-menu-item clickable" onclick="toggleNotesWindow()"><span>${t('notepad')}</span><span class="chevron">›</span></button>
-      <button class="app-menu-item clickable" onclick="openSettingsView()"><span>${t('settings')}</span><span class="chevron">›</span></button>
-    `;
+    default: return '';
   }
 }
 
@@ -1988,6 +2223,7 @@ function renderSettingsHome(){
     { view:'settings-appearance', label:t('appearance'), icon:'🎨' },
     { view:'settings-language', label:t('language'), icon:'🌐' },
     { view:'settings-day', label:t('daySection'), icon:'🕔' },
+    { view:'settings-account', label:t('account'), icon:'👤' },
     { view:'settings-backup', label:t('backup'), icon:'💾' },
     { view:'settings-danger', label:t('dangerZone'), icon:'⚠️' }
   ];
@@ -1995,6 +2231,7 @@ function renderSettingsHome(){
     <button class="app-menu-item clickable settings-cat-item" onclick="openMenuView('${c.view}')">
       <span class="settings-cat-icon">${c.icon}</span>
       <span>${c.label}</span>
+      ${c.view==='settings-account' && currentUser ? '<span class="account-dot" title="'+t('authSyncedAs')+' '+esc(currentUser.email)+'"></span>' : ''}
       <span class="chevron">›</span>
     </button>
   `).join('');
@@ -2050,6 +2287,36 @@ function renderSettingsDay(){
         </div>
       </label>
       <p class="settings-hint">${t('dayStartHint')}</p>
+    </div>
+  `;
+}
+
+function renderSettingsAccount(){
+  if(currentUser){
+    return `
+      <div class="settings-block">
+        <p class="settings-hint">${t('authSyncedAs')} <strong>${esc(currentUser.email)}</strong></p>
+        ${cloudSyncing ? `<p class="settings-hint">${t('authSyncing')}</p>` : ''}
+        <button class="btn-settings-danger" onclick="authSignOut()">${t('authSignOutBtn')}</button>
+      </div>
+    `;
+  }
+  return `
+    <div class="settings-block">
+      <p class="settings-hint">${t('authLocalOnlyHint')}</p>
+      <label class="settings-label">
+        <span>${t('authEmailLabel')}</span>
+        <input type="email" id="authEmail" placeholder="mail@exemple.com" autocomplete="email">
+      </label>
+      <label class="settings-label">
+        <span>${t('authPasswordLabel')}</span>
+        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+      </label>
+      ${authError ? `<p class="auth-error">${esc(authError)}</p>` : ''}
+      <div class="settings-row-buttons">
+        <button class="btn-settings" ${authBusy?'disabled':''} onclick="authSignIn()">${t('authSignInBtn')}</button>
+        <button class="btn-settings" ${authBusy?'disabled':''} onclick="authSignUp()">${t('authSignUpBtn')}</button>
+      </div>
     </div>
   `;
 }
@@ -2346,7 +2613,10 @@ function submitModal(){
   if(modal.type==='edit-endofday'){
     const cost = parseInt(document.getElementById('modalEndDayCost').value,10);
     if(!(cost>0)) return;
+    let unlockHour = parseInt(document.getElementById('modalEndDayUnlockHour').value,10);
+    if(isNaN(unlockHour) || unlockHour<0 || unlockHour>23) unlockHour = state.endOfDayReward.unlockHour;
     state.endOfDayReward.cost = cost;
+    state.endOfDayReward.unlockHour = unlockHour;
     modal = null;
     save(); render();
     return;
@@ -2430,6 +2700,13 @@ function renderModal(){
         <label class="modal-field">
           <span>${t('fieldCost')}</span>
           <input type="number" min="1" id="modalEndDayCost" value="${state.endOfDayReward.cost}">
+        </label>
+        <label class="modal-field">
+          <span>${t('endOfDayUnlockLabel')}</span>
+          <div class="settings-hour-row">
+            <input type="number" min="0" max="23" id="modalEndDayUnlockHour" value="${state.endOfDayReward.unlockHour}">
+            <span>h 00</span>
+          </div>
         </label>
         <div class="modal-actions">
           <span></span>
@@ -2572,6 +2849,9 @@ function noteCardHtml(n, idx, total){
 const MINIMIZE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
 const RESTORE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
 const PIN_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 2a1 1 0 0 1 .78 1.63L15 6.1V12l2.9 3.87A1 1 0 0 1 17.1 17.5H13v4.5a1 1 0 0 1-2 0V17.5H6.9a1 1 0 0 1-.8-1.63L9 12V6.1L7.22 3.63A1 1 0 0 1 8 2h8Z"/></svg>';
+const GEAR_ICON = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
+const NOTEPAD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>';
+const BELL_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
 
 function renderNotesWindow(){
   if(!notesWindowOpen) return '';
@@ -2770,6 +3050,7 @@ function pinnedTasksHtml(){
 
 function render(){
   const app = document.getElementById('app');
+  app.classList.toggle('hide-edit-icons', !showEditIcons);
   const modalSnap = snapshotModalInputs();
 
   const tasksHtml = state.tasks.length ? tasksListHtml() : `<div class="empty">${t('noTasks')}</div>`;
@@ -2815,7 +3096,12 @@ function render(){
 
     <div class="columns">
       <div class="panel tasks">
-        <h2>${t('tasksTitle')} <span class="tag">${t('tasksTag')}</span></h2>
+        <h2><span>${t('tasksTitle')}</span>
+          <span class="h2-right">
+            <span class="tag">${t('tasksTag')}</span>
+            <button class="btn-edit-toggle ${showEditIcons?'active':''}" title="${t('toggleEditIcons')}" onclick="toggleEditIcons()">✎</button>
+          </span>
+        </h2>
         ${pinnedTasksHtml()}
         <div id="taskList" ondragover="onContainerDragOver(event,'task')" ondrop="onContainerDrop(event,'task')">
           ${tasksHtml}
@@ -2825,16 +3111,22 @@ function render(){
       </div>
 
       <div class="panel rewards">
-        <h2>${t('rewardsTitle')} <span class="tag">${t('rewardsTag')}</span></h2>
+        <h2><span>${t('rewardsTitle')}</span>
+          <span class="h2-right">
+            <span class="tag">${t('rewardsTag')}</span>
+            <button class="btn-edit-toggle ${showEditIcons?'active':''}" title="${t('toggleEditIcons')}" onclick="toggleEditIcons()">✎</button>
+          </span>
+        </h2>
         <div class="end-of-day-block">
           <div class="entry-row">
             <span class="entry-name">${t('endOfDay')}</span>
             <span class="entry-pts">${state.endOfDayPaidToday ? t('free') : '-'+state.endOfDayReward.cost}</span>
             <div class="entry-actions">
-              <button class="btn-redeem" ${(!state.endOfDayPaidToday && state.balance<state.endOfDayReward.cost)?'disabled':''} onclick="redeemEndOfDay()">${t('redeem')}</button>
+              <button class="btn-redeem" ${(!state.endOfDayPaidToday && (state.balance<state.endOfDayReward.cost || !endOfDayUnlocked()))?'disabled':''} onclick="redeemEndOfDay()">${t('redeem')}</button>
               <button class="btn-edit" title="${t('edit')}" onclick="openEditEndOfDayModal()">✎</button>
             </div>
           </div>
+          ${(!state.endOfDayPaidToday && !endOfDayUnlocked()) ? `<div class="end-of-day-hint">${t('endOfDayLockedUntil')} ${String(state.endOfDayReward.unlockHour).padStart(2,'0')}h00</div>` : ''}
         </div>
         <div id="rewardList" ondragover="onContainerDragOver(event,'reward')" ondrop="onContainerDrop(event,'reward')">
           ${rewardsHtml}
