@@ -863,6 +863,13 @@
     padding:9px 4px; border:1px solid var(--rust); border-radius:calc(12px * var(--radius-scale)); cursor:pointer; width:100%;
   }
   .btn-settings-danger:hover{ background:rgba(242,115,79,0.08); }
+  .btn-settings-neutral{
+    background:transparent; color:#8a8a8a; font-size:12px; font-weight:600;
+    padding:9px 4px; border:1px solid rgba(138,138,138,0.45); border-radius:calc(12px * var(--radius-scale));
+    cursor:pointer; width:100%;
+  }
+  .btn-settings-neutral:hover{ background:rgba(138,138,138,0.08); }
+  .settings-stack{ display:flex; flex-direction:column; gap:8px; }
   .btn-settings-google{
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%; box-sizing:border-box;
@@ -1273,6 +1280,10 @@ const I18N = {
     authLocalOnlyHint:'Sans compte, tes données restent uniquement sur cet appareil. Connecte-toi pour les synchroniser entre tes appareils.',
     authGoogleBtn:'Continuer avec Google', authOr:'ou',
     authErrAccountExists:'Un compte existe déjà avec cet email via une autre méthode de connexion.',
+    resetBalance:'Réinitialiser le solde', resetBalanceConfirm:'Remettre le solde à 0 ? Cette action ne peut pas être annulée.',
+    deleteAccountBtn:'Supprimer le compte',
+    deleteAccountConfirm:'Supprimer définitivement ton compte et toutes tes données cloud ? Cette action ne peut pas être annulée.',
+    deleteAccountReauthNeeded:'Pour des raisons de sécurité, reconnecte-toi (déconnexion puis connexion) avant de supprimer ton compte.',
     tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
     rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
     done:'Fait', redeem:'Échanger', edit:'Modifier',
@@ -1351,6 +1362,10 @@ const I18N = {
     authLocalOnlyHint:'Without an account, your data stays only on this device. Sign in to sync it across your devices.',
     authGoogleBtn:'Continue with Google', authOr:'or',
     authErrAccountExists:'An account already exists with this email using a different sign-in method.',
+    resetBalance:'Reset balance', resetBalanceConfirm:'Reset the balance to 0? This cannot be undone.',
+    deleteAccountBtn:'Delete account',
+    deleteAccountConfirm:'Permanently delete your account and all your cloud data? This cannot be undone.',
+    deleteAccountReauthNeeded:'For security reasons, please sign out and sign back in before deleting your account.',
     tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
     rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
     done:'Done', redeem:'Redeem', edit:'Edit',
@@ -1429,6 +1444,10 @@ const I18N = {
     authLocalOnlyHint:'Sin cuenta, tus datos quedan solo en este dispositivo. Inicia sesión para sincronizarlos entre tus dispositivos.',
     authGoogleBtn:'Continuar con Google', authOr:'o',
     authErrAccountExists:'Ya existe una cuenta con este email usando otro método de inicio de sesión.',
+    resetBalance:'Restablecer el saldo', resetBalanceConfirm:'¿Restablecer el saldo a 0? Esta acción no se puede deshacer.',
+    deleteAccountBtn:'Eliminar cuenta',
+    deleteAccountConfirm:'¿Eliminar definitivamente tu cuenta y todos tus datos en la nube? Esta acción no se puede deshacer.',
+    deleteAccountReauthNeeded:'Por seguridad, cierra sesión y vuelve a iniciarla antes de eliminar tu cuenta.',
     tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
     rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
     done:'Hecho', redeem:'Canjear', edit:'Editar',
@@ -1620,7 +1639,10 @@ function translateAuthError(err){
     'auth/too-many-requests': t('authErrTooMany'),
     'auth/account-exists-with-different-credential': t('authErrAccountExists')
   };
-  return (code && map[code]) || t('authErrGeneric');
+  if(code && map[code]) return map[code];
+  // Erreur non reconnue : on affiche le code brut de Firebase pour pouvoir
+  // diagnostiquer facilement (visible aussi dans la console via console.error).
+  return t('authErrGeneric') + (code ? ' ('+code+')' : '');
 }
 function authSignUp(){
   const email = document.getElementById('authEmail').value.trim();
@@ -1628,7 +1650,7 @@ function authSignUp(){
   if(!email || !pw){ authError = t('authFillFields'); render(); return; }
   authBusy = true; authError = ''; render();
   fbAuth.createUserWithEmailAndPassword(email, pw)
-    .catch(function(err){ authError = translateAuthError(err); })
+    .catch(function(err){ console.error('Erreur inscription email', err); authError = translateAuthError(err); })
     .then(function(){ authBusy = false; render(); });
 }
 function authSignIn(){
@@ -1637,13 +1659,24 @@ function authSignIn(){
   if(!email || !pw){ authError = t('authFillFields'); render(); return; }
   authBusy = true; authError = ''; render();
   fbAuth.signInWithEmailAndPassword(email, pw)
-    .catch(function(err){ authError = translateAuthError(err); })
+    .catch(function(err){ console.error('Erreur connexion email', err); authError = translateAuthError(err); })
     .then(function(){ authBusy = false; render(); });
 }
 function authSignInGoogle(){
   authBusy = true; authError = ''; render();
   fbAuth.signInWithPopup(googleProvider)
-    .catch(function(err){ authError = translateAuthError(err); })
+    .catch(function(err){
+      const code = err && err.code;
+      // Certains environnements refusent les popups (bloqueur, navigateur mobile,
+      // page ouverte en file://...) : on retente alors avec une redirection classique
+      // plutôt que d'abandonner directement.
+      if(code==='auth/popup-blocked' || code==='auth/operation-not-supported-in-this-environment'){
+        console.error('Popup Google indisponible, tentative en redirection', err);
+        return fbAuth.signInWithRedirect(googleProvider);
+      }
+      if(code!=='auth/popup-closed-by-user') console.error('Erreur connexion Google', err);
+      authError = translateAuthError(err);
+    })
     .then(function(){ authBusy = false; render(); });
 }
 function authSignOut(){
@@ -1673,10 +1706,33 @@ async function syncFromCloud(uid){
   cloudSyncing = false;
   render();
 }
+function deleteAccount(){
+  if(!currentUser) return;
+  if(!confirm(t('deleteAccountConfirm'))) return;
+  const uid = currentUser.uid;
+  fbDb.collection('users').doc(uid).delete()
+    .catch(function(e){ console.error('Erreur suppression des données cloud', e); })
+    .then(function(){ return currentUser.delete(); })
+    .then(function(){ state = defaultState(); save(); render(); })
+    .catch(function(err){
+      console.error('Erreur suppression du compte', err);
+      if(err && err.code==='auth/requires-recent-login'){
+        alert(t('deleteAccountReauthNeeded'));
+      }else{
+        alert(translateAuthError(err) || t('authErrGeneric'));
+      }
+    });
+}
 fbAuth.onAuthStateChanged(function(user){
   currentUser = user;
   if(user) syncFromCloud(user.uid);
   else render();
+});
+fbAuth.getRedirectResult().catch(function(err){
+  if(!err || !err.code) return;
+  console.error('Erreur redirection Google', err);
+  authError = translateAuthError(err);
+  render();
 });
 
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
@@ -2200,6 +2256,12 @@ function resetAllData(){
   save(); render();
 }
 
+function resetBalance(){
+  if(!confirm(t('resetBalanceConfirm'))) return;
+  state.balance = 0;
+  save(); render();
+}
+
 function renderAppMenu(){
   let html = appMenuOpen ? '' : `<button class="app-menu-btn" title="${t('menu')}" onclick="toggleAppMenu()">☰</button>`;
   if(!appMenuOpen) return html;
@@ -2365,7 +2427,11 @@ function renderSettingsDangerSection(){
   return `
     <div class="settings-block settings-subsection">
       <div class="settings-subsection-title">${t('dangerZone')}</div>
-      <button class="btn-settings-danger" onclick="resetAllData()">${t('resetAllData')}</button>
+      <div class="settings-stack">
+        <button class="btn-settings-neutral" onclick="resetBalance()">${t('resetBalance')}</button>
+        <button class="btn-settings-danger" onclick="resetAllData()">${t('resetAllData')}</button>
+        ${currentUser ? `<button class="btn-settings-danger" onclick="deleteAccount()">${t('deleteAccountBtn')}</button>` : ''}
+      </div>
     </div>
   `;
 }
