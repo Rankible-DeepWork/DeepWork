@@ -780,14 +780,6 @@
   }
   .menu-fab-collapse:hover{ opacity:1; background:var(--hover-menu-item); }
   @keyframes menuFabIn{ from{ opacity:0; transform:translateY(-8px) scale(0.75); } to{ opacity:1; transform:translateY(0) scale(1); } }
-  .app-menu-backdrop{
-    position:fixed; inset:0; z-index:55;
-    background:rgba(11,46,58,0.14);
-    animation:menuBackdropIn 0.25s ease;
-    /* Purement visuel : on laisse les clics traverser jusqu'au contenu en dessous,
-       pour que l'ouverture du menu n'empêche plus d'interagir avec le reste de la page. */
-    pointer-events:none;
-  }
   .app-drawer{
     position:fixed;
     top:0; left:0; bottom:0;
@@ -836,6 +828,10 @@
   .app-menu-item.clickable:hover{ background:var(--hover-menu-item); }
   .app-menu-item .chevron{ margin-left:auto; opacity:0.45; }
   .settings-block{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
+  .settings-subsection-title{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;
+    opacity:0.5; margin-bottom:10px;
+  }
   .settings-block:last-child{ border-bottom:none; }
   .settings-label{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; opacity:0.75; margin-bottom:2px; }
   .settings-hour-row{ display:flex; align-items:center; gap:6px; font-weight:400; text-transform:none; letter-spacing:normal; opacity:1; font-size:13px; }
@@ -867,6 +863,24 @@
     padding:9px 4px; border:1px solid var(--rust); border-radius:calc(12px * var(--radius-scale)); cursor:pointer; width:100%;
   }
   .btn-settings-danger:hover{ background:rgba(242,115,79,0.08); }
+  .btn-settings-google{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; box-sizing:border-box;
+    background:var(--paper); color:var(--ink);
+    font-size:12.5px; font-weight:600;
+    padding:9px 12px; border:1px solid var(--line); border-radius:calc(12px * var(--radius-scale));
+    cursor:pointer;
+  }
+  .btn-settings-google:hover{ background:var(--paper-deep); }
+  .btn-settings-google:disabled{ opacity:0.5; cursor:not-allowed; }
+  .auth-divider{
+    display:flex; align-items:center; gap:10px;
+    margin:12px 0; font-size:10px; text-transform:uppercase; letter-spacing:0.5px;
+    opacity:0.45;
+  }
+  .auth-divider::before, .auth-divider::after{
+    content:''; flex:1; height:1px; background:var(--line);
+  }
 
   .theme-swatch-list{ display:flex; flex-direction:column; gap:8px; }
   .theme-swatch{
@@ -897,7 +911,6 @@
   .theme-swatch-check{ color:var(--gold); font-weight:700; font-size:14px; }
 
   /* Animations du menu */
-  @keyframes menuBackdropIn{ from{ opacity:0; } to{ opacity:1; } }
 
   @keyframes menuItemIn{
     from{ opacity:0; transform:translateX(-12px); }
@@ -1166,6 +1179,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const fbAuth = firebase.auth();
 const fbDb = firebase.firestore();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 let currentUser = null;      // objet Firebase User, ou null si pas connecté
 let authError = '';          // message d'erreur affiché dans le formulaire de connexion
 let authBusy = false;        // désactive les boutons pendant une requête en cours
@@ -1257,6 +1271,8 @@ const I18N = {
     authSyncing:'Synchronisation…',
     authSyncedAs:'Connecté en tant que',
     authLocalOnlyHint:'Sans compte, tes données restent uniquement sur cet appareil. Connecte-toi pour les synchroniser entre tes appareils.',
+    authGoogleBtn:'Continuer avec Google', authOr:'ou',
+    authErrAccountExists:'Un compte existe déjà avec cet email via une autre méthode de connexion.',
     tasksTitle:'Tâches', tasksTag:'gagner', addTask:'+ Ajouter une tâche',
     rewardsTitle:'Récompenses', rewardsTag:'dépenser', addReward:'+ Ajouter une récompense',
     done:'Fait', redeem:'Échanger', edit:'Modifier',
@@ -1333,6 +1349,8 @@ const I18N = {
     authSyncing:'Syncing…',
     authSyncedAs:'Signed in as',
     authLocalOnlyHint:'Without an account, your data stays only on this device. Sign in to sync it across your devices.',
+    authGoogleBtn:'Continue with Google', authOr:'or',
+    authErrAccountExists:'An account already exists with this email using a different sign-in method.',
     tasksTitle:'Tasks', tasksTag:'earn', addTask:'+ Add a task',
     rewardsTitle:'Rewards', rewardsTag:'spend', addReward:'+ Add a reward',
     done:'Done', redeem:'Redeem', edit:'Edit',
@@ -1409,6 +1427,8 @@ const I18N = {
     authSyncing:'Sincronizando…',
     authSyncedAs:'Conectado como',
     authLocalOnlyHint:'Sin cuenta, tus datos quedan solo en este dispositivo. Inicia sesión para sincronizarlos entre tus dispositivos.',
+    authGoogleBtn:'Continuar con Google', authOr:'o',
+    authErrAccountExists:'Ya existe una cuenta con este email usando otro método de inicio de sesión.',
     tasksTitle:'Tareas', tasksTag:'ganar', addTask:'+ Añadir tarea',
     rewardsTitle:'Recompensas', rewardsTag:'gastar', addReward:'+ Añadir recompensa',
     done:'Hecho', redeem:'Canjear', edit:'Editar',
@@ -1589,6 +1609,7 @@ async function save(){
 /* ---------- Comptes (Firebase Auth) + synchronisation (Firestore) ---------- */
 function translateAuthError(err){
   const code = err && err.code;
+  if(code==='auth/popup-closed-by-user' || code==='auth/cancelled-popup-request') return '';
   const map = {
     'auth/email-already-in-use': t('authErrEmailInUse'),
     'auth/invalid-email': t('authErrInvalidEmail'),
@@ -1596,7 +1617,8 @@ function translateAuthError(err){
     'auth/user-not-found': t('authErrWrongCreds'),
     'auth/wrong-password': t('authErrWrongCreds'),
     'auth/invalid-credential': t('authErrWrongCreds'),
-    'auth/too-many-requests': t('authErrTooMany')
+    'auth/too-many-requests': t('authErrTooMany'),
+    'auth/account-exists-with-different-credential': t('authErrAccountExists')
   };
   return (code && map[code]) || t('authErrGeneric');
 }
@@ -1615,6 +1637,12 @@ function authSignIn(){
   if(!email || !pw){ authError = t('authFillFields'); render(); return; }
   authBusy = true; authError = ''; render();
   fbAuth.signInWithEmailAndPassword(email, pw)
+    .catch(function(err){ authError = translateAuthError(err); })
+    .then(function(){ authBusy = false; render(); });
+}
+function authSignInGoogle(){
+  authBusy = true; authError = ''; render();
+  fbAuth.signInWithPopup(googleProvider)
     .catch(function(err){ authError = translateAuthError(err); })
     .then(function(){ authBusy = false; render(); });
 }
@@ -2090,9 +2118,7 @@ const MENU_PARENT = {
   'settings-appearance':'settings',
   'settings-language':'settings',
   'settings-day':'settings',
-  'settings-account':'settings',
-  'settings-backup':'settings',
-  'settings-danger':'settings'
+  'settings-account':'settings'
 };
 function openSettingsView(){ openMenuView('settings'); }
 function openMenuView(view){
@@ -2110,8 +2136,6 @@ function menuTitle(){
     case 'settings-language': return t('language');
     case 'settings-day': return t('daySection');
     case 'settings-account': return t('account');
-    case 'settings-backup': return t('backup');
-    case 'settings-danger': return t('dangerZone');
     default: return t('menu');
   }
 }
@@ -2191,7 +2215,6 @@ function renderAppMenu(){
     html += renderMenuViewBody();
     html += `</div></div>`;
   }
-  html += `<div class="app-menu-backdrop"></div>`;
   return html;
 }
 
@@ -2212,20 +2235,16 @@ function renderMenuViewBody(){
     case 'settings-language': return renderSettingsLanguage();
     case 'settings-day': return renderSettingsDay();
     case 'settings-account': return renderSettingsAccount();
-    case 'settings-backup': return renderSettingsBackup();
-    case 'settings-danger': return renderSettingsDanger();
     default: return '';
   }
 }
 
 function renderSettingsHome(){
   const cats = [
+    { view:'settings-account', label:t('account'), icon:'👤' },
     { view:'settings-appearance', label:t('appearance'), icon:'🎨' },
     { view:'settings-language', label:t('language'), icon:'🌐' },
-    { view:'settings-day', label:t('daySection'), icon:'🕔' },
-    { view:'settings-account', label:t('account'), icon:'👤' },
-    { view:'settings-backup', label:t('backup'), icon:'💾' },
-    { view:'settings-danger', label:t('dangerZone'), icon:'⚠️' }
+    { view:'settings-day', label:t('daySection'), icon:'🕔' }
   ];
   return cats.map(c=>`
     <button class="app-menu-item clickable settings-cat-item" onclick="openMenuView('${c.view}')">
@@ -2299,11 +2318,15 @@ function renderSettingsAccount(){
         ${cloudSyncing ? `<p class="settings-hint">${t('authSyncing')}</p>` : ''}
         <button class="btn-settings-danger" onclick="authSignOut()">${t('authSignOutBtn')}</button>
       </div>
+      ${renderSettingsBackupSection()}
+      ${renderSettingsDangerSection()}
     `;
   }
   return `
     <div class="settings-block">
       <p class="settings-hint">${t('authLocalOnlyHint')}</p>
+      <button class="btn-settings-google" ${authBusy?'disabled':''} onclick="authSignInGoogle()">${GOOGLE_ICON}<span>${t('authGoogleBtn')}</span></button>
+      <div class="auth-divider"><span>${t('authOr')}</span></div>
       <label class="settings-label">
         <span>${t('authEmailLabel')}</span>
         <input type="email" id="authEmail" placeholder="mail@exemple.com" autocomplete="email">
@@ -2318,12 +2341,15 @@ function renderSettingsAccount(){
         <button class="btn-settings" ${authBusy?'disabled':''} onclick="authSignUp()">${t('authSignUpBtn')}</button>
       </div>
     </div>
+    ${renderSettingsBackupSection()}
+    ${renderSettingsDangerSection()}
   `;
 }
 
-function renderSettingsBackup(){
+function renderSettingsBackupSection(){
   return `
-    <div class="settings-block">
+    <div class="settings-block settings-subsection">
+      <div class="settings-subsection-title">${t('backup')}</div>
       <div class="settings-row-buttons">
         <button class="btn-settings" onclick="exportData()">${t('export')}</button>
         <label class="btn-settings" style="cursor:pointer;">
@@ -2335,9 +2361,10 @@ function renderSettingsBackup(){
   `;
 }
 
-function renderSettingsDanger(){
+function renderSettingsDangerSection(){
   return `
-    <div class="settings-block">
+    <div class="settings-block settings-subsection">
+      <div class="settings-subsection-title">${t('dangerZone')}</div>
       <button class="btn-settings-danger" onclick="resetAllData()">${t('resetAllData')}</button>
     </div>
   `;
@@ -2852,6 +2879,7 @@ const PIN_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentC
 const GEAR_ICON = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
 const NOTEPAD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>';
 const BELL_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
+const GOOGLE_ICON = '<svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.02l7.73 6c4.51-4.18 7.09-10.36 7.09-17.49z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24 24 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.9l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
 
 function renderNotesWindow(){
   if(!notesWindowOpen) return '';
